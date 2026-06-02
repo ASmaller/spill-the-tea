@@ -3,16 +3,16 @@
 # This compose file runs the database for development.
 # Copy .env.example and fill out your Gamma Client credentials to get started.
 
-name: dont-spill-the-tea
+name: spill-the-tea
 
 services:
   db:
     image: postgres:18
-    container_name: dont-spill-the-tea-dev-db
+    container_name: spill-the-tea-dev-db
     restart: unless-stopped
     user: postgres
     environment:
-      - POSTGRES_DB=dont-spill-the-tea
+      - POSTGRES_DB=spill-the-tea
       - POSTGRES_PASSWORD=secret-dev-password
 
     ports:
@@ -23,10 +23,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  green-bite:
-    image: arienshibani/green-bite:latest
-    platform: linux/amd64
-    restart: unless-stopped
-
-    ports:
-      - "3806:80" # Bind to a non-standard port to avoid collisions
