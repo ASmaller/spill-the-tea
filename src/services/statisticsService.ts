@@ -1,15 +1,11 @@
 "use server";
 
-import type {
-  Tea,
-  Review,
-  Prisma,
-} from "@/generated/prisma/client";
+import type { Prisma, Review, Tea } from "@/generated/prisma/client";
 import { LINE_COLOR, MEAL_LINES } from "@/lib/admin/colors";
 import {
   type Kpi,
-  type TeaStat,
   type TagBarItem,
+  type TeaStat,
   type TrendFootnote,
   type TrendSeries,
 } from "@/lib/admin/types";
@@ -53,7 +49,7 @@ type ReviewSnapshot = Pick<
   "id" | "rating" | "comment" | "tags" | "posted"
 >;
 
-type TeaWithReviews = Prisma.TeaGetPayload<{ include: { reviews: true } }>
+type TeaWithReviews = Prisma.TeaGetPayload<{ include: { reviews: true } }>;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -79,7 +75,7 @@ const NEGATIVE_TAGS = new Set([
   "weak",
 ]);
 
-export type Rating = 1 | 2 | 3 | 4 | 5
+export type Rating = 1 | 2 | 3 | 4 | 5;
 
 function isValidRating(rating: number): rating is Rating {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5;
@@ -249,7 +245,7 @@ function getTagBars(reviews: ReviewSnapshot[]): TagBarItem[] {
 }
 
 function getComments(
-  tea: Pick<TeaWithReviews, "id" | "name" | "reviews">,
+  tea: Pick<TeaWithReviews, "id" | "name" | "reviews">
 ): Comment[] {
   return tea.reviews
     .filter(review => review.comment?.trim())

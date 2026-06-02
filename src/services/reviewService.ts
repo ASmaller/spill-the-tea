@@ -1,7 +1,12 @@
 "use server";
 
 import { Review } from "@/generated/prisma/client";
-import { ReviewCreateInput, ReviewWhereInput, ReviewWhereUniqueInput, UserWhereUniqueInput } from "@/generated/prisma/models";
+import {
+  ReviewCreateInput,
+  ReviewWhereInput,
+  ReviewWhereUniqueInput,
+  UserWhereUniqueInput,
+} from "@/generated/prisma/models";
 import { readClientId } from "@/lib/clientId";
 import { prisma } from "@/lib/prisma";
 import { ReviewValidationError } from "@/services/reviewErrors";
@@ -11,7 +16,7 @@ export async function addReview({
   comment,
   tags = [],
   tea,
-  user
+  user,
 }: ReviewCreateInput) {
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     throw new ReviewValidationError("rating must be an integer from 1 to 5");
@@ -63,11 +68,13 @@ export async function getReview(id: string) {
 
 export async function getAllReviewsOnTea(id: string): Promise<Review[] | null> {
   let results = null;
-  await prisma.tea.findUnique({
-    where: { id },
-    select: { reviews: true }
-  }).then((res) => {
-    results = res?.reviews
-  });
-  return results
+  await prisma.tea
+    .findUnique({
+      where: { id },
+      select: { reviews: true },
+    })
+    .then(res => {
+      results = res?.reviews;
+    });
+  return results;
 }

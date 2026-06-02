@@ -2,110 +2,77 @@
 
 import { SelectFilter } from "@/components/admin/SelectFilter";
 import { Card } from "@/components/ui/Card";
-import { MEAL_LINES } from "@/lib/admin/colors";
-import { NEW_TAG } from "@/lib/admin/types";
-import type { TeaStat } from "@/lib/admin/types";
+import { TAG_OPTIONS, TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
-import type { MealLine } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
 
 type Props = { teas: TeaStat[]; ratedIds?: Set<string>; urlPrefix: string };
 
-type LineKey = "all" | MealLine;
-type DietKey = "all" | "vegetarian" | "vegan" | "fish" | "meat";
-type StatusKey = "all" | "served" | typeof NEW_TAG;
-type SortKey = "rating" | "rating-asc" | "votes" | "name" | "co2";
+type SortKey = "rating" | "rating-asc" | "votes" | "name";
 type ViewKey = "grid" | "table";
 
-const LINE_KEYS: readonly LineKey[] = ["all", ...MEAL_LINES];
-const LINE_LABELS = {
-  all: "All",
-  Nordic: "Nordic",
-  Vegetarian: "Vegetarian",
-  "Street food": "Street food",
-} satisfies Record<LineKey, string>;
+const TAG_KEYS = ["all", ...TAG_OPTIONS] as const;
+type TagKey = (typeof TAG_KEYS)[number];
 
-const DIET_KEYS: readonly DietKey[] = [
-  "all",
-  "vegetarian",
-  "vegan",
-  "fish",
-  "meat",
-];
-const DIET_LABELS = {
-  all: "Any",
-  vegetarian: "Vegetarian",
-  vegan: "Vegan",
-  fish: "Contains fish",
-  meat: "Contains meat",
-} satisfies Record<DietKey, string>;
-
-const STATUS_KEYS: readonly StatusKey[] = ["all", "served", NEW_TAG];
-const STATUS_LABELS = {
+const TAG_LABELS: Record<TagKey, string> = {
   all: "All",
-  served: "Served",
-  [NEW_TAG]: "New",
-} satisfies Record<StatusKey, string>;
+  eco: "Eco",
+  exotic: "Exotic",
+};
+
+const STATUS_KEYS = ["all", "untried", "tried"] as const;
+type StatusKey = (typeof STATUS_KEYS)[number];
+
+const STATUS_LABELS: Record<StatusKey, string> = {
+  all: "All",
+  untried: "Untried",
+  tried: "Tried",
+};
 
 const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   rating: (a, b) => (b.rating ?? -1) - (a.rating ?? -1),
   "rating-asc": (a, b) => (a.rating ?? Infinity) - (b.rating ?? Infinity),
   votes: (a, b) => b.votes - a.votes,
   name: (a, b) => a.name.localeCompare(b.name),
-  co2: (a, b) => (a.co2 ?? Infinity) - (b.co2 ?? Infinity),
 };
 
 export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
   const [view, setView] = useState<ViewKey>("grid");
-  const [line, setLine] = useState<LineKey>("all");
-  const [diet, setDiet] = useState<DietKey>("all");
+  const [tag, setTag] = useState<TagKey>("all");
   const [status, setStatus] = useState<StatusKey>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("rating");
 
   const filtered = useMemo(() => {
-    const lower = query.trim().toLowerCase();
+    const lowerQuery = query.trim().toLowerCase();
     return teas
       .filter(tea => {
-        if (line !== "all" && tea.line !== line) return false;
-        if (diet !== "all" && !tea.tags.includes(diet)) return false;
-        if (status === NEW_TAG && !tea.tags.includes(NEW_TAG)) return false;
-        if (status === "served" && tea.tags.includes(NEW_TAG)) return false;
-        if (lower) {
+        if (tag !== "all" && !tea.tags.includes(tag)) return false;
+        if (status === "untried" && ratedIds != null && ratedIds.has(tea.id))
+          return false;
+        if (status === "tried" && ratedIds != null && !ratedIds.has(tea.id))
+          return false;
+        if (lowerQuery !== "") {
           const matches =
-            tea.name.toLowerCase().includes(lower) ||
-            tea.tags.some(t => t.toLowerCase().includes(lower));
+            tea.name.toLowerCase().includes(lowerQuery) ||
+            tea.tags.some(t => t.toLowerCase().includes(lowerQuery));
           if (!matches) return false;
         }
         return true;
       })
       .sort(SORT_COMPARE[sort]);
-  }, [teas, line, diet, status, query, sort]);
+  }, [teas, tag, status, query, sort]);
 
-  const lineCounts = useMemo(() => {
-    const counts: Record<MealLine, number> = {
-      Nordic: 0,
-      Vegetarian: 0,
-      "Street food": 0,
-    };
-    teas.forEach(tea => {
-      counts[tea.line] += 1;
-    });
-    return counts;
-  }, [teas]);
-
-  const dietCounts = useMemo(() => {
-    const counts: Record<DietKey, number> = {
+  const tagCounts = useMemo(() => {
+    const counts: Record<TagKey, number> = {
       all: teas.length,
-      vegetarian: 0,
-      vegan: 0,
-      fish: 0,
-      meat: 0,
+      eco: 0,
+      exotic: 0,
     };
     teas.forEach(tea => {
-      DIET_KEYS.forEach(key => {
+      TAG_KEYS.forEach(key => {
         if (key !== "all" && tea.tags.includes(key)) counts[key] += 1;
       });
     });
@@ -113,11 +80,13 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
   }, [teas]);
 
   const statusCounts = useMemo(() => {
-    const newCount = teas.filter(tea => tea.tags.includes(NEW_TAG)).length;
+    const triedCount = teas.filter(
+      tea => ratedIds != null && ratedIds.has(tea.id)
+    ).length;
     return {
       all: teas.length,
-      served: teas.length - newCount,
-      [NEW_TAG]: newCount,
+      untried: teas.length - triedCount,
+      tried: triedCount,
     } satisfies Record<StatusKey, number>;
   }, [teas]);
 
@@ -154,7 +123,6 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
             <option value="rating-asc">Lowest rated</option>
             <option value="votes">Most votes</option>
             <option value="name">Name (A→Z)</option>
-            <option value="co2">Lowest CO₂e</option>
           </SelectFilter>
 
           <div
@@ -168,8 +136,9 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
                   key={v}
                   type="button"
                   onClick={() => setView(v)}
-                  className={`text-meta font-medium ${active ? "bg-ink text-paper" : "bg-paper text-ink"
-                    } ${FOCUS_RING.paper}`}
+                  className={`text-meta font-medium ${
+                    active ? "bg-ink text-paper" : "bg-paper text-ink"
+                  } ${FOCUS_RING.paper}`}
                   style={{ padding: "7px 12px", cursor: "pointer" }}
                   aria-pressed={active}
                 >
@@ -180,28 +149,15 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
           </div>
         </div>
 
-        <FilterRow label="Line">
-          {LINE_KEYS.map(key => (
+        <FilterRow label="Tag">
+          {TAG_KEYS.map(key => (
             <Chip
               key={key}
-              active={line === key}
-              onClick={() => setLine(key)}
-              count={key === "all" ? teas.length : lineCounts[key]}
+              active={tag === key}
+              onClick={() => setTag(key)}
+              count={tagCounts[key]}
             >
-              {LINE_LABELS[key]}
-            </Chip>
-          ))}
-        </FilterRow>
-
-        <FilterRow label="Diet">
-          {DIET_KEYS.map(key => (
-            <Chip
-              key={key}
-              active={diet === key}
-              onClick={() => setDiet(key)}
-              count={dietCounts[key]}
-            >
-              {DIET_LABELS[key]}
+              {TAG_LABELS[key]}
             </Chip>
           ))}
         </FilterRow>
@@ -242,7 +198,7 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
           </div>
           <div className="text-ink-muted text-meta" style={{ marginTop: 6 }}>
             {teas.length === 0
-              ? "Teas will appear here after being added to the database."
+              ? "Teas will appear here after being added."
               : "Try clearing the filters or widening your search."}
           </div>
         </Card>
@@ -259,7 +215,7 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
           ))}
         </div>
       ) : (
-        <TeaTable teas={filtered} />
+        <TeaTable teas={filtered} urlPrefix={urlPrefix} />
       )}
     </>
   );
@@ -305,10 +261,11 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`text-meta flex items-center font-medium ${active
+      className={`text-meta flex items-center font-medium ${
+        active
           ? "bg-ink text-paper"
           : "bg-paper text-ink border-ink/[0.10] border"
-        } ${FOCUS_RING.paper}`}
+      } ${FOCUS_RING.paper}`}
       style={{
         padding: "4px 10px",
         borderRadius: 999,
@@ -320,8 +277,9 @@ function Chip({
       {children}
       {count != null && (
         <span
-          className={`text-tiny tabular-nums ${active ? "text-paper/70" : "text-ink-soft"
-            }`}
+          className={`text-tiny tabular-nums ${
+            active ? "text-paper/70" : "text-ink-soft"
+          }`}
         >
           {count}
         </span>

@@ -24,8 +24,8 @@ import {
   type ClimateFormState,
   type IngredientRow,
   type IngredientUnit,
-  type TeaStat,
   type PhotoRef,
+  type TeaStat,
 } from "@/lib/admin/types";
 import { getFeedDateKey } from "@/lib/dateFormat";
 import type { DietTag } from "@/lib/types";
@@ -54,21 +54,21 @@ function seedForm(tea: TeaStat): Initial {
   const ingredients: IngredientRow[] =
     tea.ingredients.length > 0
       ? tea.ingredients.map(ingredient => ({
-        id: ingredient.id,
-        name: ingredient.name,
-        amount: ingredient.amount,
-        unit: ingredient.unit,
-      }))
+          id: ingredient.id,
+          name: ingredient.name,
+          amount: ingredient.amount,
+          unit: ingredient.unit,
+        }))
       : [newIngredientRow()];
   // Form only manages diet tags
   const tags = tea.tags.filter((t): t is DietTag => DIET_TAG_SET.has(t));
   const climate: ClimateFormState =
     tea.co2 != null && tea.co2 > 0
       ? {
-        state: "done",
-        kg: tea.co2,
-        calculatedFromCount: tea.ingredients.length,
-      }
+          state: "done",
+          kg: tea.co2,
+          calculatedFromCount: tea.ingredients.length,
+        }
       : { state: "idle", kg: null, calculatedFromCount: 0 };
   return {
     name: tea.name,
@@ -114,7 +114,7 @@ export default function EditMealPage({
           reviews.length === 0
             ? null
             : reviews.map(review => review.rating).reduce((acc, x) => x + acc) /
-            votes;
+              votes;
         const countReviews = (rating: number) =>
           reviews.filter(review => review.rating == rating).length;
         const distribution: [number, number, number, number, number] = [

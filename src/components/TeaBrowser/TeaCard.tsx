@@ -2,8 +2,7 @@ import { DistSpark } from "@/components/admin/charts/DistSpark";
 import { MealThumb } from "@/components/admin/MealThumb";
 import { Pill } from "@/components/admin/Pill";
 import { CupRating } from "@/components/brand/CupRating";
-import { climateTone, ratingColor } from "@/lib/admin/colors";
-import { NEW_TAG } from "@/lib/admin/types";
+import { ratingColor } from "@/lib/admin/colors";
 import type { TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import Link from "next/link";
@@ -11,12 +10,9 @@ import Link from "next/link";
 type Props = { tea: TeaStat; urlPrefix: string };
 
 export function TeaCard({ tea, urlPrefix }: Props) {
-  const tone = climateTone(tea.climate);
-  const visibleTags = tea.tags.filter(t => t !== NEW_TAG).slice(0, 3);
-
   return (
     <Link
-      href={`${urlPrefix}${tea.id}`}
+      href={urlPrefix + tea.id}
       className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       style={{ borderRadius: 12 }}
     >
@@ -36,15 +32,9 @@ export function TeaCard({ tea, urlPrefix }: Props) {
           >
             {tea.name}
           </div>
-          <div
-            className="text-ink-soft text-caption uppercase"
-            style={{ marginTop: 3 }}
-          >
-            {tea.line}
-          </div>
-          {visibleTags.length > 0 && (
+          {tea.tags.length > 0 && (
             <div className="flex flex-wrap" style={{ gap: 4, marginTop: 6 }}>
-              {visibleTags.map(t => (
+              {tea.tags.map(t => (
                 <Pill key={t} tone="neutral">
                   {t}
                 </Pill>
@@ -74,7 +64,7 @@ export function TeaCard({ tea, urlPrefix }: Props) {
             className="text-amber bg-amber/10 text-meta text-center font-medium"
             style={{ padding: "6px 10px", borderRadius: 6 }}
           >
-            Not yet served
+            Unrated
           </div>
         )}
 
@@ -85,11 +75,6 @@ export function TeaCard({ tea, urlPrefix }: Props) {
           <span className="tabular-nums">
             {tea.rating != null ? `${tea.votes} votes` : "—"}
           </span>
-          <span className="tabular-nums">Last {tea.lastServed}</span>
-          <span className="tabular-nums">
-            {tea.co2 != null ? `${tea.co2} kg CO₂e` : "—"}
-          </span>
-          {tone && <Pill tone={tone}>{tea.climate}</Pill>}
         </div>
       </div>
     </Link>

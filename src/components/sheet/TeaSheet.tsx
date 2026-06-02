@@ -27,12 +27,7 @@ type Props = {
   onSubmit: (payload: RatingPayload) => void;
 };
 
-export function TeaSheet({
-  teaId,
-  existingRating,
-  onClose,
-  onSubmit,
-}: Props) {
+export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
   const open = teaId != null;
   const [display, setDisplay] = useState<{ option: Option; day: Day } | null>(
     null
@@ -161,8 +156,9 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div
-        className={`flex min-h-0 flex-1 flex-col transition-opacity duration-200 ease-out ${submitted ? "pointer-events-none opacity-0" : "opacity-100"
-          }`}
+        className={`flex min-h-0 flex-1 flex-col transition-opacity duration-200 ease-out ${
+          submitted ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
         aria-hidden={submitted}
       >
         <div
@@ -240,10 +236,11 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
             type="button"
             onClick={handleSubmit}
             disabled={rating === 0}
-            className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${rating > 0
-              ? "bg-ink text-paper cursor-pointer"
-              : "bg-ink/10 text-ink-muted cursor-not-allowed"
-              }`}
+            className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${
+              rating > 0
+                ? "bg-ink text-paper cursor-pointer"
+                : "bg-ink/10 text-ink-muted cursor-not-allowed"
+            }`}
             style={{ fontSize: 14, padding: "15px" }}
           >
             {buttonLabel}

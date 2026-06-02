@@ -1,5 +1,3 @@
-export const NEW_TAG = "new";
-
 // TODO: storage pipeline. Picked Files are captured locally and only
 // `filename` is set. `url` is populated once a real upload lands.
 export type PhotoRef = {
@@ -24,10 +22,7 @@ export type TeaForm = {
 };
 
 // TODO: Move to database and allow admin user to update
-export const TAG_OPTIONS = [
-  "eco",
-  "exotic",
-] as const;
+export const TAG_OPTIONS = ["eco", "exotic"] as const;
 
 export type Comment = {
   id: number;
