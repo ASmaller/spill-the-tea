@@ -1,23 +1,23 @@
 import { PageShell } from "@/components/admin/PageShell";
-import { MealsBrowser } from "@/components/admin/sections/MealsBrowser";
+import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
 import { buttonClassName } from "@/components/ui/Button";
 import { getAdminMealCatalog } from "@/services/statisticsService";
 import Link from "next/link";
 
-export default async function AdminMealsPage() {
-  const meals = await getAdminMealCatalog();
+export default async function AdminTeaPage() {
+  const teas = await getAdminMealCatalog();
 
   return (
     <PageShell
-      title="Meals"
+      title="Tea"
       subtitle="Your full catalog · search, browse, and schedule"
       actions={
-        <Link href="/admin/meals/new" className={buttonClassName(true)}>
-          + New meal
+        <Link href="/admin/teas/new" className={buttonClassName(true)}>
+          + New tea
         </Link>
       }
     >
-      <MealsBrowser meals={meals} />
+      <TeaBrowser teas={teas} urlPrefix="/admin/teas/" />
     </PageShell>
   );
 }

@@ -6,7 +6,7 @@ import { Pill } from "@/components/admin/Pill";
 import { ScheduleMealDialog } from "@/components/admin/ScheduleMealDialog";
 import { SectionHead } from "@/components/admin/SectionHead";
 import { CommentList } from "@/components/admin/sections/CommentList";
-import { MealTrendCard } from "@/components/admin/sections/MealTrendCard";
+import { TeaTrendCard } from "@/components/admin/sections/TeaTrendCard";
 import { UpcomingServingsSection } from "@/components/admin/sections/UpcomingServingsSection";
 import { CupRating } from "@/components/brand/CupRating";
 import { buttonClassName } from "@/components/ui/Button";
@@ -25,30 +25,30 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function MealDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const lunchId = Number(id);
+  const teaId = Number(id);
 
-  if (!Number.isInteger(lunchId) || lunchId <= 0) notFound();
+  if (!Number.isInteger(teaId) || teaId <= 0) notFound();
 
-  const meal = await getAdminMealDetail(lunchId);
-  if (!meal) notFound();
+  const tea = await getAdminMealDetail(teaId);
+  if (!tea) notFound();
 
-  const comments = meal.comments;
-  const total = ratingTotal(meal.distribution);
-  const avg = ratingAverage(meal.distribution);
+  const comments = tea.comments;
+  const total = ratingTotal(tea.distribution);
+  const avg = ratingAverage(tea.distribution);
   const avgLabel = total > 0 ? avg.toFixed(1) : "—";
-  const visibleTags = meal.tags.filter(t => t !== NEW_TAG);
+  const visibleTags = tea.tags.filter(t => t !== NEW_TAG);
 
   return (
     <PageShell
       title={
         <>
-          <BackLink href="/admin/meals">← Meals</BackLink>
-          <span>{meal.name}</span>
+          <BackLink href="/admin/teas">← Teas</BackLink>
+          <span>{tea.name}</span>
         </>
       }
       subtitle={
         <div className="flex flex-wrap items-center" style={{ gap: 4 }}>
-          <Pill tone="tea">{meal.line}</Pill>
+          <Pill tone="tea">{tea.line}</Pill>
           {visibleTags.map(t => (
             <Pill key={t} tone="neutral">
               {t}
@@ -59,12 +59,12 @@ export default async function MealDetailPage({ params }: PageProps) {
       actions={
         <>
           <Link
-            href={`/admin/meals/${meal.id}/edit`}
+            href={`/admin/teas/${tea.id}/edit`}
             className={buttonClassName()}
           >
             Edit
           </Link>
-          <ScheduleMealDialog mealId={meal.id} mealName={meal.name} />
+          <ScheduleMealDialog mealId={tea.id} mealName={tea.name} />
         </>
       }
     >
@@ -97,11 +97,11 @@ export default async function MealDetailPage({ params }: PageProps) {
             className="text-ink text-kpi font-serif"
             style={{ lineHeight: 1, marginTop: 4 }}
           >
-            {meal.timesServed ?? 0}
+            {tea.timesServed ?? 0}
             <span className="text-ink-muted text-back"> times</span>
           </div>
           <div className="text-ink-muted text-meta" style={{ marginTop: 8 }}>
-            Last {meal.lastServed}
+            Last {tea.lastServed}
           </div>
         </Card>
         <Card padding={18}>
@@ -110,7 +110,7 @@ export default async function MealDetailPage({ params }: PageProps) {
             className="text-ink text-kpi font-serif"
             style={{ lineHeight: 1, marginTop: 4 }}
           >
-            {meal.co2 ?? "—"}
+            {tea.co2 ?? "—"}
             <span
               className="text-ink-muted text-body"
               style={{ marginLeft: 4 }}
@@ -137,15 +137,15 @@ export default async function MealDetailPage({ params }: PageProps) {
             title="Rating distribution"
             sub="How students actually scored it"
           />
-          <RatingHistogram dist={meal.distribution} />
+          <RatingHistogram dist={tea.distribution} />
           <div
             className="text-ink-muted text-meta border-ink/[0.06] border-t"
             style={{ marginTop: 14, paddingTop: 14, lineHeight: 1.5 }}
           >
-            Distribution is {interpretRatingDistribution(meal.distribution)}
+            Distribution is {interpretRatingDistribution(tea.distribution)}
           </div>
         </Card>
-        <MealTrendCard mealId={meal.id} initialTrend={meal.trend} />
+        <TeaTrendCard teaId={tea.id} initialTrend={tea.trend} />
       </div>
 
       <div
@@ -158,8 +158,8 @@ export default async function MealDetailPage({ params }: PageProps) {
               title="What students said"
               sub="Quick-tag frequencies"
             />
-            {meal.tagBars.length > 0 ? (
-              <TagBars items={meal.tagBars} />
+            {tea.tagBars.length > 0 ? (
+              <TagBars items={tea.tagBars} />
             ) : (
               <div
                 className="text-ink-soft text-meta text-center"
@@ -171,7 +171,7 @@ export default async function MealDetailPage({ params }: PageProps) {
           </Card>
           <Card>
             <SectionHead title="Upcoming servings" sub="Scheduled ahead" />
-            <UpcomingServingsSection upcomingServings={meal.upcomingServings} />
+            <UpcomingServingsSection upcomingServings={tea.upcomingServings} />
           </Card>
         </div>
         <Card>

@@ -1,6 +1,6 @@
 import { PageShell } from "@/components/admin/PageShell";
 import { KpiStrip } from "@/components/admin/sections/KpiStrip";
-import { RankedMeals } from "@/components/admin/sections/RankedMeals";
+import { RankedTeas } from "@/components/admin/sections/RankedTeas";
 import { TrendCard } from "@/components/admin/sections/TrendCard";
 import { Card } from "@/components/ui/Card";
 import { verifySession } from "@/lib/session";
@@ -30,7 +30,7 @@ export default async function AdminOverviewPage() {
     >
       <KpiStrip kpis={overview.kpis} />
       <Card style={{ marginBottom: 16 }}>
-        <RankedMeals meals={overview.meals} />
+        <RankedTeas teas={overview.meals} />
       </Card>
       <TrendCard initialTrend={overview.trend} />
     </PageShell>

@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
 import z from "zod";
 
-const FORM_ID = "edit-meal-form";
+const FORM_ID = "edit-tea-form";
 
 type Initial = {
   name: string;
@@ -50,10 +50,10 @@ type Initial = {
   climate: ClimateFormState;
 };
 
-function seedForm(meal: MealStat): Initial {
+function seedForm(tea: MealStat): Initial {
   const ingredients: IngredientRow[] =
-    meal.ingredients.length > 0
-      ? meal.ingredients.map(ingredient => ({
+    tea.ingredients.length > 0
+      ? tea.ingredients.map(ingredient => ({
           id: ingredient.id,
           name: ingredient.name,
           amount: ingredient.amount,
@@ -61,21 +61,21 @@ function seedForm(meal: MealStat): Initial {
         }))
       : [newIngredientRow()];
   // Form only manages diet tags
-  const tags = meal.tags.filter((t): t is DietTag => DIET_TAG_SET.has(t));
+  const tags = tea.tags.filter((t): t is DietTag => DIET_TAG_SET.has(t));
   const climate: ClimateFormState =
-    meal.co2 != null && meal.co2 > 0
+    tea.co2 != null && tea.co2 > 0
       ? {
           state: "done",
-          kg: meal.co2,
-          calculatedFromCount: meal.ingredients.length,
+          kg: tea.co2,
+          calculatedFromCount: tea.ingredients.length,
         }
       : { state: "idle", kg: null, calculatedFromCount: 0 };
   return {
-    name: meal.name,
-    line: meal.line,
+    name: tea.name,
+    line: tea.line,
     tags,
     ingredients,
-    photo: meal.photo ?? null,
+    photo: tea.photo ?? null,
     climate,
   };
 }
@@ -87,7 +87,7 @@ export default function EditMealPage({
 }) {
   const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [meal, setMeal] = useState<MealStat | null>(null);
+  const [tea, setTea] = useState<MealStat | null>(null);
 
   useEffect(() => {
     getLunchById(Number(id))
@@ -135,7 +135,7 @@ export default function EditMealPage({
           ? new Date(Math.max(...pastServingTimes))
           : null;
 
-        setMeal({
+        setTea({
           id: lunch.id,
           name: lunch.name,
           line,
@@ -163,16 +163,16 @@ export default function EditMealPage({
     return <p>Loading...</p>;
   }
 
-  if (!meal) {
-    return <p>Could not find meal</p>;
+  if (!tea) {
+    return <p>Could not find tea</p>;
   }
 
-  return <EditMealForm meal={meal} />;
+  return <EditMealForm tea={tea} />;
 }
 
-function EditMealForm({ meal }: { meal: MealStat }) {
+function EditMealForm({ tea }: { tea: MealStat }) {
   const router = useRouter();
-  const initial = useMemo(() => seedForm(meal), [meal]);
+  const initial = useMemo(() => seedForm(tea), [tea]);
 
   const [name, setName] = useState(initial.name);
   const [line, setLine] = useState(initial.line);
@@ -220,8 +220,8 @@ function EditMealForm({ meal }: { meal: MealStat }) {
     return current !== initialKey;
   }, [name, line, tags, ingredients, photo, climate.kg, initialKey]);
 
-  const total = ratingTotal(meal.distribution);
-  const avg = ratingAverage(meal.distribution);
+  const total = ratingTotal(tea.distribution);
+  const avg = ratingAverage(tea.distribution);
   const visibleAvg = total > 0 ? avg.toFixed(1) : "—";
   const avgColor = total === 0 ? "var(--color-ink-muted)" : ratingColor(avg);
 
@@ -229,7 +229,7 @@ function EditMealForm({ meal }: { meal: MealStat }) {
     if (!isValid || submitting) return;
     setSubmitting(true);
     try {
-      const updated = await updateLunch(meal.id, ingredients, {
+      const updated = await updateLunch(tea.id, ingredients, {
         name,
         line,
         description: "",
@@ -251,7 +251,7 @@ function EditMealForm({ meal }: { meal: MealStat }) {
       setSavedInitialKey(currentKey);
       setSubmitting(false);
 
-      router.push(`/admin/meals/${updated.id}/edit`);
+      router.push(`/admin/teas/${updated.id}/edit`);
     } catch {
       setSubmitting(false);
     }
@@ -261,14 +261,14 @@ function EditMealForm({ meal }: { meal: MealStat }) {
     setShowDelete(false);
     setSubmitting(true);
     try {
-      await removeLunch(meal.id);
-      router.push("/admin/meals");
+      await removeLunch(tea.id);
+      router.push("/admin/teas");
     } catch {
       setSubmitting(false);
     }
   };
 
-  const cancelHref = `/admin/meals/${meal.id}`;
+  const cancelHref = `/admin/teas/${tea.id}`;
   const guardCancel = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isDirty) {
       e.preventDefault();
@@ -281,15 +281,15 @@ function EditMealForm({ meal }: { meal: MealStat }) {
       title={
         <>
           <BackLink href={cancelHref} onClick={guardCancel}>
-            ← {meal.name}
+            ← {tea.name}
           </BackLink>
-          <span>Edit meal</span>
+          <span>Edit tea</span>
         </>
       }
       subtitle={
-        meal.lastServed === "—"
+        tea.lastServed === "—"
           ? `Not served yet · ${total} ratings · ${visibleAvg} avg`
-          : `Last served ${meal.lastServed} · ${total} ratings · ${visibleAvg} avg`
+          : `Last served ${tea.lastServed} · ${total} ratings · ${visibleAvg} avg`
       }
       actions={
         <>
@@ -374,7 +374,7 @@ function EditMealForm({ meal }: { meal: MealStat }) {
               total={total}
               avgLabel={visibleAvg}
               avgColor={avgColor}
-              lastServed={meal.lastServed}
+              lastServed={tea.lastServed}
             />
           </Card>
         </div>
@@ -382,7 +382,7 @@ function EditMealForm({ meal }: { meal: MealStat }) {
         <Card>
           <SectionHead title="Details" />
           <div className="flex flex-col" style={{ gap: 18, marginTop: 4 }}>
-            <Field label="Dish name" required>
+            <Field label="Tea name" required>
               <TextInput value={name} onChange={setName} large />
             </Field>
 
@@ -390,10 +390,7 @@ function EditMealForm({ meal }: { meal: MealStat }) {
               <LineSegmented value={line} onChange={setLine} />
             </Field>
 
-            <Field
-              label="Diet tags"
-              hint="Students use these to filter the feed."
-            >
+            <Field label="Tags" hint="Students use these to filter the feed.">
               <TagPicker value={tags} onToggle={toggleTag} />
             </Field>
 
@@ -411,20 +408,20 @@ function EditMealForm({ meal }: { meal: MealStat }) {
       <Dialog
         open={showDelete}
         onClose={() => setShowDelete(false)}
-        title={`Delete ${meal.name}?`}
+        title={`Delete ${tea.name}?`}
         footer={
           <>
             <Button type="button" onClick={() => setShowDelete(false)}>
               Cancel
             </Button>
             <Button primary danger type="button" onClick={confirmDelete}>
-              Delete meal
+              Delete tea
             </Button>
           </>
         }
       >
-        The meal will be removed from the catalog. Past ratings stay in your
-        reports but the dish won&apos;t be available for future scheduling.
+        The tea will be removed from the catalog. Past ratings stay in your
+        reports but the tea won&apos;t be visible to users.
       </Dialog>
 
       <ConfirmDiscardDialog

@@ -8,24 +8,24 @@ import type { MealStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import Link from "next/link";
 
-type Props = { meal: MealStat };
+type Props = { tea: MealStat; urlPrefix: string };
 
-export function MealCard({ meal }: Props) {
-  const tone = climateTone(meal.climate);
-  const visibleTags = meal.tags.filter(t => t !== NEW_TAG).slice(0, 3);
+export function TeaCard({ tea, urlPrefix }: Props) {
+  const tone = climateTone(tea.climate);
+  const visibleTags = tea.tags.filter(t => t !== NEW_TAG).slice(0, 3);
 
   return (
     <Link
-      href={`/admin/meals/${meal.id}`}
+      href={`${urlPrefix}${tea.id}`}
       className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       style={{ borderRadius: 12 }}
     >
-      {meal.photo?.url && (
+      {tea.photo?.url && (
         <div
           className="w-full overflow-hidden"
           style={{ aspectRatio: "4 / 3" }}
         >
-          <MealThumb meal={meal} />
+          <MealThumb meal={tea} />
         </div>
       )}
       <div className="flex flex-1 flex-col" style={{ padding: 12, gap: 8 }}>
@@ -34,13 +34,13 @@ export function MealCard({ meal }: Props) {
             className="text-ink text-body font-semibold"
             style={{ lineHeight: 1.3 }}
           >
-            {meal.name}
+            {tea.name}
           </div>
           <div
             className="text-ink-soft text-caption uppercase"
             style={{ marginTop: 3 }}
           >
-            {meal.line}
+            {tea.line}
           </div>
           {visibleTags.length > 0 && (
             <div className="flex flex-wrap" style={{ gap: 4, marginTop: 6 }}>
@@ -53,7 +53,7 @@ export function MealCard({ meal }: Props) {
           )}
         </div>
 
-        {meal.rating != null ? (
+        {tea.rating != null ? (
           <div
             className="flex items-center justify-between"
             style={{ marginTop: 2 }}
@@ -61,13 +61,13 @@ export function MealCard({ meal }: Props) {
             <div className="flex items-baseline" style={{ gap: 6 }}>
               <span
                 className="text-section font-serif"
-                style={{ color: ratingColor(meal.rating), lineHeight: 1 }}
+                style={{ color: ratingColor(tea.rating), lineHeight: 1 }}
               >
-                {meal.rating.toFixed(1)}
+                {tea.rating.toFixed(1)}
               </span>
-              <CupRating value={Math.round(meal.rating)} size={9} />
+              <CupRating value={Math.round(tea.rating)} size={9} />
             </div>
-            <DistSpark dist={meal.distribution} />
+            <DistSpark dist={tea.distribution} />
           </div>
         ) : (
           <div
@@ -83,13 +83,13 @@ export function MealCard({ meal }: Props) {
           style={{ paddingTop: 8, gap: 8 }}
         >
           <span className="tabular-nums">
-            {meal.rating != null ? `${meal.votes} votes` : "—"}
+            {tea.rating != null ? `${tea.votes} votes` : "—"}
           </span>
-          <span className="tabular-nums">Last {meal.lastServed}</span>
+          <span className="tabular-nums">Last {tea.lastServed}</span>
           <span className="tabular-nums">
-            {meal.co2 != null ? `${meal.co2} kg CO₂e` : "—"}
+            {tea.co2 != null ? `${tea.co2} kg CO₂e` : "—"}
           </span>
-          {tone && <Pill tone={tone}>{meal.climate}</Pill>}
+          {tone && <Pill tone={tone}>{tea.climate}</Pill>}
         </div>
       </div>
     </Link>

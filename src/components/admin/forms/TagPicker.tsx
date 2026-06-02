@@ -6,7 +6,7 @@ import type { DietTag } from "@/lib/types";
 
 type Props = {
   // Loose `string[]` accepts non-DietTag legacy/orphan tags (e.g. `pasta`,
-  // `mexican`) read from existing meals. The picker still only toggles
+  // `mexican`) read from existing teas. The picker still only toggles
   // DietTag values.
   value: readonly string[];
   onToggle: (tag: DietTag) => void;

@@ -27,9 +27,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const FORM_ID = "new-meal-form";
+const FORM_ID = "new-tea-form";
 
-export default function NewMealPage() {
+export default function NewTeaPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [line, setLine] = useState<MealLine>(DEFAULT_LINE);
@@ -69,7 +69,7 @@ export default function NewMealPage() {
     setSubmitting(true);
     try {
       const lunch = await addLunch(name, ingredients, { line, tags });
-      router.push(`/admin/meals/${lunch.id}`);
+      router.push(`/admin/teas/${lunch.id}`);
     } catch {
       setSubmitting(false);
     }
@@ -79,15 +79,15 @@ export default function NewMealPage() {
     <PageShell
       title={
         <>
-          <BackLink href="/admin/meals">← Meals</BackLink>
-          <span>New meal</span>
+          <BackLink href="/admin/teas">← Teas</BackLink>
+          <span>New tea</span>
         </>
       }
-      subtitle="Add a dish to the catalog"
+      subtitle="Add a tea to the catalog"
       actions={
         <>
           <Link
-            href="/admin/meals"
+            href="/admin/teas"
             className={buttonClassName()}
             onClick={e => {
               if (isDirty) {
@@ -104,7 +104,7 @@ export default function NewMealPage() {
             form={FORM_ID}
             disabled={!isValid || submitting}
           >
-            {submitting ? "Creating…" : "Create meal"}
+            {submitting ? "Creating…" : "Create tea"}
           </Button>
         </>
       }
@@ -143,7 +143,7 @@ export default function NewMealPage() {
               <TextInput
                 value={name}
                 onChange={setName}
-                placeholder="e.g. Halloumi salad"
+                placeholder="e.g. White Raspberry"
                 autoFocus
                 large
               />
@@ -154,7 +154,7 @@ export default function NewMealPage() {
             </Field>
 
             <Field
-              label="Diet tags"
+              label="Tags"
               hint="Students use these to filter the feed. Pick all that apply."
             >
               <TagPicker value={tags} onToggle={toggleTag} />
@@ -174,7 +174,7 @@ export default function NewMealPage() {
       <ConfirmDiscardDialog
         open={showCancelConfirm}
         onClose={() => setShowCancelConfirm(false)}
-        onConfirm={() => router.push("/admin/meals")}
+        onConfirm={() => router.push("/admin/teas")}
       />
     </PageShell>
   );

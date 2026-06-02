@@ -12,11 +12,11 @@ type RangeKey = "10" | "30" | "100";
 const RANGE_KEYS: RangeKey[] = ["10", "30", "100"];
 
 type Props = {
-  mealId: number;
+  teaId: number;
   initialTrend: AdminMealTrend;
 };
 
-export function MealTrendCard({ mealId, initialTrend }: Props) {
+export function TeaTrendCard({ teaId, initialTrend }: Props) {
   const [range, setRange] = useState<RangeKey>("30");
   const [trend, setTrend] = useState(initialTrend);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,7 @@ export function MealTrendCard({ mealId, initialTrend }: Props) {
 
     try {
       const response = await fetch(
-        `/api/admin/meals/${mealId}/analytics?servings=${nextRange}`,
+        `/api/admin/teas/${teaId}/analytics?servings=${nextRange}`,
         { cache: "no-store" }
       );
 

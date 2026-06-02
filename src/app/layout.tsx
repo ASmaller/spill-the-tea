@@ -15,8 +15,8 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Don't Spill the Tea",
-  description: "Rate today's lunch at Chalmers kårrestaurangen.",
+  title: "Spill the Tea",
+  description: "Review and browse teas in Hubben 2.2",
 };
 
 export const viewport: Viewport = {

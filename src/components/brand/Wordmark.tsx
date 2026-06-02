@@ -13,8 +13,8 @@ export function Wordmark({ size = 22 }: Props) {
         gap: size * 0.18,
       }}
     >
-      <span>Don&apos;t Spill</span>
-      <span className="text-amber">the Tea</span>
+      <span className="text-amber">Spill</span>
+      <span>the Tea</span>
     </span>
   );
 }

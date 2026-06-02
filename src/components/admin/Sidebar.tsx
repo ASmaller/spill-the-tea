@@ -53,10 +53,10 @@ export function Sidebar({ manager, weekStat }: Props) {
   const navItems: NavItem[] = [
     { key: "home", label: "Overview", href: "/admin", matchPrefix: "/admin" },
     {
-      key: "meals",
-      label: "Meals",
-      href: "/admin/meals",
-      matchPrefix: "/admin/meals",
+      key: "teas",
+      label: "Teas",
+      href: "/admin/teas",
+      matchPrefix: "/admin/teas",
     },
     {
       key: "suggestions",

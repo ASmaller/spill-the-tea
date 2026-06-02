@@ -1,7 +1,5 @@
 "use client";
 
-import { MealCard } from "@/components/admin/sections/MealCard";
-import { MealsTable } from "@/components/admin/sections/MealsTable";
 import { SelectFilter } from "@/components/admin/SelectFilter";
 import { Card } from "@/components/ui/Card";
 import { MEAL_LINES } from "@/lib/admin/colors";
@@ -10,8 +8,10 @@ import type { MealStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import type { MealLine } from "@/lib/types";
 import { useMemo, useState } from "react";
+import { TeaCard } from "./TeaCard";
+import { TeaTable } from "./TeaTable";
 
-type Props = { meals: MealStat[] };
+type Props = { teas: MealStat[]; ratedIds?: Set<string>; urlPrefix: string };
 
 type LineKey = "all" | MealLine;
 type DietKey = "all" | "vegetarian" | "vegan" | "fish" | "meat";
@@ -57,7 +57,7 @@ const SORT_COMPARE: Record<SortKey, (a: MealStat, b: MealStat) => number> = {
   co2: (a, b) => (a.co2 ?? Infinity) - (b.co2 ?? Infinity),
 };
 
-export function MealsBrowser({ meals }: Props) {
+export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
   const [view, setView] = useState<ViewKey>("grid");
   const [line, setLine] = useState<LineKey>("all");
   const [diet, setDiet] = useState<DietKey>("all");
@@ -67,22 +67,22 @@ export function MealsBrowser({ meals }: Props) {
 
   const filtered = useMemo(() => {
     const lower = query.trim().toLowerCase();
-    return meals
-      .filter(m => {
-        if (line !== "all" && m.line !== line) return false;
-        if (diet !== "all" && !m.tags.includes(diet)) return false;
-        if (status === NEW_TAG && !m.tags.includes(NEW_TAG)) return false;
-        if (status === "served" && m.tags.includes(NEW_TAG)) return false;
+    return teas
+      .filter(tea => {
+        if (line !== "all" && tea.line !== line) return false;
+        if (diet !== "all" && !tea.tags.includes(diet)) return false;
+        if (status === NEW_TAG && !tea.tags.includes(NEW_TAG)) return false;
+        if (status === "served" && tea.tags.includes(NEW_TAG)) return false;
         if (lower) {
           const matches =
-            m.name.toLowerCase().includes(lower) ||
-            m.tags.some(t => t.toLowerCase().includes(lower));
+            tea.name.toLowerCase().includes(lower) ||
+            tea.tags.some(t => t.toLowerCase().includes(lower));
           if (!matches) return false;
         }
         return true;
       })
       .sort(SORT_COMPARE[sort]);
-  }, [meals, line, diet, status, query, sort]);
+  }, [teas, line, diet, status, query, sort]);
 
   const lineCounts = useMemo(() => {
     const counts: Record<MealLine, number> = {
@@ -90,36 +90,36 @@ export function MealsBrowser({ meals }: Props) {
       Vegetarian: 0,
       "Street food": 0,
     };
-    meals.forEach(m => {
-      counts[m.line] += 1;
+    teas.forEach(tea => {
+      counts[tea.line] += 1;
     });
     return counts;
-  }, [meals]);
+  }, [teas]);
 
   const dietCounts = useMemo(() => {
     const counts: Record<DietKey, number> = {
-      all: meals.length,
+      all: teas.length,
       vegetarian: 0,
       vegan: 0,
       fish: 0,
       meat: 0,
     };
-    meals.forEach(m => {
+    teas.forEach(tea => {
       DIET_KEYS.forEach(key => {
-        if (key !== "all" && m.tags.includes(key)) counts[key] += 1;
+        if (key !== "all" && tea.tags.includes(key)) counts[key] += 1;
       });
     });
     return counts;
-  }, [meals]);
+  }, [teas]);
 
   const statusCounts = useMemo(() => {
-    const newCount = meals.filter(m => m.tags.includes(NEW_TAG)).length;
+    const newCount = teas.filter(tea => tea.tags.includes(NEW_TAG)).length;
     return {
-      all: meals.length,
-      served: meals.length - newCount,
+      all: teas.length,
+      served: teas.length - newCount,
       [NEW_TAG]: newCount,
     } satisfies Record<StatusKey, number>;
-  }, [meals]);
+  }, [teas]);
 
   return (
     <>
@@ -133,7 +133,7 @@ export function MealsBrowser({ meals }: Props) {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search meals, ingredients, tags…"
+              placeholder="Search teas…"
               className={`text-ink text-body flex-1 rounded-sm bg-transparent outline-none ${FOCUS_RING.cream}`}
               style={{ fontFamily: "inherit" }}
             />
@@ -187,7 +187,7 @@ export function MealsBrowser({ meals }: Props) {
               key={key}
               active={line === key}
               onClick={() => setLine(key)}
-              count={key === "all" ? meals.length : lineCounts[key]}
+              count={key === "all" ? teas.length : lineCounts[key]}
             >
               {LINE_LABELS[key]}
             </Chip>
@@ -227,23 +227,23 @@ export function MealsBrowser({ meals }: Props) {
       >
         <div className="text-ink-muted">
           Showing <strong className="text-ink">{filtered.length}</strong> of{" "}
-          {meals.length} meals
+          {teas.length} teas
         </div>
         <div className="text-ink-muted">
-          Click any meal for full rating history & comments
+          Click any tea for ratings & comments
         </div>
       </div>
 
       {filtered.length === 0 ? (
         <Card style={{ textAlign: "center", padding: 40 }}>
           <div className="text-ink text-feature font-serif">
-            {meals.length === 0
-              ? "No meals available."
-              : "No meals match those filters."}
+            {teas.length === 0
+              ? "No teas available."
+              : "No teas match those filters."}
           </div>
           <div className="text-ink-muted text-meta" style={{ marginTop: 6 }}>
-            {meals.length === 0
-              ? "Meals will appear here after lunches are added to the database."
+            {teas.length === 0
+              ? "Teas will appear here after being added to the database."
               : "Try clearing the filters or widening your search."}
           </div>
         </Card>
@@ -255,12 +255,12 @@ export function MealsBrowser({ meals }: Props) {
             gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
           }}
         >
-          {filtered.map(m => (
-            <MealCard key={m.id} meal={m} />
+          {filtered.map(tea => (
+            <TeaCard key={tea.id} tea={tea} urlPrefix={urlPrefix} />
           ))}
         </div>
       ) : (
-        <MealsTable meals={filtered} />
+        <TeaTable teas={filtered} />
       )}
     </>
   );

@@ -1,3 +1,5 @@
+"use server";
+
 import type {
   Lunch,
   Ingredient as PrismaIngredient,
