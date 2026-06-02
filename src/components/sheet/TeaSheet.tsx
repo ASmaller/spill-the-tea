@@ -4,7 +4,7 @@ import { MealPhoto } from "@/components/brand/MealPhoto";
 import { Tag } from "@/components/brand/Tag";
 import { formatFeedDate } from "@/lib/dateFormat";
 import { FOCUS_RING } from "@/lib/styles";
-import type { Day, Option, RatingPayload } from "@/lib/types";
+import type { RatingPayload } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import { Drawer } from "vaul";
 import { CupRating } from "../brand/CupRating";
@@ -21,21 +21,19 @@ function getButtonLabel(rating: number, hasExtras: boolean): string {
 }
 
 type Props = {
-  option: Option | null;
-  day: Day | null;
+  teaId: string | null;
   existingRating: number | null;
   onClose: () => void;
   onSubmit: (payload: RatingPayload) => void;
 };
 
-export function MealSheet({
-  option,
-  day,
+export function TeaSheet({
+  teaId,
   existingRating,
   onClose,
   onSubmit,
 }: Props) {
-  const open = option !== null;
+  const open = teaId != null;
   const [display, setDisplay] = useState<{ option: Option; day: Day } | null>(
     null
   );
@@ -61,10 +59,10 @@ export function MealSheet({
         <Drawer.Overlay className="bg-ink/45 fixed inset-0 z-40 backdrop-blur-[4px]" />
         <Drawer.Content className="bg-cream fixed right-0 bottom-0 left-0 z-50 mt-24 flex max-h-[92dvh] flex-col rounded-t-[28px] shadow-[0_-8px_32px_rgba(0,0,0,0.2)] outline-none">
           <Drawer.Title className="sr-only">
-            {display?.option.name ?? "Meal detail"}
+            {display?.option.name ?? "Tea detail"}
           </Drawer.Title>
           <Drawer.Description className="sr-only">
-            Rate this meal and leave an optional comment for the kitchen.
+            Rate this tea and leave an optional comment.
           </Drawer.Description>
 
           <div className="bg-cream relative z-20 flex items-center justify-center rounded-t-[28px] px-4 pt-2.5 pb-2.5">
@@ -163,9 +161,8 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div
-        className={`flex min-h-0 flex-1 flex-col transition-opacity duration-200 ease-out ${
-          submitted ? "pointer-events-none opacity-0" : "opacity-100"
-        }`}
+        className={`flex min-h-0 flex-1 flex-col transition-opacity duration-200 ease-out ${submitted ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
         aria-hidden={submitted}
       >
         <div
@@ -243,11 +240,10 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
             type="button"
             onClick={handleSubmit}
             disabled={rating === 0}
-            className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${
-              rating > 0
-                ? "bg-ink text-paper cursor-pointer"
-                : "bg-ink/10 text-ink-muted cursor-not-allowed"
-            }`}
+            className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${rating > 0
+              ? "bg-ink text-paper cursor-pointer"
+              : "bg-ink/10 text-ink-muted cursor-not-allowed"
+              }`}
             style={{ fontSize: 14, padding: "15px" }}
           >
             {buttonLabel}

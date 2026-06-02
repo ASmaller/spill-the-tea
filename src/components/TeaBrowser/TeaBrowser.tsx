@@ -4,14 +4,14 @@ import { SelectFilter } from "@/components/admin/SelectFilter";
 import { Card } from "@/components/ui/Card";
 import { MEAL_LINES } from "@/lib/admin/colors";
 import { NEW_TAG } from "@/lib/admin/types";
-import type { MealStat } from "@/lib/admin/types";
+import type { TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import type { MealLine } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
 
-type Props = { teas: MealStat[]; ratedIds?: Set<string>; urlPrefix: string };
+type Props = { teas: TeaStat[]; ratedIds?: Set<string>; urlPrefix: string };
 
 type LineKey = "all" | MealLine;
 type DietKey = "all" | "vegetarian" | "vegan" | "fish" | "meat";
@@ -49,7 +49,7 @@ const STATUS_LABELS = {
   [NEW_TAG]: "New",
 } satisfies Record<StatusKey, string>;
 
-const SORT_COMPARE: Record<SortKey, (a: MealStat, b: MealStat) => number> = {
+const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   rating: (a, b) => (b.rating ?? -1) - (a.rating ?? -1),
   "rating-asc": (a, b) => (a.rating ?? Infinity) - (b.rating ?? Infinity),
   votes: (a, b) => b.votes - a.votes,
@@ -168,9 +168,8 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
                   key={v}
                   type="button"
                   onClick={() => setView(v)}
-                  className={`text-meta font-medium ${
-                    active ? "bg-ink text-paper" : "bg-paper text-ink"
-                  } ${FOCUS_RING.paper}`}
+                  className={`text-meta font-medium ${active ? "bg-ink text-paper" : "bg-paper text-ink"
+                    } ${FOCUS_RING.paper}`}
                   style={{ padding: "7px 12px", cursor: "pointer" }}
                   aria-pressed={active}
                 >
@@ -306,11 +305,10 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`text-meta flex items-center font-medium ${
-        active
+      className={`text-meta flex items-center font-medium ${active
           ? "bg-ink text-paper"
           : "bg-paper text-ink border-ink/[0.10] border"
-      } ${FOCUS_RING.paper}`}
+        } ${FOCUS_RING.paper}`}
       style={{
         padding: "4px 10px",
         borderRadius: 999,
@@ -322,9 +320,8 @@ function Chip({
       {children}
       {count != null && (
         <span
-          className={`text-tiny tabular-nums ${
-            active ? "text-paper/70" : "text-ink-soft"
-          }`}
+          className={`text-tiny tabular-nums ${active ? "text-paper/70" : "text-ink-soft"
+            }`}
         >
           {count}
         </span>

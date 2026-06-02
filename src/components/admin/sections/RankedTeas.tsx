@@ -4,13 +4,13 @@ import { SectionHead } from "@/components/admin/SectionHead";
 import { SelectFilter } from "@/components/admin/SelectFilter";
 import { LINE_COLOR, MEAL_LINES, ratingColor } from "@/lib/admin/colors";
 import { relativeDays } from "@/lib/admin/relative-time";
-import type { MealStat } from "@/lib/admin/types";
+import type { TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import type { MealLine } from "@/lib/types";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-type Props = { teas: MealStat[] };
+type Props = { teas: TeaStat[] };
 
 type LineKey = "all" | MealLine;
 type RangeKey = "7d" | "30d";
@@ -35,15 +35,15 @@ function daysSinceDate(iso: string | null | undefined): number | null {
   return Math.round((today.getTime() - parsed.getTime()) / DAY_MS);
 }
 
-function mealRecencyDays(meal: MealStat): number | null {
+function mealRecencyDays(meal: TeaStat): number | null {
   return daysSinceDate(meal.lastServedAt) ?? relativeDays(meal.lastServed);
 }
 
-function mealServedTime(meal: MealStat): number {
+function mealServedTime(meal: TeaStat): number {
   return meal.lastServedAt ? new Date(meal.lastServedAt).getTime() : 0;
 }
 
-const SORT_COMPARE: Record<SortKey, (a: MealStat, b: MealStat) => number> = {
+const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   top: (a, b) => (b.rating ?? 0) - (a.rating ?? 0),
   bottom: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
   votes: (a, b) => b.votes - a.votes,
@@ -268,9 +268,8 @@ function SegmentedItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`text-meta flex items-center font-medium ${
-        active ? "bg-ink text-paper" : "text-ink"
-      } ${FOCUS_RING.cream}`}
+      className={`text-meta flex items-center font-medium ${active ? "bg-ink text-paper" : "text-ink"
+        } ${FOCUS_RING.cream}`}
       style={{
         padding: "6px 11px",
         cursor: "pointer",

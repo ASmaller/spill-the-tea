@@ -1,26 +1,20 @@
 "use server";
 
 import type {
-  Lunch,
-  Ingredient as PrismaIngredient,
+  Tea,
   Review,
+  Prisma,
 } from "@/generated/prisma/client";
-import { kgToBucket, LINE_COLOR, MEAL_LINES } from "@/lib/admin/colors";
+import { LINE_COLOR, MEAL_LINES } from "@/lib/admin/colors";
 import {
-  INGREDIENT_UNITS,
-  NEW_TAG,
-  type IngredientRow,
-  type IngredientUnit,
   type Kpi,
-  type MealComment,
-  type MealStat,
+  type TeaStat,
   type TagBarItem,
   type TrendFootnote,
   type TrendSeries,
 } from "@/lib/admin/types";
 import { getFeedDateKey } from "@/lib/dateFormat";
 import { prisma } from "@/lib/prisma";
-import type { DietTag, MealLine } from "@/lib/types";
 
 type RatingDistribution = [number, number, number, number, number];
 
@@ -39,20 +33,14 @@ export type AdminMealTrend = {
 
 export type AdminOverview = {
   kpis: Kpi[];
-  meals: MealStat[];
+  meals: TeaStat[];
   trend: AdminOverviewTrend;
 };
 
-export type UpcomingServing = {
-  id: number;
-  date: string;
-};
-
-export type AdminMealDetail = MealStat & {
-  comments: MealComment[];
+export type AdminTeaDetail = TeaStat & {
+  comments: Comment[];
   tagBars: TagBarItem[];
   trend: AdminMealTrend;
-  upcomingServings: UpcomingServing[];
 };
 
 export type AdminSidebarStats = {
@@ -65,16 +53,7 @@ type ReviewSnapshot = Pick<
   "id" | "rating" | "comment" | "tags" | "posted"
 >;
 
-type ServingSnapshot = {
-  id: number;
-  date: Date;
-  reviews: ReviewSnapshot[];
-};
-
-type LunchSnapshot = Pick<Lunch, "id" | "name" | "line" | "ecoScore"> & {
-  ingredients: PrismaIngredient[];
-  servings: ServingSnapshot[];
-};
+type TeaWithReviews = Prisma.TeaGetPayload<{ include: { reviews: true } }>
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -85,48 +64,24 @@ const TREND_RANGE_DAYS: Record<TrendRange, number> = {
 };
 
 const POSITIVE_TAGS = new Set([
-  "balanced",
   "delicious",
-  "filling",
+  "energizing",
   "fresh",
-  "loved it",
-  "more please",
-  "perfect",
+  "aromatic",
+  "floral",
 ]);
 
 const NEGATIVE_TAGS = new Set([
   "bland",
-  "cold",
-  "dry",
-  "overcooked",
-  "small portion",
-  "too salty",
-  "too small",
+  "too sweet",
+  "bitter",
+  "artificial",
+  "weak",
 ]);
 
-const FISH_INGREDIENTS = ["fish", "cod", "salmon", "tuna", "herring"];
-const MEAT_INGREDIENTS = [
-  "beef",
-  "chicken",
-  "meat",
-  "pork",
-  "turkey",
-  "bacon",
-  "ham",
-];
-const ANIMAL_PRODUCT_INGREDIENTS = [
-  ...FISH_INGREDIENTS,
-  ...MEAT_INGREDIENTS,
-  "butter",
-  "cheese",
-  "cream",
-  "egg",
-  "milk",
-  "ricotta",
-  "yogurt",
-];
+export type Rating = 1 | 2 | 3 | 4 | 5
 
-function isValidRating(rating: number): boolean {
+function isValidRating(rating: number): rating is Rating {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5;
 }
 
@@ -248,110 +203,22 @@ function dateToIso(date: Date | null): string | null {
   return date ? date.toISOString() : null;
 }
 
-const warnedLines = new Set<string>();
-
-function getMealLine(line: string): MealLine {
-  if (MEAL_LINES.includes(line as MealLine)) return line as MealLine;
-  if (!warnedLines.has(line)) {
-    warnedLines.add(line);
-    console.warn(
-      `[statisticsService] Unknown meal line "${line}", falling back to "Street food".`
-    );
-  }
-  return "Street food";
-}
-
-function hasIngredient(
-  ingredients: PrismaIngredient[],
-  names: string[]
-): boolean {
-  return ingredients.some(ingredient => {
-    const tokens = ingredient.name.toLowerCase().split(/[^a-z]+/);
-    return names.some(
-      name => tokens.includes(name) || tokens.includes(`${name}s`)
-    );
-  });
-}
-
-function getDietTags(ingredients: PrismaIngredient[]): DietTag[] {
-  const hasFish = hasIngredient(ingredients, FISH_INGREDIENTS);
-  const hasMeat = hasIngredient(ingredients, MEAT_INGREDIENTS);
-  const hasAnimalProduct = hasIngredient(
-    ingredients,
-    ANIMAL_PRODUCT_INGREDIENTS
-  );
-  const tags: DietTag[] = [];
-
-  if (hasFish) tags.push("fish");
-  if (hasMeat) tags.push("meat");
-  if (!hasFish && !hasMeat) tags.push("vegetarian");
-  if (!hasAnimalProduct) tags.push("vegan");
-
-  return tags;
-}
-
-function toAdminIngredient(ingredient: PrismaIngredient): IngredientRow {
-  const unit = INGREDIENT_UNITS.includes(ingredient.unit as IngredientUnit)
-    ? (ingredient.unit as IngredientUnit)
-    : "g";
-
-  return {
-    id: ingredient.id,
-    name: ingredient.name,
-    amount: ingredient.amount,
-    unit,
-  };
-}
-
-function getServingDateRange(servings: ServingSnapshot[]) {
-  if (servings.length === 0) {
-    return { firstServedAt: null, lastServedAt: null };
-  }
-
-  const timestamps = servings.map(serving => serving.date.getTime());
-
-  return {
-    firstServedAt: new Date(Math.min(...timestamps)),
-    lastServedAt: new Date(Math.max(...timestamps)),
-  };
-}
-
-function getAllReviews(servings: ServingSnapshot[]): ReviewSnapshot[] {
-  return servings.flatMap(serving => serving.reviews);
-}
-
-function toMealStat(lunch: LunchSnapshot): MealStat {
+function toTeaStat(tea: TeaWithReviews): TeaStat {
   // Compare via UTC date keys so the past/future partition matches
   // scheduleServing's storage (UTC midnight) regardless of server timezone.
   const todayKey = getFeedDateKey(new Date());
-  const pastServings = lunch.servings.filter(
-    serving => getFeedDateKey(serving.date) <= todayKey
-  );
-  const reviews = getAllReviews(pastServings);
+  const reviews = tea.reviews;
   const ratings = reviews.map(review => review.rating).filter(isValidRating);
   const rating = averageRating(ratings);
   const distribution = getDistribution(ratings);
-  const { firstServedAt, lastServedAt } = getServingDateRange(pastServings);
-  const tags: string[] = getDietTags(lunch.ingredients);
-
-  if (!lastServedAt) tags.push(NEW_TAG);
 
   return {
-    id: lunch.id,
-    name: lunch.name,
-    line: getMealLine(lunch.line),
-    tags,
+    id: tea.id,
+    name: tea.name,
+    tags: tea.tags,
     rating: rating == null ? null : roundTo(rating),
     votes: ratings.length,
     distribution,
-    co2: roundTo(lunch.ecoScore),
-    climate: kgToBucket(lunch.ecoScore),
-    lastServed: formatRelativeDate(lastServedAt),
-    firstServed: formatRelativeDate(firstServedAt),
-    firstServedAt: dateToIso(firstServedAt),
-    lastServedAt: dateToIso(lastServedAt),
-    timesServed: pastServings.length,
-    ingredients: lunch.ingredients.map(toAdminIngredient),
   };
 }
 
@@ -382,16 +249,15 @@ function getTagBars(reviews: ReviewSnapshot[]): TagBarItem[] {
 }
 
 function getComments(
-  lunch: Pick<LunchSnapshot, "id" | "name">,
-  servings: ServingSnapshot[]
-): MealComment[] {
-  return getAllReviews(servings)
+  tea: Pick<TeaWithReviews, "id" | "name" | "reviews">,
+): Comment[] {
+  return tea.reviews
     .filter(review => review.comment?.trim())
     .sort((a, b) => b.posted.getTime() - a.posted.getTime())
     .map(review => ({
       id: review.id,
-      mealId: lunch.id,
-      mealName: lunch.name,
+      teaId: tea.id,
+      mealName: tea.name,
       rating: review.rating,
       text: review.comment?.trim() ?? "",
       when: formatRelativeDate(review.posted),
@@ -400,9 +266,9 @@ function getComments(
     }));
 }
 
-function buildMealTrend(servings: ServingSnapshot[]): AdminMealTrend {
+function buildMealTrend(servings: TeaWithReviews[]): AdminMealTrend {
   const points = [...servings]
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    .sort((a, b) => a.posted.getTime() - b.date.getTime())
     .flatMap(serving => {
       const ratings = serving.reviews
         .map(review => review.rating)
@@ -656,16 +522,8 @@ export async function getAdminKpis(): Promise<Kpi[]> {
   ];
 }
 
-export async function getAdminMealCatalog(): Promise<MealStat[]> {
-  const lunches = await prisma.lunch.findMany({
-    include: {
-      ingredients: true,
-      servings: {
-        include: {
-          reviews: true,
-        },
-      },
-    },
+export async function getAdminMealCatalog(): Promise<TeaStat[]> {
+  const lunches = await prisma.tea.findMany({
     orderBy: {
       name: "asc",
     },

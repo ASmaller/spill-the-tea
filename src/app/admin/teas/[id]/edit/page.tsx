@@ -24,7 +24,7 @@ import {
   type ClimateFormState,
   type IngredientRow,
   type IngredientUnit,
-  type MealStat,
+  type TeaStat,
   type PhotoRef,
 } from "@/lib/admin/types";
 import { getFeedDateKey } from "@/lib/dateFormat";
@@ -43,32 +43,32 @@ const FORM_ID = "edit-tea-form";
 
 type Initial = {
   name: string;
-  line: MealStat["line"];
+  line: TeaStat["line"];
   tags: DietTag[];
   ingredients: IngredientRow[];
   photo: PhotoRef | null;
   climate: ClimateFormState;
 };
 
-function seedForm(tea: MealStat): Initial {
+function seedForm(tea: TeaStat): Initial {
   const ingredients: IngredientRow[] =
     tea.ingredients.length > 0
       ? tea.ingredients.map(ingredient => ({
-          id: ingredient.id,
-          name: ingredient.name,
-          amount: ingredient.amount,
-          unit: ingredient.unit,
-        }))
+        id: ingredient.id,
+        name: ingredient.name,
+        amount: ingredient.amount,
+        unit: ingredient.unit,
+      }))
       : [newIngredientRow()];
   // Form only manages diet tags
   const tags = tea.tags.filter((t): t is DietTag => DIET_TAG_SET.has(t));
   const climate: ClimateFormState =
     tea.co2 != null && tea.co2 > 0
       ? {
-          state: "done",
-          kg: tea.co2,
-          calculatedFromCount: tea.ingredients.length,
-        }
+        state: "done",
+        kg: tea.co2,
+        calculatedFromCount: tea.ingredients.length,
+      }
       : { state: "idle", kg: null, calculatedFromCount: 0 };
   return {
     name: tea.name,
@@ -87,7 +87,7 @@ export default function EditMealPage({
 }) {
   const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [tea, setTea] = useState<MealStat | null>(null);
+  const [tea, setTea] = useState<TeaStat | null>(null);
 
   useEffect(() => {
     getLunchById(Number(id))
@@ -114,7 +114,7 @@ export default function EditMealPage({
           reviews.length === 0
             ? null
             : reviews.map(review => review.rating).reduce((acc, x) => x + acc) /
-              votes;
+            votes;
         const countReviews = (rating: number) =>
           reviews.filter(review => review.rating == rating).length;
         const distribution: [number, number, number, number, number] = [
@@ -170,7 +170,7 @@ export default function EditMealPage({
   return <EditMealForm tea={tea} />;
 }
 
-function EditMealForm({ tea }: { tea: MealStat }) {
+function EditMealForm({ tea }: { tea: TeaStat }) {
   const router = useRouter();
   const initial = useMemo(() => seedForm(tea), [tea]);
 

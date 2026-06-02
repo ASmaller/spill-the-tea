@@ -25,7 +25,8 @@ model Review {
   comment String?
   tags    String[] @default([])
   posted  DateTime
-  teaId   Int
+  teaId   String?
+  tea     Tea?     @relation(fields: [teaId], references: [id], onDelete: SetNull)
   userId  String?
   user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
@@ -35,6 +36,7 @@ model Tea {
   name        String   @unique
   tags        String[]
   description String   @default("")
+  reviews     Review[]
 }
 
 model Suggestion {

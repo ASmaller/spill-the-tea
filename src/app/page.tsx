@@ -1,19 +1,17 @@
 "use client";
 
 import { FeedHeader } from "@/components/feed/FeedHeader";
-import { MealSheet } from "@/components/sheet/MealSheet";
+import { TeaSheet } from "@/components/sheet/TeaSheet";
 import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
-import { MealStat } from "@/lib/admin/types";
-import type { Day, Option, RatingPayload } from "@/lib/types";
+import { TeaStat } from "@/lib/admin/types";
+import type { RatingPayload } from "@/lib/types";
 import { addReview, getMyReviewSummaries } from "@/services/reviewService";
 import { getAdminMealCatalog } from "@/services/statisticsService";
 import { useEffect, useMemo, useState } from "react";
 
-type Opened = { option: Option; day: Day };
-
 export default function Home() {
-  const [teas, setTeas] = useState<MealStat[] | null>(null);
-  const [opened, setOpened] = useState<Opened | null>(null);
+  const [teas, setTeas] = useState<TeaStat[] | null>(null);
+  const [openedTeaId, setOpenedTeaId] = useState<string | null>(null);
   const [myRatings, setMyRatings] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
@@ -50,25 +48,25 @@ export default function Home() {
     try {
       await addReview({
         rating: payload.rating,
-        servingId: Number(payload.optionId),
-        comment: payload.note,
+        teaId: payload.teaId,
+        comment: payload.comment,
         tags: payload.tags,
         userId: null,
       });
 
       setMyRatings(prev => {
         const next = new Map(prev);
-        next.set(payload.optionId, payload.rating);
+        next.set(payload.teaId, payload.rating);
         return next;
       });
-      setOpened(null);
+      setOpenedTeaId(null);
     } catch (error) {
       console.error("Failed to submit rating", error);
     }
   };
 
-  const existingRating = opened
-    ? (myRatings.get(opened.option.id) ?? null)
+  const existingRating = openedTeaId
+    ? (myRatings.get(openedTeaId) ?? null)
     : null;
 
   return (
@@ -84,11 +82,10 @@ export default function Home() {
           <span>Loading teas...</span>
         )}
       </div>
-      <MealSheet
-        option={opened?.option ?? null}
-        day={opened?.day ?? null}
+      <TeaSheet
+        teaId={openedTeaId}
         existingRating={existingRating}
-        onClose={() => setOpened(null)}
+        onClose={() => setOpenedTeaId(null)}
         onSubmit={handleSubmit}
       />
     </main>

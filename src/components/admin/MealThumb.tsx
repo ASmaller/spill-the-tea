@@ -1,10 +1,10 @@
 import { NEW_TAG } from "@/lib/admin/types";
-import type { MealStat } from "@/lib/admin/types";
+import type { TeaStat } from "@/lib/admin/types";
 import Image from "next/image";
 import { Pill } from "./Pill";
 
 type Props = {
-  meal: Pick<MealStat, "name" | "photo" | "tags">;
+  meal: Pick<TeaStat, "name" | "photo" | "tags">;
   showNewBadge?: boolean;
 };
 

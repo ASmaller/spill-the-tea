@@ -4,11 +4,11 @@ import { Pill } from "@/components/admin/Pill";
 import { CupRating } from "@/components/brand/CupRating";
 import { climateTone, ratingColor } from "@/lib/admin/colors";
 import { NEW_TAG } from "@/lib/admin/types";
-import type { MealStat } from "@/lib/admin/types";
+import type { TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import Link from "next/link";
 
-type Props = { tea: MealStat; urlPrefix: string };
+type Props = { tea: TeaStat; urlPrefix: string };
 
 export function TeaCard({ tea, urlPrefix }: Props) {
   const tone = climateTone(tea.climate);
