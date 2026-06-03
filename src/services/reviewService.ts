@@ -12,7 +12,7 @@ export async function addReview({
   comment,
   tea,
   user,
-}: Omit<ReviewCreateInput, 'posted'>) {
+}: Omit<ReviewCreateInput, "posted">) {
   if (!isValidRating(rating)) {
     throw new ReviewValidationError("rating must be an integer from 1 to 5");
   }
