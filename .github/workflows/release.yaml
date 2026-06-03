@@ -15,5 +15,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
-          name: Don't Spill the Tea ${{ github.ref_name }}
+          name: Spill the Tea ${{ github.ref_name }}
           draft: true

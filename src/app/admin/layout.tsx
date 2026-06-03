@@ -4,7 +4,7 @@ import { getAdminSidebarStats } from "@/services/statisticsService";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin · Don't Spill the Tea",
+  title: "Admin · Spill the Tea",
 };
 
 export default function AdminLayout({

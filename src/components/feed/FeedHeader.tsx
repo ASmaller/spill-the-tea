@@ -9,7 +9,7 @@ export function FeedHeader() {
       <div className="mx-auto flex h-14 max-w-screen-sm items-center justify-between px-4">
         <Link
           href="/"
-          aria-label="Don't Spill the Tea — home"
+          aria-label="Spill the Tea — home"
           className={`rounded-sm ${FOCUS_RING.paper}`}
         >
           <Wordmark size={20} />

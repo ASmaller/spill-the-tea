@@ -1,6 +1,6 @@
 # Spill the Tea
 
-Welcome to spill the tea! A solution for rating the teas found in Hubben 2.2.
+Welcome to **Spill the Tea**! A solution for rating the teas found in Hubben 2.2.
 
 For setting up your own instance, see [SETUP.md](./SETUP.md).
 
