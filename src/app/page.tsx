@@ -47,14 +47,13 @@ export default function Home() {
   const handleSubmit = async (payload: RatingPayload) => {
     try {
       await addReview({
+        rating: payload.rating,
+        comment: payload.comment,
         tea: {
           connect: {
             id: payload.teaId,
           },
         },
-        rating: payload.rating,
-        comment: payload.comment,
-        tags: payload.tags,
       });
 
       setMyRatings(prev => {
