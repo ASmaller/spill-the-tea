@@ -1,7 +1,7 @@
 import { Sparkline } from "@/components/admin/charts/Sparkline";
 import { Pill } from "@/components/admin/Pill";
 import { Card } from "@/components/ui/Card";
-import type { Kpi } from "@/lib/admin/types";
+import type { Kpi } from "@/lib/types";
 
 type Props = { kpis: Kpi[] };
 

@@ -4,42 +4,31 @@ import { Pill } from "@/components/admin/Pill";
 import { SectionHead } from "@/components/admin/SectionHead";
 import { SelectFilter } from "@/components/admin/SelectFilter";
 import { CupRating } from "@/components/brand/CupRating";
-import { relativeDays } from "@/lib/admin/relative-time";
-import type { MealComment } from "@/lib/admin/types";
+import { Review } from "@/generated/prisma/client";
+import { formatRelativeDate } from "@/lib/dateFormat";
 import { FOCUS_RING } from "@/lib/styles";
 import { useMemo, useState } from "react";
 
 type Props = {
-  comments: MealComment[];
+  reviews: Review[];
   pageSize?: number;
 };
 
 type SortKey = "recent" | "highest" | "lowest";
 
-function commentTime(comment: MealComment, nowMs: number): number {
-  if (comment.postedAt) {
-    const parsed = new Date(comment.postedAt);
-    if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
-  }
-
-  const days = relativeDays(comment.when);
-  return days == null ? 0 : nowMs - days * 24 * 60 * 60 * 1000;
-}
-
-export function CommentList({ comments, pageSize = 5 }: Props) {
+export function CommentList({ reviews, pageSize = 5 }: Props) {
   const [sort, setSort] = useState<SortKey>("recent");
   const [page, setPage] = useState(1);
-  const [nowMs] = useState(() => Date.now());
 
   const sorted = useMemo(() => {
-    const next = [...comments];
+    const next = [...reviews];
     if (sort === "recent") {
-      next.sort((a, b) => commentTime(b, nowMs) - commentTime(a, nowMs));
+      next.sort((a, b) => b.posted.getTime() - a.posted.getTime());
     }
     if (sort === "highest") next.sort((a, b) => b.rating - a.rating);
     if (sort === "lowest") next.sort((a, b) => a.rating - b.rating);
     return next;
-  }, [comments, sort, nowMs]);
+  }, [reviews, sort]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -50,7 +39,7 @@ export function CommentList({ comments, pageSize = 5 }: Props) {
     <>
       <SectionHead
         title="All comments"
-        sub={`${comments.length} on this meal`}
+        sub={`${reviews.length} on this meal`}
         right={
           <div className="flex items-center" style={{ gap: 10 }}>
             <SelectFilter
@@ -100,9 +89,9 @@ export function CommentList({ comments, pageSize = 5 }: Props) {
           No comments yet.
         </div>
       ) : (
-        visible.map((c, i) => (
+        visible.map((review, i) => (
           <div
-            key={c.id}
+            key={review.id}
             style={{
               padding: "12px 0",
               borderTop: i === 0 ? "none" : "1px solid rgba(26,24,21,0.06)",
@@ -112,18 +101,20 @@ export function CommentList({ comments, pageSize = 5 }: Props) {
               className="flex items-center"
               style={{ gap: 8, marginBottom: 5 }}
             >
-              <CupRating value={c.rating} size={11} />
-              <span className="text-ink-soft text-meta">{c.when}</span>
+              <CupRating value={review.rating} size={11} />
+              <span className="text-ink-soft text-meta">
+                {formatRelativeDate(review.posted)}
+              </span>
             </div>
             <div
               className="text-ink text-body italic"
               style={{ lineHeight: 1.5 }}
             >
-              &ldquo;{c.text}&rdquo;
+              &ldquo;{review.comment}&rdquo;
             </div>
-            {c.tags.length > 0 && (
+            {review.tags.length > 0 && (
               <div className="flex flex-wrap" style={{ gap: 4, marginTop: 6 }}>
-                {c.tags.map(t => (
+                {review.tags.map(t => (
                   <Pill key={t} tone="neutral">
                     {t}
                   </Pill>

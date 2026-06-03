@@ -1,7 +1,7 @@
 import { FOCUS_RING } from "@/lib/styles";
 import { submitSuggestion } from "@/services/suggestionService";
 import { useEffect, useRef, useState } from "react";
-import { ThankYouView } from "../sheet/ThankYouView";
+import { ThankYouView } from "../TeaSheet/ThankYouView";
 import { Card } from "../ui/Card";
 
 const SUBMIT_CLOSE_DELAY = 1600;

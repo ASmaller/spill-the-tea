@@ -3,10 +3,7 @@
 import { BackLink } from "@/components/admin/BackLink";
 import { ConfirmDiscardDialog } from "@/components/admin/ConfirmDiscardDialog";
 import { Dialog } from "@/components/admin/Dialog";
-import { ClimateImpact } from "@/components/admin/forms/ClimateImpact";
 import { Field } from "@/components/admin/forms/Field";
-import { IngredientsEditor } from "@/components/admin/forms/IngredientsEditor";
-import { LineSegmented } from "@/components/admin/forms/LineSegmented";
 import { PhotoDrop } from "@/components/admin/forms/PhotoDrop";
 import { TagPicker } from "@/components/admin/forms/TagPicker";
 import { TextInput } from "@/components/admin/forms/TextInput";
@@ -16,67 +13,30 @@ import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ratingColor } from "@/lib/admin/colors";
 import { ratingAverage, ratingTotal } from "@/lib/admin/ratings";
+import { isTeaTag, TeaTag, type PhotoRef, type TeaStat } from "@/lib/types";
 import {
-  DIET_TAG_SET,
-  isValidRow,
-  newIngredientRow,
-  parseAmount,
-  type ClimateFormState,
-  type IngredientRow,
-  type IngredientUnit,
-  type PhotoRef,
-  type TeaStat,
-} from "@/lib/admin/types";
-import { getFeedDateKey } from "@/lib/dateFormat";
-import type { DietTag } from "@/lib/types";
-import {
-  getLunchById,
-  removeLunch,
-  updateLunch,
-} from "@/services/lunchService";
+  deleteTeaById,
+  getTeaWithReviewsById,
+  updateTea,
+} from "@/services/teaService";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
-import z from "zod";
 
 const FORM_ID = "edit-tea-form";
 
 type Initial = {
   name: string;
-  line: TeaStat["line"];
-  tags: DietTag[];
-  ingredients: IngredientRow[];
+  tags: TeaTag[];
   photo: PhotoRef | null;
-  climate: ClimateFormState;
 };
 
 function seedForm(tea: TeaStat): Initial {
-  const ingredients: IngredientRow[] =
-    tea.ingredients.length > 0
-      ? tea.ingredients.map(ingredient => ({
-          id: ingredient.id,
-          name: ingredient.name,
-          amount: ingredient.amount,
-          unit: ingredient.unit,
-        }))
-      : [newIngredientRow()];
-  // Form only manages diet tags
-  const tags = tea.tags.filter((t): t is DietTag => DIET_TAG_SET.has(t));
-  const climate: ClimateFormState =
-    tea.co2 != null && tea.co2 > 0
-      ? {
-          state: "done",
-          kg: tea.co2,
-          calculatedFromCount: tea.ingredients.length,
-        }
-      : { state: "idle", kg: null, calculatedFromCount: 0 };
+  const tags = tea.tags.filter(t => isTeaTag(t));
   return {
     name: tea.name,
-    line: tea.line,
     tags,
-    ingredients,
     photo: tea.photo ?? null,
-    climate,
   };
 }
 
@@ -90,33 +50,26 @@ export default function EditMealPage({
   const [tea, setTea] = useState<TeaStat | null>(null);
 
   useEffect(() => {
-    getLunchById(Number(id))
+    getTeaWithReviewsById(id)
       .catch(reason => {
         console.warn(reason);
         return null;
       })
-      .then(lunch => {
+      .then(tea => {
         setIsLoading(false);
-        if (lunch == null) {
+        if (tea == null) {
           return;
         }
 
-        const MealLine = z.enum([
-          "Vegetarian",
-          "Nordic",
-          "Street food",
-        ] as const);
-        const line = MealLine.parse(lunch.line);
-
-        const reviews = lunch.servings.map(serving => serving.reviews).flat(1);
-        const votes = reviews.length;
+        const votes = tea.reviews.length;
         const rating =
-          reviews.length === 0
+          tea.reviews.length === 0
             ? null
-            : reviews.map(review => review.rating).reduce((acc, x) => x + acc) /
-              votes;
+            : tea.reviews
+                .map(review => review.rating)
+                .reduce((acc, x) => x + acc) / votes;
         const countReviews = (rating: number) =>
-          reviews.filter(review => review.rating == rating).length;
+          tea.reviews.filter(review => review.rating == rating).length;
         const distribution: [number, number, number, number, number] = [
           countReviews(1),
           countReviews(2),
@@ -125,35 +78,13 @@ export default function EditMealPage({
           countReviews(5),
         ];
 
-        // Future-scheduled servings shouldn't appear as "last served". Use
-        // the shared UTC date-key helper so this matches statisticsService.
-        const todayKey = getFeedDateKey(new Date());
-        const pastServingTimes = lunch.servings
-          .filter(s => getFeedDateKey(s.date) <= todayKey)
-          .map(s => s.date.getTime());
-        const lastServedDate = pastServingTimes.length
-          ? new Date(Math.max(...pastServingTimes))
-          : null;
-
         setTea({
-          id: lunch.id,
-          name: lunch.name,
-          line,
-          tags: lunch.tags,
+          id: tea.id,
+          name: tea.name,
+          tags: tea.tags,
           rating,
           votes,
           distribution,
-          co2: lunch.ecoScore,
-          climate: null,
-          lastServed: lastServedDate ? lastServedDate.toString() : "—",
-          ingredients: lunch.ingredients.map(dbIngredient => {
-            return {
-              id: dbIngredient.id,
-              unit: dbIngredient.unit as IngredientUnit,
-              name: dbIngredient.name,
-              amount: dbIngredient.amount,
-            };
-          }),
           photo: undefined,
         });
       });
@@ -175,35 +106,27 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
   const initial = useMemo(() => seedForm(tea), [tea]);
 
   const [name, setName] = useState(initial.name);
-  const [line, setLine] = useState(initial.line);
   const [tags, setTags] = useState(initial.tags);
-  const [ingredients, setIngredients] = useState(initial.ingredients);
   const [photo, setPhoto] = useState(initial.photo);
-  const [climate, setClimate] = useState(initial.climate);
   const [submitting, setSubmitting] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [savedInitialKey, setSavedInitialKey] = useState<string | null>(null);
 
-  const toggleTag = (tag: DietTag) =>
+  const toggleTag = (tag: TeaTag) =>
     setTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
 
-  const isValid =
-    name.trim().length > 0 &&
-    ingredients.some(r => r.name.trim() && parseAmount(r.amount) > 0);
+  const isValid = name.trim().length > 0;
 
   const initialKey = useMemo(
     () =>
       savedInitialKey ??
       JSON.stringify({
         name: initial.name,
-        line: initial.line,
         tags: initial.tags,
-        ingredients: initial.ingredients,
         photo: initial.photo,
-        kg: initial.climate.kg,
       }),
     [initial, savedInitialKey]
   );
@@ -211,14 +134,11 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
   const isDirty = useMemo(() => {
     const current = JSON.stringify({
       name,
-      line,
       tags,
-      ingredients,
       photo,
-      kg: climate.kg,
     });
     return current !== initialKey;
-  }, [name, line, tags, ingredients, photo, climate.kg, initialKey]);
+  }, [name, tags, photo, initialKey]);
 
   const total = ratingTotal(tea.distribution);
   const avg = ratingAverage(tea.distribution);
@@ -229,24 +149,15 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
     if (!isValid || submitting) return;
     setSubmitting(true);
     try {
-      const updated = await updateLunch(tea.id, ingredients, {
+      const updated = await updateTea(tea.id, {
         name,
-        line,
         description: "",
         tags,
       });
-      setClimate({
-        state: "done",
-        kg: updated.ecoScore,
-        calculatedFromCount: ingredients.filter(isValidRow).length,
-      });
       const currentKey = JSON.stringify({
         name,
-        line,
         tags,
-        ingredients,
         photo,
-        kg: updated.ecoScore,
       });
       setSavedInitialKey(currentKey);
       setSubmitting(false);
@@ -261,7 +172,7 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
     setShowDelete(false);
     setSubmitting(true);
     try {
-      await removeLunch(tea.id);
+      await deleteTeaById(tea.id);
       router.push("/admin/teas");
     } catch {
       setSubmitting(false);
@@ -285,11 +196,6 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
           </BackLink>
           <span>Edit tea</span>
         </>
-      }
-      subtitle={
-        tea.lastServed === "—"
-          ? `Not served yet · ${total} ratings · ${visibleAvg} avg`
-          : `Last served ${tea.lastServed} · ${total} ratings · ${visibleAvg} avg`
       }
       actions={
         <>
@@ -357,24 +263,12 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
           </Card>
 
           <Card>
-            <SectionHead
-              title="Climate impact"
-              sub="Estimated from ingredients"
-            />
-            <ClimateImpact
-              rows={ingredients}
-              state={climate}
-              onChange={setClimate}
-            />
-          </Card>
-
-          <Card>
             <SectionHead title="History" />
             <HistoryRows
               total={total}
               avgLabel={visibleAvg}
               avgColor={avgColor}
-              lastServed={tea.lastServed}
+              lastServed={"N/A"}
             />
           </Card>
         </div>
@@ -386,20 +280,8 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
               <TextInput value={name} onChange={setName} large />
             </Field>
 
-            <Field label="Line" required>
-              <LineSegmented value={line} onChange={setLine} />
-            </Field>
-
             <Field label="Tags" hint="Students use these to filter the feed.">
               <TagPicker value={tags} onToggle={toggleTag} />
-            </Field>
-
-            <Field
-              label="Ingredients"
-              required
-              hint="Per-portion amounts. Climate impact is calculated from this list."
-            >
-              <IngredientsEditor rows={ingredients} onChange={setIngredients} />
             </Field>
           </div>
         </Card>

@@ -1,16 +1,15 @@
-import type { TeaStat } from "@/lib/admin/types";
+import type { TeaStat } from "@/lib/types";
 import Image from "next/image";
 import { Pill } from "./Pill";
 
 export enum TriedStatus {
-  UNSET,
   TRIED,
   UNTRIED,
 }
 
 type Props = {
-  meal: Pick<TeaStat, "name" | "photo" | "tags">;
-  tried: TriedStatus;
+  meal: Pick<TeaStat, "name" | "photo">;
+  tried?: TriedStatus;
 };
 
 export function MealThumb({ meal, tried }: Props) {

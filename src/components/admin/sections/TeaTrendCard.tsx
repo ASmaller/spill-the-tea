@@ -4,7 +4,7 @@ import { TrendChart } from "@/components/admin/charts/TrendChart";
 import { SectionHead } from "@/components/admin/SectionHead";
 import { Card } from "@/components/ui/Card";
 import { FOCUS_RING } from "@/lib/styles";
-import type { AdminMealTrend } from "@/services/statisticsService";
+import type { TeaTrend } from "@/services/statisticsService";
 import { useState } from "react";
 
 type RangeKey = "10" | "30" | "100";
@@ -12,8 +12,8 @@ type RangeKey = "10" | "30" | "100";
 const RANGE_KEYS: RangeKey[] = ["10", "30", "100"];
 
 type Props = {
-  teaId: number;
-  initialTrend: AdminMealTrend;
+  teaId: string;
+  initialTrend: TeaTrend;
 };
 
 export function TeaTrendCard({ teaId, initialTrend }: Props) {
@@ -37,7 +37,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
 
       if (!response.ok) throw new Error("Failed to load meal trend");
 
-      setTrend((await response.json()) as AdminMealTrend);
+      setTrend((await response.json()) as TeaTrend);
     } catch (error) {
       console.error("Failed to load meal trend", error);
       setLoadError("Could not load this range.");

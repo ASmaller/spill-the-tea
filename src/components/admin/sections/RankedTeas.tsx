@@ -2,58 +2,31 @@
 
 import { SectionHead } from "@/components/admin/SectionHead";
 import { SelectFilter } from "@/components/admin/SelectFilter";
-import { LINE_COLOR, MEAL_LINES, ratingColor } from "@/lib/admin/colors";
-import { relativeDays } from "@/lib/admin/relative-time";
-import type { TeaStat } from "@/lib/admin/types";
+import { ratingColor } from "@/lib/admin/colors";
 import { FOCUS_RING } from "@/lib/styles";
-import type { MealLine } from "@/lib/types";
+import type { TeaStat } from "@/lib/types";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type Props = { teas: TeaStat[] };
 
-type LineKey = "all" | MealLine;
 type RangeKey = "7d" | "30d";
-type SortKey = "top" | "bottom" | "votes" | "latest";
+type SortKey = "top" | "bottom" | "votes";
 
 const RANGE_DAYS: Record<RangeKey, number> = {
   "7d": 7,
   "30d": 30,
 };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-function daysSinceDate(iso: string | null | undefined): number | null {
-  if (!iso) return null;
-  const parsed = new Date(iso);
-  if (Number.isNaN(parsed.getTime())) return null;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  parsed.setHours(0, 0, 0, 0);
-
-  return Math.round((today.getTime() - parsed.getTime()) / DAY_MS);
-}
-
-function mealRecencyDays(meal: TeaStat): number | null {
-  return daysSinceDate(meal.lastServedAt) ?? relativeDays(meal.lastServed);
-}
-
-function mealServedTime(meal: TeaStat): number {
-  return meal.lastServedAt ? new Date(meal.lastServedAt).getTime() : 0;
-}
-
 const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   top: (a, b) => (b.rating ?? 0) - (a.rating ?? 0),
   bottom: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
   votes: (a, b) => b.votes - a.votes,
-  latest: (a, b) => mealServedTime(b) - mealServedTime(a),
 };
 
 const RANGE_KEYS = Object.keys(RANGE_DAYS) as RangeKey[];
 
 export function RankedTeas({ teas }: Props) {
-  const [line, setLine] = useState<LineKey>("all");
   const [range, setRange] = useState<RangeKey>("30d");
   const [sort, setSort] = useState<SortKey>("top");
   const [showAll, setShowAll] = useState(false);
@@ -64,16 +37,8 @@ export function RankedTeas({ teas }: Props) {
   );
 
   const filtered = useMemo(() => {
-    const maxDays = RANGE_DAYS[range];
-    return teas
-      .filter(tea => {
-        if (tea.rating == null) return false;
-        if (line !== "all" && tea.line !== line) return false;
-        const days = mealRecencyDays(tea);
-        return days != null && days <= maxDays;
-      })
-      .sort(SORT_COMPARE[sort]);
-  }, [teas, line, range, sort]);
+    return teas.filter(tea => tea.rating != null).sort(SORT_COMPARE[sort]);
+  }, [teas, sort]);
 
   const visible = showAll ? filtered : filtered.slice(0, 6);
 
@@ -88,27 +53,6 @@ export function RankedTeas({ teas }: Props) {
         className="flex flex-wrap items-center justify-between"
         style={{ gap: 10, marginTop: 4, marginBottom: 14 }}
       >
-        <div
-          className="bg-paper border-ink/[0.10] flex overflow-hidden border"
-          style={{ borderRadius: 7 }}
-        >
-          <SegmentedItem
-            label="All lines"
-            active={line === "all"}
-            onClick={() => setLine("all")}
-            isFirst
-          />
-          {MEAL_LINES.map(l => (
-            <SegmentedItem
-              key={l}
-              label={l}
-              dot={LINE_COLOR[l]}
-              active={line === l}
-              onClick={() => setLine(l)}
-            />
-          ))}
-        </div>
-
         <div className="flex items-center" style={{ gap: 12 }}>
           <div
             className="text-ink-soft text-meta flex items-center font-medium"
@@ -134,7 +78,6 @@ export function RankedTeas({ teas }: Props) {
             <option value="top">Highest rated</option>
             <option value="bottom">Lowest rated</option>
             <option value="votes">Most votes</option>
-            <option value="latest">Latest served</option>
           </SelectFilter>
         </div>
       </div>
@@ -150,7 +93,6 @@ export function RankedTeas({ teas }: Props) {
         <div />
         <div>Tea · line</div>
         <div>Rating</div>
-        <div style={{ textAlign: "right" }}>Last served</div>
         <div style={{ textAlign: "right" }}>Avg</div>
         <div style={{ textAlign: "right" }}>Votes</div>
       </div>
@@ -175,7 +117,7 @@ export function RankedTeas({ teas }: Props) {
               style={{
                 width: 3,
                 height: 32,
-                background: LINE_COLOR[teas.line],
+                background: "var(--color-tea)",
                 borderRadius: 2,
               }}
             />
@@ -185,12 +127,6 @@ export function RankedTeas({ teas }: Props) {
                 style={{ lineHeight: 1.2 }}
               >
                 {teas.name}
-              </div>
-              <div
-                className="text-ink-soft text-caption uppercase"
-                style={{ marginTop: 2 }}
-              >
-                {teas.line}
               </div>
             </div>
             <div
@@ -205,9 +141,6 @@ export function RankedTeas({ teas }: Props) {
                   borderRadius: 4,
                 }}
               />
-            </div>
-            <div className="text-ink-soft text-meta text-right tabular-nums">
-              {teas.lastServed}
             </div>
             <div
               className="text-body text-right font-semibold tabular-nums"

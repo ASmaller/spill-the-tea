@@ -1,33 +1,29 @@
-import { LinePill } from "@/components/brand/LinePill";
 import { MealPhoto } from "@/components/brand/MealPhoto";
+import { Tea } from "@/generated/prisma/client";
 import { FOCUS_RING } from "@/lib/styles";
-import type { Option } from "@/lib/types";
 import { Check } from "lucide-react";
 
 type Props = {
-  option: Option;
-  onOpen: (option: Option) => void;
+  tea: Tea;
+  onOpen: (tea: Tea) => void;
   rated: boolean;
   compact?: boolean;
 };
 
-export function OptionCard({ option, onOpen, rated, compact }: Props) {
+export function OptionCard({ tea, onOpen, rated, compact }: Props) {
   return (
     <button
       type="button"
-      onClick={() => onOpen(option)}
+      onClick={() => onOpen(tea)}
       className={`group border-ink/6 bg-paper flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[18px] border text-left shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-transform select-none active:scale-[0.99] ${FOCUS_RING.cream}`}
       style={{ WebkitTapHighlightColor: "transparent" }}
     >
       <MealPhoto
-        color={option.color}
-        pattern={option.pattern}
+        color={"var(--color-tea)"}
+        pattern={0}
         height={compact ? 110 : 130}
         className="shrink-0"
       >
-        <LinePill className="absolute top-2.5 left-2.5" size="sm">
-          {option.line}
-        </LinePill>
         {rated && (
           <span
             className="bg-tea text-paper animate-check-pop absolute top-2.5 right-2.5 grid h-6 w-6 place-items-center rounded-full"
@@ -46,7 +42,7 @@ export function OptionCard({ option, onOpen, rated, compact }: Props) {
             lineHeight: 1.15,
           }}
         >
-          {option.name}
+          {tea.name}
         </h3>
       </div>
     </button>

@@ -1,10 +1,10 @@
+import { prisma } from "@/lib/prisma";
 import {
   ReviewAlreadyExistsError,
-  ReviewServingNotFoundError,
+  ReviewTeaNotFoundError,
   ReviewUserNotFoundError,
   ReviewValidationError,
 } from "@/services/reviewErrors";
-import { addReview } from "@/services/reviewService";
 import { z } from "zod";
 
 const ReviewSchema = z.object({
@@ -33,12 +33,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const review = await addReview({
-      teaId: parsed.data.teaId,
-      rating: parsed.data.rating,
-      comment: parsed.data.comment,
-      tags: parsed.data.tags,
-      userId: null,
+    const review = await prisma.review.create({
+      data: {
+        tea: {
+          connect: {
+            id: parsed.data.teaId,
+          },
+        },
+        rating: parsed.data.rating,
+        comment: parsed.data.comment,
+        tags: parsed.data.tags,
+      },
     });
 
     return Response.json(review, { status: 201 });

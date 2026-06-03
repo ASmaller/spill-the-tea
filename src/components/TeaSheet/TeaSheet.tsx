@@ -39,7 +39,7 @@ export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
         setDisplay(tea);
       });
     }
-  }, [teaId]);
+  }, [teaId, display?.id]);
 
   return (
     <Drawer.Root
@@ -263,7 +263,7 @@ function ReadOnlyView({ tea, rating, onClose }: ReadOnlyViewProps) {
             className="text-ink mt-1 font-serif"
             style={{ fontSize: 30, letterSpacing: -0.5, lineHeight: 1.08 }}
           >
-            {te.name}
+            {tea.name}
           </h2>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">

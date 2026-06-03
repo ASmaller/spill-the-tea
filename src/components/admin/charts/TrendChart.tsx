@@ -1,6 +1,6 @@
 "use client";
 
-import type { TrendSeries } from "@/lib/admin/types";
+import type { TrendSeries } from "@/lib/types";
 import type { TooltipValueType } from "recharts";
 import {
   CartesianGrid,

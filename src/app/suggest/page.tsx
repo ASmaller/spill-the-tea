@@ -1,7 +1,7 @@
 "use client";
 
 import { FeedHeader } from "@/components/feed/FeedHeader";
-import { SuggestForm } from "@/components/suggest/SuggestForm";
+import { SuggestForm } from "@/components/SuggestForm/SuggestForm";
 
 export default function Suggest() {
   return (

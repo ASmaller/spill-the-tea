@@ -4,7 +4,6 @@ import { SuggestionAndUser } from "@/app/admin/suggestions/page";
 import { SelectFilter } from "@/components/admin/SelectFilter";
 import { Card } from "@/components/ui/Card";
 import { isNewSuggestion } from "@/lib/admin/suggestions";
-import { NEW_TAG } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
 import { useMemo, useState } from "react";
 import { SuggestionsTable } from "./SuggestionsTable";
@@ -14,7 +13,7 @@ type Props = { suggestions: SuggestionAndUser[]; lastViewed: Date };
 type StatusKey = "all" | "viewed" | "new";
 type SortKey = "newest" | "oldest" | "title" | "title-asc";
 
-const STATUS_KEYS: readonly StatusKey[] = ["all", "viewed", NEW_TAG];
+const STATUS_KEYS: readonly StatusKey[] = ["all", "viewed", "new"];
 const STATUS_LABELS = {
   all: "All",
   viewed: "Viewed",
@@ -37,8 +36,6 @@ export function SuggestionsBrowser({ suggestions, lastViewed }: Props) {
   const [status, setStatus] = useState<StatusKey>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
-
-  // TODO: Update last viewed time after loading
 
   const filtered = useMemo(() => {
     const queryLower = query.trim().toLowerCase();

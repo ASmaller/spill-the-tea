@@ -3,7 +3,7 @@
 import { FeedHeader } from "@/components/feed/FeedHeader";
 import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
 import { TeaSheet } from "@/components/TeaSheet/TeaSheet";
-import { TeaStat } from "@/lib/admin/types";
+import { TeaStat } from "@/lib/types";
 import type { RatingPayload } from "@/lib/types";
 import { addReview, getMyRatings } from "@/services/reviewService";
 import { getTeaCatalog } from "@/services/statisticsService";

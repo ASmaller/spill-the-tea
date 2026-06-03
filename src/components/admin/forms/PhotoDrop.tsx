@@ -1,6 +1,6 @@
 "use client";
 
-import type { PhotoRef } from "@/lib/admin/types";
+import type { PhotoRef } from "@/lib/types";
 import { ImageIcon } from "lucide-react";
 
 type Props = {

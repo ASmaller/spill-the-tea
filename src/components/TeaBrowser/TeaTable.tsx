@@ -1,8 +1,8 @@
 import { Pill } from "@/components/admin/Pill";
 import { Card } from "@/components/ui/Card";
 import { ratingColor } from "@/lib/admin/colors";
-import type { TeaStat } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
+import type { TeaStat } from "@/lib/types";
 import Link from "next/link";
 
 type Props = { teas: TeaStat[]; urlPrefix: string };

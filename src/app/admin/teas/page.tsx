@@ -1,11 +1,11 @@
 import { PageShell } from "@/components/admin/PageShell";
 import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
 import { buttonClassName } from "@/components/ui/Button";
-import { getAdminMealCatalog } from "@/services/statisticsService";
+import { getTeaCatalog } from "@/services/statisticsService";
 import Link from "next/link";
 
 export default async function AdminTeaPage() {
-  const teas = await getAdminMealCatalog();
+  const teas = await getTeaCatalog();
 
   return (
     <PageShell

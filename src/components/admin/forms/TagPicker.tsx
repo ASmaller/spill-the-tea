@@ -1,15 +1,14 @@
 "use client";
 
-import { TAG_OPTIONS } from "@/lib/admin/types";
 import { FOCUS_RING } from "@/lib/styles";
-import type { DietTag } from "@/lib/types";
+import { TAG_OPTIONS, TeaTag } from "@/lib/types";
 
 type Props = {
   // Loose `string[]` accepts non-DietTag legacy/orphan tags (e.g. `pasta`,
   // `mexican`) read from existing teas. The picker still only toggles
   // DietTag values.
   value: readonly string[];
-  onToggle: (tag: DietTag) => void;
+  onToggle: (tag: TeaTag) => void;
 };
 
 export function TagPicker({ value, onToggle }: Props) {
