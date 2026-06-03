@@ -139,7 +139,7 @@ export default function NewTeaPage() {
         <Card>
           <SectionHead title="Details" />
           <div className="flex flex-col" style={{ gap: 18, marginTop: 4 }}>
-            <Field label="Dish name" required>
+            <Field label="Name" required>
               <TextInput
                 value={name}
                 onChange={setName}

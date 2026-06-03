@@ -8,8 +8,8 @@ import { addReview } from "@/services/reviewService";
 import { z } from "zod";
 
 const ReviewSchema = z.object({
+  teaId: z.string(),
   rating: z.int().min(1).max(5),
-  servingId: z.int(),
   comment: z.string().optional(),
   tags: z.array(z.string()).default([]),
 });
@@ -26,13 +26,16 @@ export async function POST(request: Request) {
   const parsed = ReviewSchema.safeParse(body);
 
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+    return Response.json(
+      { error: z.treeifyError(parsed.error) },
+      { status: 400 }
+    );
   }
 
   try {
     const review = await addReview({
+      teaId: parsed.data.teaId,
       rating: parsed.data.rating,
-      servingId: parsed.data.servingId,
       comment: parsed.data.comment,
       tags: parsed.data.tags,
       userId: null,
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
 
     return Response.json(review, { status: 201 });
   } catch (error) {
-    if (error instanceof ReviewServingNotFoundError) {
+    if (error instanceof ReviewTeaNotFoundError) {
       return Response.json({ error: error.message }, { status: 404 });
     }
 

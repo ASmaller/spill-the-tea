@@ -1,17 +1,20 @@
-import { NEW_TAG } from "@/lib/admin/types";
 import type { TeaStat } from "@/lib/admin/types";
 import Image from "next/image";
 import { Pill } from "./Pill";
 
+export enum TriedStatus {
+  UNSET,
+  TRIED,
+  UNTRIED,
+}
+
 type Props = {
   meal: Pick<TeaStat, "name" | "photo" | "tags">;
-  showNewBadge?: boolean;
+  tried: TriedStatus;
 };
 
-export function MealThumb({ meal, showNewBadge = true }: Props) {
+export function MealThumb({ meal, tried }: Props) {
   if (!meal.photo?.url) return null;
-
-  const isNew = meal.tags.includes(NEW_TAG);
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -22,9 +25,9 @@ export function MealThumb({ meal, showNewBadge = true }: Props) {
         sizes="(max-width: 768px) 50vw, 240px"
         className="object-cover"
       />
-      {showNewBadge && isNew && (
+      {tried == TriedStatus.UNTRIED && (
         <div className="absolute" style={{ top: 8, left: 8 }}>
-          <Pill tone="warn">NEW</Pill>
+          <Pill tone="warn">UNTRIED</Pill>
         </div>
       )}
     </div>

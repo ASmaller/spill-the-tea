@@ -1,16 +1,16 @@
 "use server";
 
 import type { Prisma, Review, Tea } from "@/generated/prisma/client";
-import { LINE_COLOR, MEAL_LINES } from "@/lib/admin/colors";
-import {
-  type Kpi,
-  type TagBarItem,
-  type TeaStat,
-  type TrendFootnote,
-  type TrendSeries,
+import type {
+  Kpi,
+  TagBarItem,
+  TeaStat,
+  TrendFootnote,
+  TrendSeries,
 } from "@/lib/admin/types";
 import { getFeedDateKey } from "@/lib/dateFormat";
 import { prisma } from "@/lib/prisma";
+import { isValidRating, NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
 
 type RatingDistribution = [number, number, number, number, number];
 
@@ -22,26 +22,26 @@ export type AdminOverviewTrend = {
   footnotes: TrendFootnote[];
 };
 
-export type AdminMealTrend = {
-  xLabels: string[];
-  series: TrendSeries[];
-};
-
 export type AdminOverview = {
   kpis: Kpi[];
   meals: TeaStat[];
   trend: AdminOverviewTrend;
 };
 
-export type AdminTeaDetail = TeaStat & {
-  comments: Comment[];
-  tagBars: TagBarItem[];
-  trend: AdminMealTrend;
-};
-
 export type AdminSidebarStats = {
   week: string;
   ratingsThisWeek: number;
+};
+
+export type TeaTrend = {
+  xLabels: string[];
+  series: TrendSeries[];
+};
+
+export type TeaDetail = TeaStat & {
+  reviews: Review[];
+  tagBars: TagBarItem[];
+  trend: TeaTrend;
 };
 
 type ReviewSnapshot = Pick<
@@ -58,28 +58,6 @@ const TREND_RANGE_DAYS: Record<TrendRange, number> = {
   "30d": 30,
   "1y": 365,
 };
-
-const POSITIVE_TAGS = new Set([
-  "delicious",
-  "energizing",
-  "fresh",
-  "aromatic",
-  "floral",
-]);
-
-const NEGATIVE_TAGS = new Set([
-  "bland",
-  "too sweet",
-  "bitter",
-  "artificial",
-  "weak",
-]);
-
-export type Rating = 1 | 2 | 3 | 4 | 5;
-
-function isValidRating(rating: number): rating is Rating {
-  return Number.isInteger(rating) && rating >= 1 && rating <= 5;
-}
 
 function getStartOfToday(now: Date): Date {
   const startOfToday = new Date(now);
@@ -244,25 +222,7 @@ function getTagBars(reviews: ReviewSnapshot[]): TagBarItem[] {
     .slice(0, MAX_TAG_BARS);
 }
 
-function getComments(
-  tea: Pick<TeaWithReviews, "id" | "name" | "reviews">
-): Comment[] {
-  return tea.reviews
-    .filter(review => review.comment?.trim())
-    .sort((a, b) => b.posted.getTime() - a.posted.getTime())
-    .map(review => ({
-      id: review.id,
-      teaId: tea.id,
-      mealName: tea.name,
-      rating: review.rating,
-      text: review.comment?.trim() ?? "",
-      when: formatRelativeDate(review.posted),
-      postedAt: review.posted.toISOString(),
-      tags: review.tags,
-    }));
-}
-
-function buildMealTrend(servings: TeaWithReviews[]): AdminMealTrend {
+function buildMealTrend(servings: TeaWithReviews[]): TeaTrend {
   const points = [...servings]
     .sort((a, b) => a.posted.getTime() - b.date.getTime())
     .flatMap(serving => {
@@ -518,14 +478,17 @@ export async function getAdminKpis(): Promise<Kpi[]> {
   ];
 }
 
-export async function getAdminMealCatalog(): Promise<TeaStat[]> {
-  const lunches = await prisma.tea.findMany({
+export async function getTeaCatalog(): Promise<TeaStat[]> {
+  const teas = await prisma.tea.findMany({
     orderBy: {
       name: "asc",
     },
+    include: {
+      reviews: true,
+    },
   });
 
-  return lunches.map(toMealStat);
+  return teas.map(toTeaStat);
 }
 
 export async function getAdminOverviewTrend(
@@ -546,34 +509,26 @@ export async function getAdminOverviewTrend(
   const [currentReviews, previousReviews] = await Promise.all([
     prisma.review.findMany({
       where: {
-        serving: {
-          date: {
-            gte: start,
-            lt: endExclusive,
-          },
+        posted: {
+          gte: start,
+          lt: endExclusive,
         },
       },
       select: {
         rating: true,
-        serving: {
+        posted: true,
+        tea: {
           select: {
-            date: true,
-            lunch: {
-              select: {
-                line: true,
-              },
-            },
+            name: true,
           },
         },
       },
     }),
     prisma.review.findMany({
       where: {
-        serving: {
-          date: {
-            gte: previousStart,
-            lt: start,
-          },
+        posted: {
+          gte: previousStart,
+          lt: start,
         },
       },
       select: {

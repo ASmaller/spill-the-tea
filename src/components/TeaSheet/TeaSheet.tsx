@@ -1,14 +1,13 @@
 import { Eyebrow } from "@/components/brand/Eyebrow";
-import { LinePill } from "@/components/brand/LinePill";
 import { MealPhoto } from "@/components/brand/MealPhoto";
 import { Tag } from "@/components/brand/Tag";
-import { formatFeedDate } from "@/lib/dateFormat";
+import { Tea } from "@/generated/prisma/client";
 import { FOCUS_RING } from "@/lib/styles";
 import type { RatingPayload } from "@/lib/types";
+import { getTeaById } from "@/services/teaService";
 import { useEffect, useRef, useState } from "react";
 import { Drawer } from "vaul";
 import { CupRating } from "../brand/CupRating";
-import { ClimateTag } from "./ClimateTag";
 import { RatingBlock } from "./RatingBlock";
 import { ThankYouView } from "./ThankYouView";
 
@@ -29,16 +28,18 @@ type Props = {
 
 export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
   const open = teaId != null;
-  const [display, setDisplay] = useState<{ option: Option; day: Day } | null>(
-    null
-  );
+  const [display, setDisplay] = useState<Tea | null>(null);
 
-  // Cache the last non-null meal so content stays visible through the close
+  // Cache the last non-null tea so content stays visible through the close
   // animation after the parent clears `option`. React sanctions this
   // "adjusting state from props" pattern when guarded against re-entry.
-  if (option && day && (display?.option !== option || display?.day !== day)) {
-    setDisplay({ option, day });
-  }
+  useEffect(() => {
+    if (teaId != null && display?.id !== teaId) {
+      getTeaById(teaId).then(tea => {
+        setDisplay(tea);
+      });
+    }
+  }, [teaId]);
 
   return (
     <Drawer.Root
@@ -54,7 +55,7 @@ export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
         <Drawer.Overlay className="bg-ink/45 fixed inset-0 z-40 backdrop-blur-[4px]" />
         <Drawer.Content className="bg-cream fixed right-0 bottom-0 left-0 z-50 mt-24 flex max-h-[92dvh] flex-col rounded-t-[28px] shadow-[0_-8px_32px_rgba(0,0,0,0.2)] outline-none">
           <Drawer.Title className="sr-only">
-            {display?.option.name ?? "Tea detail"}
+            {display?.name ?? "Tea detail"}
           </Drawer.Title>
           <Drawer.Description className="sr-only">
             Rate this tea and leave an optional comment.
@@ -67,17 +68,15 @@ export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
           {display &&
             (existingRating !== null ? (
               <ReadOnlyView
-                key={display.option.id}
-                option={display.option}
-                day={display.day}
+                key={display.id}
+                tea={display}
                 rating={existingRating}
                 onClose={onClose}
               />
             ) : (
               <EditableContent
-                key={display.option.id}
-                option={display.option}
-                day={display.day}
+                key={display.id}
+                tea={display}
                 onSubmit={onSubmit}
               />
             ))}
@@ -88,15 +87,14 @@ export function TeaSheet({ teaId, existingRating, onClose, onSubmit }: Props) {
 }
 
 type EditableContentProps = {
-  option: Option;
-  day: Day;
+  tea: Tea;
   onSubmit: (payload: RatingPayload) => void;
 };
 
-function EditableContent({ option, day, onSubmit }: EditableContentProps) {
+function EditableContent({ tea, onSubmit }: EditableContentProps) {
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<Set<string>>(new Set());
-  const [note, setNote] = useState("");
+  const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const gradientRef = useRef<HTMLDivElement>(null);
@@ -122,7 +120,7 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
     });
   };
 
-  const hasExtras = tags.size > 0 || note.trim().length > 0;
+  const hasExtras = tags.size > 0 || comment.trim().length > 0;
   const buttonLabel = getButtonLabel(rating, hasExtras);
 
   const submitTimerRef = useRef<number | null>(null);
@@ -144,11 +142,10 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
     submitTimerRef.current = window.setTimeout(() => {
       submitTimerRef.current = null;
       onSubmit({
-        optionId: option.id,
-        dayId: day.id,
+        teaId: tea.id,
         rating,
         tags: [...tags],
-        note: note.trim(),
+        comment: comment.trim(),
       });
     }, SUBMIT_CLOSE_DELAY);
   };
@@ -177,18 +174,13 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
             className="from-cream pointer-events-none sticky top-0 z-10 -mb-5 h-5 bg-gradient-to-b to-transparent opacity-0 transition-opacity duration-200"
           />
           <MealPhoto
-            color={option.color}
-            pattern={option.pattern}
+            color="#09cdda"
+            pattern={0}
             height={200}
             className="mx-4 mt-1 rounded-[20px]"
-          >
-            <LinePill className="absolute top-3 left-3" size="md">
-              {option.line}
-            </LinePill>
-          </MealPhoto>
+          ></MealPhoto>
 
           <div className="px-5 pt-4.5">
-            <Eyebrow>{formatFeedDate(day.date)}</Eyebrow>
             <h2
               className="text-ink mt-1 font-serif"
               style={{
@@ -197,24 +189,20 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
                 lineHeight: 1.08,
               }}
             >
-              {option.name}
+              {tea.name}
             </h2>
 
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-              {option.tags.map(t => (
+              {tea.tags.map(t => (
                 <Tag key={t}>{t}</Tag>
               ))}
-              <ClimateTag
-                climate={option.climate}
-                climateLabel={option.climateLabel}
-              />
             </div>
 
             <p
               className="text-ink-muted mt-3.5"
               style={{ fontSize: 14, lineHeight: 1.5 }}
             >
-              {option.desc}
+              {tea.description}
             </p>
 
             <RatingBlock
@@ -222,8 +210,8 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
               setRating={setRating}
               tags={tags}
               toggleTag={toggleTag}
-              note={note}
-              setNote={setNote}
+              comment={comment}
+              setComment={setComment}
             />
           </div>
         </div>
@@ -254,51 +242,41 @@ function EditableContent({ option, day, onSubmit }: EditableContentProps) {
 }
 
 type ReadOnlyViewProps = {
-  option: Option;
-  day: Day;
+  tea: Tea;
   rating: number;
   onClose: () => void;
 };
 
-function ReadOnlyView({ option, day, rating, onClose }: ReadOnlyViewProps) {
+function ReadOnlyView({ tea, rating, onClose }: ReadOnlyViewProps) {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div className="relative flex-1 overflow-y-auto">
         <MealPhoto
-          color={option.color}
-          pattern={option.pattern}
+          color={"#09cdda"}
+          pattern={0}
           height={200}
           className="mx-4 mt-1 rounded-[20px]"
-        >
-          <LinePill className="absolute top-3 left-3" size="md">
-            {option.line}
-          </LinePill>
-        </MealPhoto>
+        ></MealPhoto>
 
         <div className="px-5 pt-4.5">
-          <Eyebrow>{formatFeedDate(day.date)}</Eyebrow>
           <h2
             className="text-ink mt-1 font-serif"
             style={{ fontSize: 30, letterSpacing: -0.5, lineHeight: 1.08 }}
           >
-            {option.name}
+            {te.name}
           </h2>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {option.tags.map(t => (
+            {tea.tags.map(t => (
               <Tag key={t}>{t}</Tag>
             ))}
-            <ClimateTag
-              climate={option.climate}
-              climateLabel={option.climateLabel}
-            />
           </div>
 
           <p
             className="text-ink-muted mt-3.5"
             style={{ fontSize: 14, lineHeight: 1.5 }}
           >
-            {option.desc}
+            {tea.description}
           </p>
 
           <div className="border-ink/6 bg-paper mt-3.5 rounded-[16px] border p-[18px]">

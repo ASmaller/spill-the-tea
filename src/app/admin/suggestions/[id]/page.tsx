@@ -12,12 +12,10 @@ import { notFound } from "next/navigation";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export default async function MealDetailPage({ params }: PageProps) {
+export default async function SuggestionDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const parsedId = parseInt(id);
-  if (isNaN(parsedId)) notFound();
 
-  const suggestion = await getSuggestionById(parsedId);
+  const suggestion = await getSuggestionById(id);
   if (!suggestion) notFound();
   const suggestionUser = suggestion.userId
     ? await getUser(suggestion.userId)

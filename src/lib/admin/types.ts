@@ -24,20 +24,6 @@ export type TeaForm = {
 // TODO: Move to database and allow admin user to update
 export const TAG_OPTIONS = ["eco", "exotic"] as const;
 
-export type Comment = {
-  id: number;
-  userId?: string;
-  tea: {
-    id: number;
-    name: string;
-  };
-  rating: number;
-  comment: string;
-  when: string;
-  postedAt?: string;
-  tags: string[];
-};
-
 export type TrendSeries = {
   name: string;
   color: string;

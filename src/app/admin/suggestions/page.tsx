@@ -14,7 +14,7 @@ export interface SuggestionAndUser extends Suggestion {
   displayName: string | null;
 }
 
-export default function AdminMealsPage() {
+export default function AdminSuggestionsPage() {
   const [suggestions, setSuggestions] = useState<SuggestionAndUser[]>([]);
   const [lastViewed, setLastViewed] = useState<Date>(new Date());
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function AdminMealsPage() {
     });
   }, []);
   return (
-    <PageShell title="Suggestions" subtitle="Meal suggestions left by students">
+    <PageShell title="Suggestions" subtitle="Tea suggestions left by students">
       <SuggestionsBrowser suggestions={suggestions} lastViewed={lastViewed} />
     </PageShell>
   );

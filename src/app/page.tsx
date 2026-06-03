@@ -1,33 +1,33 @@
 "use client";
 
 import { FeedHeader } from "@/components/feed/FeedHeader";
-import { TeaSheet } from "@/components/sheet/TeaSheet";
 import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
+import { TeaSheet } from "@/components/TeaSheet/TeaSheet";
 import { TeaStat } from "@/lib/admin/types";
 import type { RatingPayload } from "@/lib/types";
-import { addReview, getMyReviewSummaries } from "@/services/reviewService";
-import { getAdminMealCatalog } from "@/services/statisticsService";
+import { addReview, getMyRatings } from "@/services/reviewService";
+import { getTeaCatalog } from "@/services/statisticsService";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
   const [teas, setTeas] = useState<TeaStat[] | null>(null);
   const [openedTeaId, setOpenedTeaId] = useState<string | null>(null);
-  const [myRatings, setMyRatings] = useState<Map<string, number>>(new Map());
+  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let ignore = false;
 
-    getMyReviewSummaries()
+    getMyRatings()
       .then(rows => {
         if (!ignore) {
-          setMyRatings(new Map(rows.map(r => [r.servingId, r.rating])));
+          setMyRatings(rows);
         }
       })
       .catch(error => {
         console.error("Failed to fetch my reviews: ", error);
       });
 
-    getAdminMealCatalog()
+    getTeaCatalog()
       .then(teas => {
         if (!ignore) {
           setTeas(teas);
@@ -42,21 +42,24 @@ export default function Home() {
     };
   }, []);
 
-  const ratedIds = useMemo(() => new Set(myRatings.keys()), [myRatings]);
+  const ratedIds = useMemo(() => new Set(Object.keys(myRatings)), [myRatings]);
 
   const handleSubmit = async (payload: RatingPayload) => {
     try {
       await addReview({
+        tea: {
+          connect: {
+            id: payload.teaId,
+          },
+        },
         rating: payload.rating,
-        teaId: payload.teaId,
         comment: payload.comment,
         tags: payload.tags,
-        userId: null,
       });
 
       setMyRatings(prev => {
-        const next = new Map(prev);
-        next.set(payload.teaId, payload.rating);
+        const next: Record<string, number> = { ...prev };
+        next[payload.teaId] = payload.rating;
         return next;
       });
       setOpenedTeaId(null);
@@ -65,9 +68,7 @@ export default function Home() {
     }
   };
 
-  const existingRating = openedTeaId
-    ? (myRatings.get(openedTeaId) ?? null)
-    : null;
+  const existingRating = openedTeaId ? (myRatings[openedTeaId] ?? null) : null;
 
   return (
     <main className="relative">
