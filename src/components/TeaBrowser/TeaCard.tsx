@@ -11,8 +11,7 @@ type Props = { tea: TeaStat; urlPrefix: string };
 
 export function TeaCard({ tea, urlPrefix }: Props) {
   return (
-    <Link
-      href={urlPrefix + tea.id}
+    <div
       className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       style={{ borderRadius: 12 }}
     >
@@ -26,12 +25,13 @@ export function TeaCard({ tea, urlPrefix }: Props) {
       )}
       <div className="flex flex-1 flex-col" style={{ padding: 12, gap: 8 }}>
         <div>
-          <div
+          <Link
+            href={urlPrefix + tea.id}
             className="text-ink text-body font-semibold"
             style={{ lineHeight: 1.3 }}
           >
             {tea.name}
-          </div>
+          </Link>
           {tea.tags.length > 0 && (
             <div className="flex flex-wrap" style={{ gap: 4, marginTop: 6 }}>
               {tea.tags.map(t => (
@@ -77,6 +77,6 @@ export function TeaCard({ tea, urlPrefix }: Props) {
           </span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
