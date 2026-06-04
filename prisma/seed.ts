@@ -7,8 +7,8 @@ const connectionString = process.env.DATABASE_URL!;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-await prisma.tea.deleteMany({})
-await prisma.review.deleteMany({})
+await prisma.tea.deleteMany({});
+await prisma.review.deleteMany({});
 
 const TEAS: TeaCreateInput[] = [
   {
@@ -130,13 +130,13 @@ const REVIEWS: ReviewCreateInput[] = [
 async function main() {
   for (const tea of TEAS) {
     await prisma.tea.create({
-      data: tea
-    })
+      data: tea,
+    });
   }
   for (const review of REVIEWS) {
     await prisma.review.create({
-      data: review
-    })
+      data: review,
+    });
   }
   console.log("added teas and reviews");
 }
