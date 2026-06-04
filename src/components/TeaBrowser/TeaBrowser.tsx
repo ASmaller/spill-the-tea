@@ -8,7 +8,12 @@ import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
 
-type Props = { teas: TeaStat[]; ratedIds?: Set<string>; urlPrefix: string };
+type Props = {
+  onClick: (id: string) => void;
+  teas: TeaStat[];
+  ratedIds?: Set<string>;
+  urlPrefix: string;
+};
 
 type SortKey = "rating" | "rating-asc" | "votes" | "name";
 type ViewKey = "grid" | "table";
@@ -32,7 +37,7 @@ const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   name: (a, b) => a.name.localeCompare(b.name),
 };
 
-export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
+export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
   const [view, setView] = useState<ViewKey>("grid");
   const [tag, setTag] = useState<TagKey>("all");
   const [status, setStatus] = useState<StatusKey>("all");
@@ -169,7 +174,12 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
           }}
         >
           {filtered.map(tea => (
-            <TeaCard key={tea.id} tea={tea} urlPrefix={urlPrefix} />
+            <TeaCard
+              key={tea.id}
+              tea={tea}
+              urlPrefix={urlPrefix}
+              onClick={onClick}
+            />
           ))}
         </div>
       ) : (

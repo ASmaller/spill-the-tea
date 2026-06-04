@@ -25,7 +25,7 @@ export async function addReview({
       tags,
       posted: new Date(),
       tea,
-      user,
+      ...(user && { user }),
     },
   });
 }

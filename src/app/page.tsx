@@ -78,7 +78,12 @@ export default function Home() {
         style={{ padding: "24px 28px" }}
       >
         {teas != null ? (
-          <TeaBrowser teas={teas} ratedIds={ratedIds} urlPrefix="/tea/" />
+          <TeaBrowser
+            onClick={id => setOpenedTeaId(id)}
+            teas={teas}
+            ratedIds={ratedIds}
+            urlPrefix="/tea/"
+          />
         ) : (
           <span>Loading teas...</span>
         )}
