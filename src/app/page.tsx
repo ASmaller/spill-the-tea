@@ -58,7 +58,7 @@ export default function Home() {
         tags: payload.tags,
       });
 
-      setrefreshKey(oldKey => oldKey + 1)
+      setrefreshKey(oldKey => oldKey + 1);
 
       setMyRatings(prev => {
         const next: Record<string, number> = { ...prev };
