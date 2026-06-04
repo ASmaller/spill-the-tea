@@ -7,12 +7,17 @@ import { FOCUS_RING } from "@/lib/styles";
 import type { TeaStat } from "@/lib/types";
 import Link from "next/link";
 
-type Props = { tea: TeaStat; urlPrefix: string; onClick: (id: string) => void };
+type Props = {
+  tea: TeaStat;
+  urlPrefix: string;
+  onClick?: (id: string) => void;
+};
 
 export function TeaCard({ tea, urlPrefix, onClick }: Props) {
   return (
     <div
-      onClick={() => onClick(tea.id)}
+      // ...(onClick && { onClick })
+      onClick={() => onClick?.(tea.id)}
       className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       style={{ borderRadius: 12 }}
     >

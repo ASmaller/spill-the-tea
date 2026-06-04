@@ -9,7 +9,7 @@ import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
 
 type Props = {
-  onClick: (id: string) => void;
+  onClick?: (id: string) => void;
   teas: TeaStat[];
   ratedIds?: Set<string>;
   urlPrefix: string;
