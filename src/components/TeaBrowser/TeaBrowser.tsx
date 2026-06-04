@@ -89,31 +89,13 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
 
   return (
     <>
-      <Card padding={14} style={{ marginBottom: 12 }}>
-        <div className="flex items-center" style={{ gap: 10 }}>
-          <div
-            className="bg-cream border-ink/[0.10] flex flex-1 items-center border"
-            style={{ padding: "8px 12px", borderRadius: 9, gap: 8 }}
-          >
-            <SearchIcon />
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search teas…"
-              className={`text-ink text-body flex-1 rounded-sm bg-transparent outline-none ${FOCUS_RING.cream}`}
-              style={{ fontFamily: "inherit" }}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label="Clear search"
-                className={`text-ink-soft text-meta cursor-pointer rounded-sm ${FOCUS_RING.cream}`}
-              >
-                ✕
-              </button>
-            )}
-          </div>
+      <Card padding={14} className={"mb-3"}>
+        <div className="flex flex-wrap items-center gap-4">
+          <SearchBar
+            query={query}
+            onChange={value => setQuery(value)}
+            onClear={() => setQuery("")}
+          />
 
           <SelectFilter label="Sort" value={sort} onChange={setSort}>
             <option value="rating">Highest rated</option>
@@ -122,28 +104,7 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
             <option value="name">Name (A→Z)</option>
           </SelectFilter>
 
-          <div
-            className="border-ink/[0.10] flex overflow-hidden border"
-            style={{ borderRadius: 7 }}
-          >
-            {(["grid", "table"] as ViewKey[]).map(v => {
-              const active = view === v;
-              return (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setView(v)}
-                  className={`text-meta font-medium ${
-                    active ? "bg-ink text-paper" : "bg-paper text-ink"
-                  } ${FOCUS_RING.paper}`}
-                  style={{ padding: "7px 12px", cursor: "pointer" }}
-                  aria-pressed={active}
-                >
-                  {v === "grid" ? "▦ Grid" : "☰ Table"}
-                </button>
-              );
-            })}
-          </div>
+          <ViewPicker view={view} onChange={setView} />
         </div>
 
         <FilterRow label="Tag">
@@ -218,6 +179,38 @@ export function TeaBrowser({ teas, ratedIds, urlPrefix }: Props) {
   );
 }
 
+function SearchBar({
+  query,
+  onChange,
+  onClear,
+}: {
+  query: string;
+  onChange?: (value: string) => void;
+  onClear?: () => void;
+}) {
+  return (
+    <div className="bg-cream border-ink/[0.10] flex flex-1 items-center gap-2 rounded-lg border px-3 py-2">
+      <SearchIcon />
+      <input
+        value={query}
+        onChange={e => onChange && onChange(e.target.value)}
+        placeholder="Search teas…"
+        className={`text-ink text-body flex-1 rounded-sm bg-transparent outline-none ${FOCUS_RING.cream}`}
+      />
+      {query && (
+        <button
+          type="button"
+          onClick={onClear}
+          aria-label="Clear search"
+          className={`text-ink-soft text-meta cursor-pointer rounded-sm ${FOCUS_RING.cream}`}
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
+}
+
 function FilterRow({
   label,
   children,
@@ -258,17 +251,11 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`text-meta flex items-center font-medium ${
+      className={`text-meta flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium ${
         active
-          ? "bg-ink text-paper"
-          : "bg-paper text-ink border-ink/[0.10] border"
+          ? "bg-ink text-paper border-ink"
+          : "bg-paper text-ink border-ink/[0.10]"
       } ${FOCUS_RING.paper}`}
-      style={{
-        padding: "4px 10px",
-        borderRadius: 999,
-        cursor: "pointer",
-        gap: 5,
-      }}
       aria-pressed={active}
     >
       {children}
@@ -302,5 +289,37 @@ function SearchIcon() {
       <circle cx="11" cy="11" r="7" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
+  );
+}
+
+function ViewPicker({
+  view,
+  onChange,
+}: {
+  view: ViewKey;
+  onChange: (value: ViewKey) => void;
+}) {
+  return (
+    <div
+      className="border-ink/[0.10] flex overflow-hidden border"
+      style={{ borderRadius: 7 }}
+    >
+      {(["grid", "table"] satisfies ViewKey[]).map(v => {
+        const active = view === v;
+        return (
+          <button
+            key={v}
+            type="button"
+            onClick={() => onChange && onChange(v)}
+            className={`text-meta cursor-pointer px-3 py-2 font-medium ${
+              active ? "bg-ink text-paper" : "bg-paper text-ink"
+            } ${FOCUS_RING.paper}`}
+            aria-pressed={active}
+          >
+            {v === "grid" ? "▦ Grid" : "☰ Table"}
+          </button>
+        );
+      })}
+    </div>
   );
 }
