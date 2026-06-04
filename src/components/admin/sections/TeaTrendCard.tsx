@@ -31,7 +31,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
 
     try {
       const response = await fetch(
-        `/api/admin/teas/${teaId}/analytics?servings=${nextRange}`,
+        `/api/admin/teas/${teaId}/analytics?limit=${nextRange}`,
         { cache: "no-store" }
       );
 
@@ -50,13 +50,13 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
     <Card>
       <SectionHead
         title="Rating over time"
-        sub={`Last ${range} servings · most recent right`}
+        sub={`Last ${range} reviews · most recent right`}
         right={
           <div
             className="text-ink-soft text-meta flex items-center font-medium"
             style={{ gap: 6 }}
           >
-            <span>Servings</span>
+            <span>Reviews</span>
             <div
               className="bg-paper border-ink/[0.10] flex overflow-hidden border"
               style={{ borderRadius: 7 }}
@@ -94,7 +94,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
               className="text-ink-soft text-meta flex items-center justify-center"
               style={{ height: 200 }}
             >
-              No rated servings yet.
+              No reviews yet.
             </div>
           )}
         </div>
@@ -132,9 +132,8 @@ function RangeItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`text-meta font-medium ${
-        active ? "bg-ink text-paper" : "text-ink"
-      } ${FOCUS_RING.cream}`}
+      className={`text-meta font-medium ${active ? "bg-ink text-paper" : "text-ink"
+        } ${FOCUS_RING.cream}`}
       style={{
         padding: "6px 11px",
         cursor: "pointer",
