@@ -13,6 +13,7 @@ export default function Home() {
   const [teas, setTeas] = useState<TeaStat[] | null>(null);
   const [openedTeaId, setOpenedTeaId] = useState<string | null>(null);
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [refreshKey, setrefreshKey] = useState<number>(0);
 
   useEffect(() => {
     let ignore = false;
@@ -40,7 +41,7 @@ export default function Home() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const ratedIds = useMemo(() => new Set(Object.keys(myRatings)), [myRatings]);
 
@@ -56,6 +57,8 @@ export default function Home() {
         comment: payload.comment,
         tags: payload.tags,
       });
+
+      setrefreshKey(oldKey => oldKey + 1)
 
       setMyRatings(prev => {
         const next: Record<string, number> = { ...prev };
