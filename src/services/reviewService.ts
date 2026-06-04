@@ -10,9 +10,10 @@ import { ReviewValidationError } from "@/services/reviewErrors";
 export async function addReview({
   rating,
   comment,
+  tags = [],
   tea,
   user,
-}: Omit<ReviewCreateInput, "posted">) {
+}: ReviewCreateInput) {
   if (!isValidRating(rating)) {
     throw new ReviewValidationError("rating must be an integer from 1 to 5");
   }
@@ -21,6 +22,7 @@ export async function addReview({
     data: {
       rating,
       comment,
+      tags,
       posted: new Date(),
       tea,
       user,
