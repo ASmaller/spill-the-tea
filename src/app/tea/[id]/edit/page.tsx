@@ -162,7 +162,7 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
       setSavedInitialKey(currentKey);
       setSubmitting(false);
 
-      router.push(`/admin/teas/${updated.id}/edit`);
+      router.push(`/tea/${updated.id}/edit`);
     } catch {
       setSubmitting(false);
     }
@@ -173,13 +173,13 @@ function EditMealForm({ tea }: { tea: TeaStat }) {
     setSubmitting(true);
     try {
       await deleteTeaById(tea.id);
-      router.push("/admin/teas");
+      router.push("/");
     } catch {
       setSubmitting(false);
     }
   };
 
-  const cancelHref = `/admin/teas/${tea.id}`;
+  const cancelHref = `/tea/${tea.id}`;
   const guardCancel = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isDirty) {
       e.preventDefault();

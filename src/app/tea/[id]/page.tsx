@@ -39,7 +39,7 @@ export default async function MealDetailPage({ params }: PageProps) {
     <PageShell
       title={
         <>
-          <BackLink href="/admin/teas">← Teas</BackLink>
+          <BackLink href="/">← Teas</BackLink>
           <span>{tea.name}</span>
         </>
       }
@@ -55,10 +55,7 @@ export default async function MealDetailPage({ params }: PageProps) {
       }
       actions={
         admin && (
-          <Link
-            href={`/admin/teas/${tea.id}/edit`}
-            className={buttonClassName()}
-          >
+          <Link href={`/tea/${tea.id}/edit`} className={buttonClassName()}>
             Edit
           </Link>
         )
