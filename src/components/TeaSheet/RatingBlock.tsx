@@ -33,7 +33,7 @@ export function RatingBlock({ tea }: Props) {
   }
 
   return (
-    <div className="border-ink/6 bg-paper mt-3.5 rounded-[16px] border p-[18px]">
+    <div className="bg-paper mt-3.5 rounded-[16px]">
       <h3
         className="text-ink text-center font-serif"
         style={{ fontSize: 20, letterSpacing: -0.2 }}
