@@ -161,3 +161,22 @@ export const verifySession = cache(
     return session;
   }
 );
+
+/**
+ * Check if there is an authorized user who is an admin.
+ * @return If the user is an admin.
+ */
+export async function isAdmin(): Promise<boolean> {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
+
+  // Check if session does not exist or has expired
+  const currentTimeSeconds = Date.now() / 1000;
+  if (session?.exp == undefined || session.exp <= currentTimeSeconds) {
+    // Session has expired
+    return false;
+  }
+
+  // TODO: Check Gamma authorities
+  return true;
+}

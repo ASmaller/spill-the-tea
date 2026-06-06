@@ -15,6 +15,7 @@ import {
   ratingAverage,
   ratingTotal,
 } from "@/lib/admin/ratings";
+import { isAdmin } from "@/lib/session";
 import { getTeaDetail } from "@/services/statisticsService";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,6 +24,8 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function MealDetailPage({ params }: PageProps) {
   const { id } = await params;
+
+  const admin = await isAdmin();
 
   const tea = await getTeaDetail(id);
   if (!tea) notFound();
@@ -51,14 +54,14 @@ export default async function MealDetailPage({ params }: PageProps) {
         </div>
       }
       actions={
-        <>
+        admin && (
           <Link
             href={`/admin/teas/${tea.id}/edit`}
             className={buttonClassName()}
           >
             Edit
           </Link>
-        </>
+        )
       }
     >
       <div
