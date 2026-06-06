@@ -29,6 +29,8 @@ export function RatingBlock({ tea }: Props) {
   const suggested = rating >= 4 ? POSITIVE_TAGS : NEGATIVE_TAGS;
 
   function updateRating(newRating: number) {
+    if ((rating >= 4 && newRating < 4) || (rating < 4 && newRating >= 4))
+      setTags(new Set());
     return rating == newRating ? setRating(0) : setRating(newRating);
   }
 
