@@ -7,6 +7,7 @@ import { SectionHead } from "@/components/admin/SectionHead";
 import { CommentList } from "@/components/admin/sections/CommentList";
 import { TeaTrendCard } from "@/components/admin/sections/TeaTrendCard";
 import { CupRating } from "@/components/brand/CupRating";
+import { RatingBlock } from "@/components/TeaSheet/RatingBlock";
 import { buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
@@ -63,7 +64,7 @@ export default async function MealDetailPage({ params }: PageProps) {
       <div
         className="grid"
         style={{
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "1fr 1.5fr",
           gap: 12,
           marginBottom: 16,
         }}
@@ -82,6 +83,10 @@ export default async function MealDetailPage({ params }: PageProps) {
           <div className="text-ink-muted text-meta" style={{ marginTop: 8 }}>
             {total} ratings · {comments.length} comments
           </div>
+        </Card>
+
+        <Card padding={18}>
+          <RatingBlock tea={tea} />
         </Card>
       </div>
 

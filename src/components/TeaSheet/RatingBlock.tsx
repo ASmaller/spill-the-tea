@@ -1,26 +1,36 @@
+"use client";
+
 import { CupRating } from "@/components/brand/CupRating";
 import { Eyebrow } from "@/components/brand/Eyebrow";
 import { FOCUS_RING } from "@/lib/styles";
 import { NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
+import { addReview } from "@/services/reviewService";
+import { TeaDetail } from "@/services/statisticsService";
+import { useState } from "react";
 
 type Props = {
-  rating: number;
-  setRating: (value: number) => void;
-  tags: Set<string>;
-  toggleTag: (value: string) => void;
-  comment: string;
-  setComment: (value: string) => void;
+  tea: TeaDetail;
 };
 
-export function RatingBlock({
-  rating,
-  setRating,
-  tags,
-  toggleTag,
-  comment,
-  setComment,
-}: Props) {
+export function RatingBlock({ tea }: Props) {
+  const [rating, setRating] = useState(0);
+  const [tags, setTags] = useState<Set<string>>(new Set());
+  const [comment, setComment] = useState("");
+
+  const toggleTag = (t: string) => {
+    setTags(prev => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      return next;
+    });
+  };
+
   const suggested = rating >= 4 ? POSITIVE_TAGS : NEGATIVE_TAGS;
+
+  function updateRating(newRating: number) {
+    return rating == newRating ? setRating(0) : setRating(newRating);
+  }
 
   return (
     <div className="border-ink/6 bg-paper mt-3.5 rounded-[16px] border p-[18px]">
@@ -31,7 +41,12 @@ export function RatingBlock({
         How was it?
       </h3>
       <div className="mt-3.5 flex justify-center">
-        <CupRating value={rating} size={46} interactive onChange={setRating} />
+        <CupRating
+          value={rating}
+          size={46}
+          interactive
+          onChange={updateRating}
+        />
       </div>
 
       {rating > 0 && (
@@ -76,6 +91,33 @@ export function RatingBlock({
           />
         </div>
       )}
+      <button
+        type="button"
+        onClick={() => {
+          addReview({
+            rating,
+            comment,
+            tags: Array.from(tags.values()),
+            tea: {
+              connect: {
+                id: tea.id,
+              },
+            },
+          });
+          setRating(0);
+          setTags(new Set());
+          setComment("");
+        }}
+        disabled={rating === 0}
+        className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${
+          rating > 0
+            ? "bg-ink text-paper cursor-pointer"
+            : "bg-ink/10 text-ink-muted cursor-not-allowed"
+        }`}
+        style={{ fontSize: 14, padding: "15px" }}
+      >
+        {rating > 0 ? "Submit rating" : "Tap a cup to rate"}
+      </button>
     </div>
   );
 }

@@ -2,18 +2,14 @@
 
 import { FeedHeader } from "@/components/feed/FeedHeader";
 import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
-import { TeaSheet } from "@/components/TeaSheet/TeaSheet";
 import { TeaStat } from "@/lib/types";
-import type { RatingPayload } from "@/lib/types";
-import { addReview, getMyRatings } from "@/services/reviewService";
+import { getMyRatings } from "@/services/reviewService";
 import { getTeaCatalog } from "@/services/statisticsService";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
   const [teas, setTeas] = useState<TeaStat[] | null>(null);
-  const [openedTeaId, setOpenedTeaId] = useState<string | null>(null);
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
-  const [refreshKey, setrefreshKey] = useState<number>(0);
 
   useEffect(() => {
     let ignore = false;
@@ -41,38 +37,9 @@ export default function Home() {
     return () => {
       ignore = true;
     };
-  }, [refreshKey]);
+  }, []);
 
   const ratedIds = useMemo(() => new Set(Object.keys(myRatings)), [myRatings]);
-
-  const handleSubmit = async (payload: RatingPayload) => {
-    try {
-      await addReview({
-        tea: {
-          connect: {
-            id: payload.teaId,
-          },
-        },
-        rating: payload.rating,
-        comment: payload.comment,
-        tags: payload.tags,
-      });
-
-      setrefreshKey(oldKey => oldKey + 1);
-
-      setMyRatings(prev => {
-        const next: Record<string, number> = { ...prev };
-        next[payload.teaId] = payload.rating;
-        return next;
-      });
-      setOpenedTeaId(null);
-    } catch (error) {
-      console.error("Failed to submit rating", error);
-    }
-  };
-
-  const existingRating = openedTeaId ? (myRatings[openedTeaId] ?? null) : null;
-
   return (
     <main className="relative">
       <FeedHeader />
@@ -81,22 +48,11 @@ export default function Home() {
         style={{ padding: "24px 28px" }}
       >
         {teas != null ? (
-          <TeaBrowser
-            onClick={id => setOpenedTeaId(id)}
-            teas={teas}
-            ratedIds={ratedIds}
-            urlPrefix="/tea/"
-          />
+          <TeaBrowser teas={teas} ratedIds={ratedIds} urlPrefix="/tea/" />
         ) : (
           <span>Loading teas...</span>
         )}
       </div>
-      <TeaSheet
-        teaId={openedTeaId}
-        existingRating={existingRating}
-        onClose={() => setOpenedTeaId(null)}
-        onSubmit={handleSubmit}
-      />
     </main>
   );
 }
