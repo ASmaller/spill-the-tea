@@ -29,7 +29,7 @@ export default async function AdminOverviewPage() {
     >
       <KpiStrip kpis={overview.kpis} />
       <Card style={{ marginBottom: 16 }}>
-        <RankedTeas teas={overview.meals} />
+        <RankedTeas teas={overview.teas} />
       </Card>
     </PageShell>
   );

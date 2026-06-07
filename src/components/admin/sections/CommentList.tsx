@@ -39,7 +39,7 @@ export function CommentList({ reviews, pageSize = 5 }: Props) {
     <>
       <SectionHead
         title="All comments"
-        sub={`${reviews.length} on this meal`}
+        sub={`${reviews.length} on this tea`}
         right={
           <div className="flex items-center" style={{ gap: 10 }}>
             <SelectFilter

@@ -8,18 +8,18 @@ export enum TriedStatus {
 }
 
 type Props = {
-  meal: Pick<TeaStat, "name" | "photo">;
+  tea: Pick<TeaStat, "name" | "photo">;
   tried?: TriedStatus;
 };
 
-export function MealThumb({ meal, tried }: Props) {
-  if (!meal.photo?.url) return null;
+export function TeaThumb({ tea, tried }: Props) {
+  if (!tea.photo?.url) return null;
 
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Image
-        src={meal.photo.url}
-        alt={meal.name}
+        src={tea.photo.url}
+        alt={tea.name}
         fill
         sizes="(max-width: 768px) 50vw, 240px"
         className="object-cover"

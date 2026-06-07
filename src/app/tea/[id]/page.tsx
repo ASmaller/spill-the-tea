@@ -22,7 +22,7 @@ import { notFound } from "next/navigation";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export default async function MealDetailPage({ params }: PageProps) {
+export default async function TeaDetailPage({ params }: PageProps) {
   const { id } = await params;
 
   const admin = await isAdmin();

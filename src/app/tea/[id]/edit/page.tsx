@@ -40,7 +40,7 @@ function seedForm(tea: TeaStat): Initial {
   };
 }
 
-export default function EditMealPage({
+export default function EditTeaPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -66,8 +66,8 @@ export default function EditMealPage({
           tea.reviews.length === 0
             ? null
             : tea.reviews
-                .map(review => review.rating)
-                .reduce((acc, x) => x + acc) / votes;
+              .map(review => review.rating)
+              .reduce((acc, x) => x + acc) / votes;
         const countReviews = (rating: number) =>
           tea.reviews.filter(review => review.rating == rating).length;
         const distribution: [number, number, number, number, number] = [
@@ -98,10 +98,10 @@ export default function EditMealPage({
     return <p>Could not find tea</p>;
   }
 
-  return <EditMealForm tea={tea} />;
+  return <EditTeaForm tea={tea} />;
 }
 
-function EditMealForm({ tea }: { tea: TeaStat }) {
+function EditTeaForm({ tea }: { tea: TeaStat }) {
   const router = useRouter();
   const initial = useMemo(() => seedForm(tea), [tea]);
 

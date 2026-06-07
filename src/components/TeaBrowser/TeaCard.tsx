@@ -1,5 +1,5 @@
 import { DistSpark } from "@/components/admin/charts/DistSpark";
-import { MealThumb } from "@/components/admin/MealThumb";
+import { TeaThumb } from "@/components/admin/TeaThumb";
 import { Pill } from "@/components/admin/Pill";
 import { CupRating } from "@/components/brand/CupRating";
 import { ratingColor } from "@/lib/admin/colors";
@@ -29,7 +29,7 @@ export function TeaCard({ tea, urlPrefix, onClick }: Props) {
       >
         {tea.photo?.url && (
           <div className="aspect-4/3 w-full overflow-hidden">
-            <MealThumb meal={tea} />
+            <TeaThumb tea={tea} />
           </div>
         )}
         <div className="flex flex-1 flex-col gap-2 p-3">

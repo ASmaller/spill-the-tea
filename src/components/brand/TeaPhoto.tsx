@@ -6,7 +6,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-export function MealPhoto({
+export function TeaPhoto({
   color,
   pattern,
   height,
