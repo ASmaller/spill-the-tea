@@ -111,7 +111,7 @@ export function RatingBlock({ tea }: Props) {
           setComment("");
         }}
         disabled={rating === 0}
-        className={`w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${
+        className={`mt-4 w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${
           rating > 0
             ? "bg-ink text-paper cursor-pointer"
             : "bg-ink/10 text-ink-muted cursor-not-allowed"
