@@ -1,6 +1,6 @@
 import { DistSpark } from "@/components/admin/charts/DistSpark";
-import { TeaThumb } from "@/components/admin/TeaThumb";
 import { Pill } from "@/components/admin/Pill";
+import { TeaThumb } from "@/components/admin/TeaThumb";
 import { CupRating } from "@/components/brand/CupRating";
 import { ratingColor } from "@/lib/admin/colors";
 import { FOCUS_RING } from "@/lib/styles";

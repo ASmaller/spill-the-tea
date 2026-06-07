@@ -66,8 +66,8 @@ export default function EditTeaPage({
           tea.reviews.length === 0
             ? null
             : tea.reviews
-              .map(review => review.rating)
-              .reduce((acc, x) => x + acc) / votes;
+                .map(review => review.rating)
+                .reduce((acc, x) => x + acc) / votes;
         const countReviews = (rating: number) =>
           tea.reviews.filter(review => review.rating == rating).length;
         const distribution: [number, number, number, number, number] = [
