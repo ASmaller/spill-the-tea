@@ -39,7 +39,7 @@ describe("statisticsService", () => {
 
     const overview = await getAdminOverview();
 
-    expect(overview.meals).toEqual([]);
+    expect(overview.teas).toEqual([]);
     expect(overview.kpis.map(kpi => kpi.value)).toEqual(["0.0", "0", "0"]);
   });
 

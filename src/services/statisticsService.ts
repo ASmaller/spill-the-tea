@@ -25,7 +25,7 @@ export type TrendRange = "7d" | "30d" | "1y";
 
 export type AdminOverview = {
   kpis: Kpi[];
-  meals: TeaStat[];
+  teas: TeaStat[];
 };
 
 export type AdminSidebarStats = {
@@ -378,9 +378,9 @@ export async function getTeaCatalog(): Promise<TeaStat[]> {
 }
 
 export async function getAdminOverview(): Promise<AdminOverview> {
-  const [kpis, meals] = await Promise.all([getAdminKpis(), getTeaCatalog()]);
+  const [kpis, teas] = await Promise.all([getAdminKpis(), getTeaCatalog()]);
 
-  return { kpis, meals };
+  return { kpis, teas };
 }
 
 export async function getTeaTrend(
