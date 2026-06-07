@@ -3,12 +3,12 @@
 import { BackLink } from "@/components/admin/BackLink";
 import { ConfirmDiscardDialog } from "@/components/admin/ConfirmDiscardDialog";
 import { Dialog } from "@/components/admin/Dialog";
-import { Field } from "@/components/admin/forms/Field";
-import { PhotoDrop } from "@/components/admin/forms/PhotoDrop";
-import { TagPicker } from "@/components/admin/forms/TagPicker";
-import { TextInput } from "@/components/admin/forms/TextInput";
 import { PageShell } from "@/components/admin/PageShell";
 import { SectionHead } from "@/components/admin/SectionHead";
+import { Field } from "@/components/forms/Field";
+import { PhotoDrop } from "@/components/forms/PhotoDrop";
+import { TagPicker } from "@/components/forms/TagPicker";
+import { TextInput } from "@/components/forms/TextInput";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ratingColor } from "@/lib/admin/colors";
