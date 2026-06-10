@@ -201,8 +201,9 @@ function SegmentedItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`text-meta flex items-center font-medium ${active ? "bg-ink text-paper" : "text-ink"
-        } ${FOCUS_RING.cream}`}
+      className={`text-meta flex items-center font-medium ${
+        active ? "bg-ink text-paper" : "text-ink"
+      } ${FOCUS_RING.cream}`}
       style={{
         padding: "6px 11px",
         cursor: "pointer",
