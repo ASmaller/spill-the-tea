@@ -5,8 +5,10 @@ import { ratingTotal } from "@/lib/admin/ratings";
 import {
   Bar,
   BarChart,
+  BarShapeProps,
   Cell,
   LabelList,
+  Rectangle,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -59,22 +61,27 @@ export function RatingHistogram({ dist }: Props) {
           />
           <Bar
             dataKey="sharePct"
-            radius={[0, 3, 3, 0]}
+            radius={3}
             background={{ fill: "rgba(26,24,21,0.04)", radius: 3 }}
             isAnimationActive={false}
+            shape={CustomBar}
           >
-            {data.map(row => (
-              <Cell key={row.rating} fill={row.color} />
-            ))}
             <LabelList
-              dataKey="summary"
+              dataKey={props =>
+                props.count ? props.summary : `${props.sharePct}%`
+              }
               position="right"
               fill="var(--color-ink-soft)"
               fontSize={11}
+              textBreakAll={true}
             />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
+}
+
+function CustomBar(props: BarShapeProps) {
+  return <Rectangle {...props} fill={props.color} />;
 }

@@ -1,33 +1,33 @@
 import type { ReactNode } from "react";
 
 type Props = {
+  backlink?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
 };
 
-export function PageShell({ title, subtitle, actions, children }: Props) {
+export function PageShell({
+  backlink,
+  title,
+  subtitle,
+  actions,
+  children,
+}: Props) {
   return (
     <div
       className="bg-cream flex-1 overflow-auto"
       style={{ padding: "24px 28px" }}
     >
-      <div
-        className="flex items-baseline justify-between"
-        style={{ marginBottom: 18, gap: 16 }}
-      >
+      <div className="mb-5 flex items-baseline justify-between gap-4">
         <div className="min-w-0">
-          <div
-            className="text-ink text-display font-serif"
-            style={{ lineHeight: 1.1 }}
-          >
+          <div className="text-ink text-display/8 font-serif">
+            {backlink}
             {title}
           </div>
           {subtitle && (
-            <div className="text-ink-muted text-body" style={{ marginTop: 4 }}>
-              {subtitle}
-            </div>
+            <div className="text-ink-muted text-body mt-2">{subtitle}</div>
           )}
         </div>
         {actions && (

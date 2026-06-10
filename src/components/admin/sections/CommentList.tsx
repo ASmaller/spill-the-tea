@@ -82,10 +82,7 @@ export function CommentList({ reviews, pageSize = 5 }: Props) {
         }
       />
       {visible.length === 0 ? (
-        <div
-          className="text-ink-soft text-meta text-center"
-          style={{ padding: "24px 0" }}
-        >
+        <div className="text-ink-soft text-meta flex items-center justify-center p-4">
           No comments yet.
         </div>
       ) : (
@@ -106,12 +103,14 @@ export function CommentList({ reviews, pageSize = 5 }: Props) {
                 {formatRelativeDate(review.posted)}
               </span>
             </div>
-            <div
-              className="text-ink text-body italic"
-              style={{ lineHeight: 1.5 }}
-            >
-              &ldquo;{review.comment}&rdquo;
-            </div>
+            {review.comment && (
+              <div
+                className="text-ink text-body italic"
+                style={{ lineHeight: 1.5 }}
+              >
+                &ldquo;{review.comment}&rdquo;
+              </div>
+            )}
             {review.tags.length > 0 && (
               <div className="flex flex-wrap" style={{ gap: 4, marginTop: 6 }}>
                 {review.tags.map(t => (

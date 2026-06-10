@@ -52,15 +52,9 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
         title="Rating over time"
         sub={`Last ${range} reviews · most recent right`}
         right={
-          <div
-            className="text-ink-soft text-meta flex items-center font-medium"
-            style={{ gap: 6 }}
-          >
+          <div className="text-ink-soft text-meta flex items-center gap-2 font-medium">
             <span>Reviews</span>
-            <div
-              className="bg-paper border-ink/[0.10] flex overflow-hidden border"
-              style={{ borderRadius: 7 }}
-            >
+            <div className="bg-paper border-ink/[0.10] flex overflow-hidden rounded-md border">
               {RANGE_KEYS.map((t, i) => (
                 <RangeItem
                   key={t}
@@ -76,10 +70,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
       />
       <div className="relative">
         <div
-          style={{
-            opacity: isLoading ? 0.5 : 1,
-            transition: "opacity 120ms ease-out",
-          }}
+          className={`transition-opacity duration-120 ease-out opacity-${isLoading ? 50 : 100}`}
         >
           {trend.xLabels.length > 0 ? (
             <TrendChart
@@ -90,10 +81,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
               showXTicks={false}
             />
           ) : (
-            <div
-              className="text-ink-soft text-meta flex items-center justify-center"
-              style={{ height: 200 }}
-            >
+            <div className="text-ink-soft text-meta flex items-center justify-center p-4">
               No reviews yet.
             </div>
           )}
@@ -107,11 +95,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
           </div>
         )}
       </div>
-      {loadError && (
-        <div className="text-rose text-meta" style={{ marginTop: 8 }}>
-          {loadError}
-        </div>
-      )}
+      {loadError && <div className="text-rose text-meta mt-2">{loadError}</div>}
     </Card>
   );
 }
@@ -132,14 +116,9 @@ function RangeItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`text-meta font-medium ${
+      className={`text-meta border-ink/[0.10] cursor-pointer px-2 py-3 font-medium ${
         active ? "bg-ink text-paper" : "text-ink"
-      } ${FOCUS_RING.cream}`}
-      style={{
-        padding: "6px 11px",
-        cursor: "pointer",
-        borderLeft: isFirst ? "none" : "1px solid rgba(26,24,21,0.10)",
-      }}
+      } ${isFirst ? "" : "border-l"} ${FOCUS_RING.cream}`}
     >
       {label}
     </button>

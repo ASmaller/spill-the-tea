@@ -119,8 +119,8 @@ export async function submitSuggestion(formData: FormData) {
   }
 
   const review = await createSuggestion(
-    rawFormData.title,
-    rawFormData.description
+    rawFormData.title.trim(),
+    rawFormData.description.trim()
   );
   return review;
 }

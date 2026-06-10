@@ -1,4 +1,3 @@
-import { BackLink } from "@/components/admin/BackLink";
 import { PageShell } from "@/components/admin/PageShell";
 import { NewTeaForm } from "@/components/TeaForm/NewTeaForm";
 import { isAdmin } from "@/lib/session";
@@ -11,16 +10,10 @@ export default async function NewTeaPage() {
   }
 
   return (
-    <PageShell
-      title={
-        <>
-          <BackLink href="/">← Back</BackLink>
-          <span>New tea</span>
-        </>
-      }
-      subtitle="Add a tea to the catalog"
-    >
-      <NewTeaForm id={"new-tea-form"} />
+    <PageShell title={"New tea"} subtitle="Add a tea to the catalog">
+      <main>
+        <NewTeaForm id={"new-tea-form"} />
+      </main>
     </PageShell>
   );
 }

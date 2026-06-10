@@ -6,23 +6,32 @@ import { PhotoDrop } from "@/components/forms/PhotoDrop";
 import { TagPicker } from "@/components/forms/TagPicker";
 import { TextInput } from "@/components/forms/TextInput";
 import { Card } from "@/components/ui/Card";
+import { Tea } from "@/generated/prisma/client";
 import { TeaCreateInput } from "@/generated/prisma/models";
 import { PhotoRef, TeaTag } from "@/lib/types";
-import { Link } from "lucide-react";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ConfirmDiscardDialog } from "../admin/ConfirmDiscardDialog";
 import { Button, buttonClassName } from "../ui/Button";
 
 interface Props {
   id: string;
+  initialTea?: Pick<Tea, "name" | "tags">;
   backlink?: string;
   onSubmit?: (value: TeaCreateInput) => void | Promise<void>;
 }
 
-export function TeaForm({ id, backlink, onSubmit }: Props) {
-  const [name, setName] = useState("");
-  const [tags, setTags] = useState<TeaTag[]>([]);
+export function TeaForm({
+  id,
+  initialTea = { name: "", tags: [] },
+  backlink,
+  onSubmit,
+}: Props) {
+  const router = useRouter();
+
+  const [name, setName] = useState<string>(initialTea.name);
+  const [tags, setTags] = useState<string[]>(initialTea.tags);
   const [photo, setPhoto] = useState<PhotoRef | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -33,11 +42,33 @@ export function TeaForm({ id, backlink, onSubmit }: Props) {
     );
 
   const isValid = name.trim().length > 0;
-
-  const isDirty = name.trim() !== "" || tags.length > 0 || photo !== null;
+  const isDirty =
+    name.trim() !== initialTea.name.trim() ||
+    JSON.stringify(tags) !== JSON.stringify(initialTea.tags) ||
+    photo !== null;
 
   return (
     <>
+      {isDirty && (
+        <div
+          className="border-amber/30 bg-amber/[0.10]"
+          style={{
+            marginBottom: 14,
+            padding: "10px 14px",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderStyle: "solid",
+            fontSize: 12,
+          }}
+          role="status"
+        >
+          <span className="text-ink font-semibold">Unsaved changes</span>
+          <span className="text-ink-muted">
+            {" "}
+            · submit your changes below to save the tea
+          </span>
+        </div>
+      )}
       <form
         id={id}
         onSubmit={async e => {
@@ -79,27 +110,26 @@ export function TeaForm({ id, backlink, onSubmit }: Props) {
               />
             </Field>
 
-            <Field
-              label="Tags"
-              hint="Students use these to filter the feed. Pick all that apply."
-            >
+            <Field label="Tags" hint="Pick all that apply">
               <TagPicker value={tags} onToggle={toggleTag} />
             </Field>
           </div>
         </Card>
         <div className="col-span-full mt-4 flex w-full justify-end gap-4">
-          <Link
-            href="/"
-            className={buttonClassName()}
-            onClick={e => {
-              if (isDirty) {
-                e.preventDefault();
-                setShowCancelConfirm(true);
-              }
-            }}
-          >
-            Cancel
-          </Link>
+          {backlink && (
+            <Link
+              href="/"
+              className={buttonClassName()}
+              onClick={e => {
+                if (isDirty) {
+                  e.preventDefault();
+                  setShowCancelConfirm(true);
+                }
+              }}
+            >
+              Cancel
+            </Link>
+          )}
 
           <Button
             primary
@@ -107,16 +137,22 @@ export function TeaForm({ id, backlink, onSubmit }: Props) {
             form={id}
             disabled={!isValid || submitting}
           >
-            {submitting ? "Creating…" : "Create tea"}
+            {submitting
+              ? "Submitting…"
+              : isValid
+                ? "Submit tea"
+                : "Provide a name"}
           </Button>
         </div>
       </form>
 
-      <ConfirmDiscardDialog
-        open={showCancelConfirm}
-        onClose={() => setShowCancelConfirm(false)}
-        onConfirm={() => redirect(backlink ?? "/")}
-      />
+      {backlink && (
+        <ConfirmDiscardDialog
+          open={showCancelConfirm}
+          onClose={() => setShowCancelConfirm(false)}
+          onConfirm={() => router.push(backlink ?? "/")}
+        />
+      )}
     </>
   );
 }

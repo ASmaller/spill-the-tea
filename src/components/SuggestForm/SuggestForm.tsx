@@ -72,7 +72,7 @@ export function SuggestForm() {
             id="title"
             type="text"
             value={title}
-            onChange={e => setTitle(e.target.value.trim())}
+            onChange={e => setTitle(e.target.value)}
             name="title"
             placeholder="What I want is..."
             className="border-ink/10 bg-cream text-ink mt-1 w-full rounded-[12px] border px-3 py-2.5 outline-none"
@@ -84,7 +84,7 @@ export function SuggestForm() {
           <textarea
             id="description"
             value={description}
-            onChange={e => setDescription(e.target.value.trim())}
+            onChange={e => setDescription(e.target.value)}
             name="description"
             placeholder="I want this because..."
             rows={4}

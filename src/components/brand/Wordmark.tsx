@@ -1,19 +1,16 @@
 type Props = {
-  size?: number;
+  className?: string;
 };
 
-export function Wordmark({ size = 22 }: Props) {
+export function Wordmark({ className }: Props) {
   return (
     <span
-      className="text-ink inline-flex items-baseline font-serif italic"
-      style={{
-        fontSize: size,
-        lineHeight: 1,
-        letterSpacing: -0.3,
-        gap: size * 0.18,
-      }}
+      className={
+        "text-ink inline-flex items-baseline font-serif tracking-tight italic " +
+        className
+      }
     >
-      <span className="text-amber">Spill</span>
+      <span className="text-amber">Spill &nbsp;</span>
       <span>the Tea</span>
     </span>
   );

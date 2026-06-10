@@ -44,15 +44,14 @@ export async function addTea(tea: TeaCreateInput): Promise<Tea> {
   });
 }
 
-export async function updateTea(id: string, tea: TeaUpdateInput): Promise<Tea> {
+export async function updateTea(
+  id: string,
+  data: TeaUpdateInput
+): Promise<Tea> {
   return prisma.tea.update({
     where: {
       id,
     },
-    data: {
-      name: tea.name,
-      description: tea.description,
-      tags: tea.tags,
-    },
+    data,
   });
 }

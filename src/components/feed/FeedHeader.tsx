@@ -12,7 +12,7 @@ export function FeedHeader() {
           aria-label="Spill the Tea — home"
           className={`rounded-sm ${FOCUS_RING.paper}`}
         >
-          <Wordmark size={20} />
+          <Wordmark className="text-xl" />
         </Link>
         <span className="flex flex-row gap-4">
           <Link href="/suggest" className="text-ink font-serif">

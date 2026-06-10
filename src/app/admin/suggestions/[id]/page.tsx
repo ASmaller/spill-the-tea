@@ -26,13 +26,11 @@ export default async function SuggestionDetailPage({ params }: PageProps) {
 
   return (
     <PageShell
+      backlink={<BackLink href="/admin/suggestions">← Suggestions</BackLink>}
       title={
-        <>
-          <BackLink href="/admin/suggestions">← Suggestions</BackLink>
-          <div className="flex flex-row items-center gap-1">
-            {suggestion.title} {isNew && <Pill tone="warn">New</Pill>}
-          </div>
-        </>
+        <div className="flex flex-row items-center gap-1">
+          {suggestion.title} {isNew && <Pill tone="warn">New</Pill>}
+        </div>
       }
       subtitle={
         <span className="text-meta text-ink-muted">

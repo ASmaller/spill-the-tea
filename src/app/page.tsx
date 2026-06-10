@@ -41,9 +41,9 @@ export default function Home() {
 
   const ratedIds = useMemo(() => new Set(Object.keys(myRatings)), [myRatings]);
   return (
-    <main className="relative">
+    <div className="relative">
       <FeedHeader />
-      <div
+      <main
         className="bg-cream flex-1 overflow-auto"
         style={{ padding: "24px 28px" }}
       >
@@ -52,7 +52,7 @@ export default function Home() {
         ) : (
           <span>Loading teas...</span>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

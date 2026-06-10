@@ -20,7 +20,6 @@ type SidebarManager = {
   name: string;
   initials: string;
   role: string;
-  school: string;
 };
 
 type Props = {
@@ -53,19 +52,18 @@ export function Sidebar({ manager, weekStat }: Props) {
   const navItems: NavItem[] = [
     { key: "home", label: "Overview", href: "/admin", matchPrefix: "/admin" },
     {
-      key: "teas",
-      label: "Teas",
-      href: "/admin/teas",
-      matchPrefix: "/admin/teas",
-    },
-    {
       key: "suggestions",
       label: "Suggestions",
       href: "/admin/suggestions",
       matchPrefix: "/admin/suggestions",
       ...suggestionsBadge,
     },
-    { key: "calendar", label: "Calendar" },
+    {
+      key: "new-tea",
+      label: "New tea",
+      href: "/admin/tea/new",
+      matchPrefix: "/admin/tea/new",
+    },
   ];
 
   const pathname = usePathname() ?? "";
@@ -85,14 +83,13 @@ export function Sidebar({ manager, weekStat }: Props) {
         flexShrink: 0,
       }}
     >
-      <div style={{ padding: "0 8px 20px" }}>
-        <Wordmark size={18} />
-        <div className="text-ink-soft text-meta" style={{ marginTop: 4 }}>
-          {manager.school}
-        </div>
+      <div className="px-0 pt-2 pb-5">
+        <Link href="/">
+          <Wordmark className="text-2xl" />
+        </Link>
       </div>
 
-      <nav className="flex flex-col" style={{ gap: 2 }}>
+      <nav className="flex flex-col gap-0.5">
         {navItems.map(it => {
           const active = activeKey === it.key;
           const stateClass = active

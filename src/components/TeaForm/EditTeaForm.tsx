@@ -1,24 +1,27 @@
 "use client";
 
+import { Tea } from "@/generated/prisma/client";
 import { TeaCreateInput } from "@/generated/prisma/models";
-import { addTea } from "@/services/teaService";
-import { redirect, useRouter } from "next/navigation";
+import { updateTea } from "@/services/teaService";
+import { useRouter } from "next/navigation";
 import { TeaForm } from "./TeaForm";
 
 interface Props {
   id: string;
+  initialTea: Pick<Tea, "name" | "tags">;
   backlink?: string;
 }
 
-export function NewTeaForm({ id, backlink }: Props) {
+export function EditTeaForm({ id, initialTea, backlink }: Props) {
   const router = useRouter();
 
   return (
     <TeaForm
       id={id}
+      initialTea={initialTea}
       backlink={backlink}
       onSubmit={async (tea: TeaCreateInput) => {
-        const created = await addTea(tea);
+        const created = await updateTea(id, tea);
         router.push(`/tea/${created.id}`);
       }}
     />

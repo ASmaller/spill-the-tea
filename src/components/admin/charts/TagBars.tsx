@@ -59,7 +59,7 @@ export function TagBars({ items, defaultColor = "var(--color-tea)" }: Props) {
           />
           <Bar
             dataKey="count"
-            radius={[0, 3, 3, 0]}
+            radius={3}
             background={{ fill: "rgba(26,24,21,0.04)", radius: 3 }}
             isAnimationActive={false}
           >
