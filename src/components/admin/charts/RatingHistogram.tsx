@@ -6,7 +6,6 @@ import {
   Bar,
   BarChart,
   BarShapeProps,
-  Cell,
   LabelList,
   Rectangle,
   ResponsiveContainer,

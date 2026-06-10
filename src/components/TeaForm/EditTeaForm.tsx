@@ -8,11 +8,12 @@ import { TeaForm } from "./TeaForm";
 
 interface Props {
   id: string;
+  teaId: string;
   initialTea: Pick<Tea, "name" | "tags">;
   backlink?: string;
 }
 
-export function EditTeaForm({ id, initialTea, backlink }: Props) {
+export function EditTeaForm({ id, teaId, initialTea, backlink }: Props) {
   const router = useRouter();
 
   return (
@@ -21,7 +22,7 @@ export function EditTeaForm({ id, initialTea, backlink }: Props) {
       initialTea={initialTea}
       backlink={backlink}
       onSubmit={async (tea: TeaCreateInput) => {
-        const created = await updateTea(id, tea);
+        const created = await updateTea(teaId, tea);
         router.push(`/tea/${created.id}`);
       }}
     />

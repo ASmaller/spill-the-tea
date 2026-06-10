@@ -2,7 +2,7 @@
 
 import { TeaCreateInput } from "@/generated/prisma/models";
 import { addTea } from "@/services/teaService";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { TeaForm } from "./TeaForm";
 
 interface Props {
