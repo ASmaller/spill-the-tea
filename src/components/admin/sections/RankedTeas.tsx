@@ -60,7 +60,7 @@ export function RankedTeas({ teas }: Props) {
           >
             <span>Last</span>
             <div
-              className="bg-paper border-ink/[0.10] flex overflow-hidden border"
+              className="bg-paper border-ink/10 flex overflow-hidden border"
               style={{ borderRadius: 7 }}
             >
               {RANGE_KEYS.map((t, i) => (
@@ -103,8 +103,8 @@ export function RankedTeas({ teas }: Props) {
         return (
           <Link
             key={teas.id}
-            href={`/admin/teas/${teas.id}`}
-            className={`hover:bg-ink/[0.03] grid items-center transition-colors ${FOCUS_RING.paper}`}
+            href={`/tea/${teas.id}`}
+            className={`hover:bg-ink/3 grid items-center transition-colors ${FOCUS_RING.paper}`}
             style={{
               gridTemplateColumns: "3px 220px 1fr 90px 60px 80px",
               gap: 14,
@@ -130,7 +130,7 @@ export function RankedTeas({ teas }: Props) {
               </div>
             </div>
             <div
-              className="bg-ink/[0.04] relative overflow-hidden"
+              className="bg-ink/4 relative overflow-hidden"
               style={{ height: 22, borderRadius: 4 }}
             >
               <div
@@ -168,7 +168,7 @@ export function RankedTeas({ teas }: Props) {
         <button
           type="button"
           onClick={() => setShowAll(!showAll)}
-          className={`text-tea text-meta border-ink/[0.06] block w-full border-t font-medium ${FOCUS_RING.paper}`}
+          className={`text-tea text-meta border-ink/6 block w-full border-t font-medium ${FOCUS_RING.paper}`}
           style={{
             marginTop: 10,
             padding: "10px 0",
@@ -201,9 +201,8 @@ function SegmentedItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`text-meta flex items-center font-medium ${
-        active ? "bg-ink text-paper" : "text-ink"
-      } ${FOCUS_RING.cream}`}
+      className={`text-meta flex items-center font-medium ${active ? "bg-ink text-paper" : "text-ink"
+        } ${FOCUS_RING.cream}`}
       style={{
         padding: "6px 11px",
         cursor: "pointer",
