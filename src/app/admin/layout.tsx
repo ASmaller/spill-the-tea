@@ -31,8 +31,7 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         manager={{
           name,
           initials,
-          role: "Lunch manager",
-          school: "Chalmers · kårrestaurangen",
+          role: "MaterialChef",
         }}
         weekStat={weekStat}
       />
