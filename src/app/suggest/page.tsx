@@ -1,5 +1,3 @@
-"use client";
-
 import { FeedHeader } from "@/components/feed/FeedHeader";
 import { SuggestForm } from "@/components/SuggestForm/SuggestForm";
 

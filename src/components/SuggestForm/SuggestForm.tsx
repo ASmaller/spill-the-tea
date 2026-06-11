@@ -1,3 +1,5 @@
+"use client";
+
 import { FOCUS_RING } from "@/lib/styles";
 import { submitSuggestion } from "@/services/suggestionService";
 import { useEffect, useRef, useState } from "react";
