@@ -45,7 +45,7 @@ export default function EditTeaPage({
         backlink={true}
         title={
           <>
-            Editing <span className="text-amber">{tea.name}</span>
+            Editing <span className="text-tea">{tea.name}</span>
           </>
         }
       >

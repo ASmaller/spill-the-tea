@@ -83,11 +83,9 @@ export function RankedTeas({ teas }: Props) {
       </div>
 
       <div
-        className="text-ink-soft text-eyebrow grid uppercase"
+        className="text-ink-soft text-eyebrow grid gap-4 pb-2 uppercase"
         style={{
           gridTemplateColumns: "3px 220px 1fr 90px 60px 80px",
-          gap: 14,
-          padding: "0 0 8px 0",
         }}
       >
         <div />
@@ -104,41 +102,23 @@ export function RankedTeas({ teas }: Props) {
           <Link
             key={teas.id}
             href={`/tea/${teas.id}`}
-            className={`hover:bg-ink/3 grid items-center transition-colors ${FOCUS_RING.paper}`}
+            className={`hover:bg-ink/3 mb-2 grid items-center gap-4 rounded-md py-1.5 transition-colors ${FOCUS_RING.paper}`}
             style={{
               gridTemplateColumns: "3px 220px 1fr 90px 60px 80px",
-              gap: 14,
-              marginBottom: 6,
-              padding: "6px 0",
-              borderRadius: 6,
             }}
           >
-            <div
-              style={{
-                width: 3,
-                height: 32,
-                background: "var(--color-tea)",
-                borderRadius: 2,
-              }}
-            />
+            <div className="bg-tea-light h-6 w-1 rounded-full" />
             <div className="min-w-0">
-              <div
-                className="text-ink text-body truncate font-medium"
-                style={{ lineHeight: 1.2 }}
-              >
+              <div className="text-ink text-body truncate font-medium">
                 {teas.name}
               </div>
             </div>
-            <div
-              className="bg-ink/4 relative overflow-hidden"
-              style={{ height: 22, borderRadius: 4 }}
-            >
+            <div className="bg-ink/4 relative h-5 overflow-hidden rounded">
               <div
-                className="h-full"
+                className="h-full rounded"
                 style={{
                   width: `${(r / 5) * 100}%`,
                   background: tone,
-                  borderRadius: 4,
                 }}
               />
             </div>
@@ -156,28 +136,25 @@ export function RankedTeas({ teas }: Props) {
       })}
 
       {filtered.length === 0 ? (
-        <div
-          className="text-ink-soft text-meta text-center"
-          style={{ padding: "24px 0" }}
-        >
+        <div className="text-ink-soft text-meta py-5 text-center">
           {teas.length === 0
             ? "No teas available."
             : "No teas match those filters."}
         </div>
       ) : filtered.length > 6 ? (
-        <button
-          type="button"
-          onClick={() => setShowAll(!showAll)}
-          className={`text-tea text-meta border-ink/6 block w-full border-t font-medium ${FOCUS_RING.paper}`}
-          style={{
-            marginTop: 10,
-            padding: "10px 0",
-            textAlign: "center",
-            cursor: "pointer",
-          }}
-        >
-          {showAll ? "Show fewer ↑" : `Show all ${filtered.length} teas ↓`}
-        </button>
+        <div className="border-ink/6 mt-2 block flex w-full justify-center border-t">
+          <button
+            type="button"
+            onClick={() => setShowAll(!showAll)}
+            className={`hover:bg-ink/3 text-tea text-meta mt-3 rounded-md px-3 py-2 font-medium ${FOCUS_RING.paper}`}
+            style={{
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            {showAll ? "Show fewer ↑" : `Show all ${filtered.length} teas ↓`}
+          </button>
+        </div>
       ) : null}
     </>
   );

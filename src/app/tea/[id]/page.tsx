@@ -71,12 +71,12 @@ export default async function TeaDetailPage({ params }: PageProps) {
               <div className="text-ink-soft text-eyebrow-lg uppercase">
                 Average
               </div>
-              <div className="mt-2 flex items-baseline gap-4">
+              <div className="mt-2 flex flex-wrap items-baseline gap-4">
                 <div className="text-ink text-kpi font-serif leading-none">
                   {avgLabel}
                 </div>
                 {total > 0 && (
-                  <CupRating value={Math.round(avg)} size={14} disabled />
+                  <CupRating value={Math.round(avg)} size={20} disabled />
                 )}
               </div>
               <div className="text-ink-muted text-meta mt-2">

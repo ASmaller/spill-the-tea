@@ -10,7 +10,7 @@ export function Wordmark({ className }: Props) {
         className
       }
     >
-      <span className="text-amber">Spill &nbsp;</span>
+      <span className="text-tea">Spill &nbsp;</span>
       <span>the Tea</span>
     </span>
   );

@@ -55,7 +55,7 @@ export function TeaCard({ tea, urlPrefix, onClick }: Props) {
                 >
                   {tea.rating.toFixed(1)}
                 </span>
-                <CupRating value={Math.round(tea.rating)} size={9} disabled />
+                <CupRating value={Math.round(tea.rating)} size={12} disabled />
               </div>
               <DistSpark dist={tea.distribution} />
             </div>

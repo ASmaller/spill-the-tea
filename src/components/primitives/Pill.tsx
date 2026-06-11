@@ -12,7 +12,7 @@ export type PillShape = "round" | "square";
 export type PillSize = "sm" | "md";
 
 const TONE: Record<PillTone, string> = {
-  good: "bg-sage/20 text-climate-low-deep",
+  good: "bg-sage/20 text-tea",
   warn: "bg-amber/20 text-amber-deep",
   bad: "bg-rose/20 text-rose-deep",
   tea: "bg-tea/10 text-tea",

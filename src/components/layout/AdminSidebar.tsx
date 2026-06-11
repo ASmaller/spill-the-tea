@@ -92,19 +92,17 @@ export function AdminSidebar({ manager, weekStat }: Props) {
                 cursor: it.href ? "pointer" : "default",
               }}
             >
-              <span className="flex items-center gap-2">
-                <span>{it.label}</span>
-                {it.badge !== undefined && (
-                  <span
-                    className={
-                      "text-tiny rounded-full px-2 py-1 leading-none font-semibold " +
-                      (active ? "bg-paper/20 text-paper" : "bg-tea text-paper")
-                    }
-                  >
-                    {it.badge}
-                  </span>
-                )}
-              </span>
+              <span>{it.label}</span>
+              {it.badge !== undefined && (
+                <span
+                  className={
+                    "text-tiny rounded-full px-2 py-1 leading-none font-semibold " +
+                    (active ? "bg-paper/20 text-paper" : "bg-tea/60 text-paper")
+                  }
+                >
+                  {it.badge}
+                </span>
+              )}
             </span>
           );
           return it.href ? (
