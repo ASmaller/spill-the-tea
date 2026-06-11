@@ -12,8 +12,8 @@ export async function FeedHeader() {
   console.log(session?.family_name);
 
   return (
-    <header className="border-ink/10 bg-paper supports-[backdrop-filter]:bg-paper/70 sticky top-0 z-30 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-screen-sm items-center justify-between px-4">
+    <header className="border-ink/10 bg-paper supports-[backdrop-filter]:bg-paper/70 sticky top-0 z-30 box-border h-14 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md">
+      <div className="mx-auto flex h-full items-center justify-between px-4">
         <Link
           href="/"
           aria-label="Spill the Tea — home"

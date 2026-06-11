@@ -25,8 +25,11 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     session.family_name[0] ?? ""
   }`.toUpperCase();
 
+  // Subtract the header height from the root layout
+  const heightClass = "h-[calc(100vh-14*var(--spacing))]";
+
   return (
-    <div className="bg-cream flex h-screen overflow-hidden">
+    <div className={`bg-cream flex overflow-hidden ${heightClass}`}>
       <Sidebar
         manager={{
           name,

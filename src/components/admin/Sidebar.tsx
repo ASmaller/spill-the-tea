@@ -1,6 +1,5 @@
 "use client";
 
-import { Wordmark } from "@/components/brand/Wordmark";
 import { LogoutButton } from "@/components/LogoutButton";
 import { FOCUS_RING } from "@/lib/styles";
 import { countNewSuggestions } from "@/services/suggestionService";
@@ -39,7 +38,7 @@ function isActive(item: NavItem, pathname: string) {
 
 export function Sidebar({ manager, weekStat }: Props) {
   const [newSuggestionsCount, setNewSuggestionsCount] = useState(0);
-  const suggestionsBadge = newSuggestionsCount
+  const suggestionsBadge: Pick<NavItem, "badge"> = newSuggestionsCount
     ? {
         badge: newSuggestionsCount,
       }
@@ -75,20 +74,7 @@ export function Sidebar({ manager, weekStat }: Props) {
   const activeKey = activeItem?.key;
 
   return (
-    <aside
-      className="bg-paper border-ink/[0.06] flex h-full flex-col border-r font-sans"
-      style={{
-        width: 220,
-        padding: "22px 14px",
-        flexShrink: 0,
-      }}
-    >
-      <div className="px-0 pt-2 pb-5">
-        <Link href="/">
-          <Wordmark className="text-2xl" />
-        </Link>
-      </div>
-
+    <aside className="bg-paper border-ink/[0.06] sticky flex h-full w-50 shrink-0 flex-col border-r px-3 py-5 font-sans">
       <nav className="flex flex-col gap-0.5">
         {navItems.map(it => {
           const active = activeKey === it.key;
@@ -107,19 +93,17 @@ export function Sidebar({ manager, weekStat }: Props) {
               }}
             >
               <span className="flex items-center gap-2">
-                <span className="flex items-center gap-2">
-                  <span>{it.label}</span>
-                  {it.badge ? (
-                    <span className="bg-paper/20 text-paper text-tiny rounded-full px-2 py-0.5 leading-none">
-                      {it.badge}
-                    </span>
-                  ) : null}
-                </span>
-                {it.badge ? (
-                  <span className="bg-paper/20 text-paper text-tiny rounded-full px-2 py-0.5 leading-none">
+                <span>{it.label}</span>
+                {it.badge !== undefined && (
+                  <span
+                    className={
+                      "text-tiny rounded-full px-2 py-1 leading-none font-semibold " +
+                      (active ? "bg-paper/20 text-paper" : "bg-tea text-paper")
+                    }
+                  >
                     {it.badge}
                   </span>
-                ) : null}
+                )}
               </span>
             </span>
           );
