@@ -1,6 +1,6 @@
 "use client";
 
-import { CupRating } from "@/components/rating/CupRating";
+import { CupRating } from "@/components/inputs/CupRating";
 import { Eyebrow } from "@/components/text/Eyebrow";
 import { FOCUS_RING } from "@/lib/styles";
 import { NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
@@ -12,7 +12,7 @@ type Props = {
   tea: TeaDetail;
 };
 
-export function RatingBlock({ tea }: Props) {
+export function RatingForm({ tea }: Props) {
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<Set<string>>(new Set());
   const [comment, setComment] = useState("");
@@ -43,12 +43,7 @@ export function RatingBlock({ tea }: Props) {
         How was it?
       </h3>
       <div className="mt-3.5 flex justify-center">
-        <CupRating
-          value={rating}
-          size={46}
-          interactive
-          onChange={updateRating}
-        />
+        <CupRating value={rating} size={46} onChange={updateRating} />
       </div>
 
       {rating > 0 && (

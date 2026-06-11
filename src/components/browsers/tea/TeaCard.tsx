@@ -1,6 +1,6 @@
 import { TeaThumb } from "@/components/browsers/tea/TeaThumb";
+import { CupRating } from "@/components/inputs/CupRating";
 import { Pill } from "@/components/primitives/Pill";
-import { CupRating } from "@/components/rating/CupRating";
 import { DistSpark } from "@/components/statistics/charts/DistSpark";
 import { ratingColor } from "@/lib/admin/colors";
 import { FOCUS_RING } from "@/lib/styles";
@@ -55,7 +55,7 @@ export function TeaCard({ tea, urlPrefix, onClick }: Props) {
                 >
                   {tea.rating.toFixed(1)}
                 </span>
-                <CupRating value={Math.round(tea.rating)} size={9} />
+                <CupRating value={Math.round(tea.rating)} size={9} disabled />
               </div>
               <DistSpark dist={tea.distribution} />
             </div>

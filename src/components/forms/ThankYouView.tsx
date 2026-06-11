@@ -1,4 +1,4 @@
-import { CupRating } from "@/components/rating/CupRating";
+import { CupRating } from "@/components/inputs/CupRating";
 
 interface Props {
   rating: number;
@@ -33,7 +33,7 @@ export function ThankYouView({ rating, label }: Props) {
         style={delay(2)}
         aria-label={label ?? `You rated ${rating} out of 5`}
       >
-        <CupRating value={rating} size={44} />
+        <CupRating value={rating} size={44} disabled />
       </div>
     </div>
   );

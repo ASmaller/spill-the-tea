@@ -1,12 +1,12 @@
 import { DeleteTeaButton } from "@/components/actions/DeleteTeaButton";
+import { RatingForm } from "@/components/forms/rating/RatingForm";
+import { CupRating } from "@/components/inputs/CupRating";
 import { Card } from "@/components/layout/Card";
 import { PageShell } from "@/components/layout/PageShell";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { CommentList } from "@/components/lists/CommentList";
 import { buttonClassName } from "@/components/primitives/Button";
 import { Pill } from "@/components/primitives/Pill";
-import { CupRating } from "@/components/rating/CupRating";
-import { RatingBlock } from "@/components/rating/RatingBlock";
 import { RatingHistogram } from "@/components/statistics/charts/RatingHistogram";
 import { TagBars } from "@/components/statistics/charts/TagBars";
 import { TeaTrendCard } from "@/components/statistics/TeaTrendCard";
@@ -75,7 +75,9 @@ export default async function TeaDetailPage({ params }: PageProps) {
                 <div className="text-ink text-kpi font-serif leading-none">
                   {avgLabel}
                 </div>
-                {total > 0 && <CupRating value={Math.round(avg)} size={14} />}
+                {total > 0 && (
+                  <CupRating value={Math.round(avg)} size={14} disabled />
+                )}
               </div>
               <div className="text-ink-muted text-meta mt-2">
                 {total} ratings · {comments.length} comments
@@ -83,7 +85,7 @@ export default async function TeaDetailPage({ params }: PageProps) {
             </Card>
 
             <Card padding={18}>
-              <RatingBlock tea={tea} />
+              <RatingForm tea={tea} />
             </Card>
           </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
+import { CupRating } from "@/components/inputs/CupRating";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { Pill } from "@/components/primitives/Pill";
-import { CupRating } from "@/components/rating/CupRating";
 import { SelectFilter } from "@/components/search/SelectFilter";
 import { Review } from "@/generated/prisma/client";
 import { formatRelativeDate } from "@/lib/dateFormat";
@@ -98,7 +98,7 @@ export function CommentList({ reviews, pageSize = 5 }: Props) {
               className="flex items-center"
               style={{ gap: 8, marginBottom: 5 }}
             >
-              <CupRating value={review.rating} size={11} />
+              <CupRating value={review.rating} size={11} disabled />
               <span className="text-ink-soft text-meta">
                 {formatRelativeDate(review.posted)}
               </span>

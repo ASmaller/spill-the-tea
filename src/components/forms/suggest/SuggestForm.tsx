@@ -1,7 +1,7 @@
 "use client";
 
+import { ThankYouView } from "@/components/forms/ThankYouView";
 import { Card } from "@/components/layout/Card";
-import { ThankYouView } from "@/components/rating/ThankYouView";
 import { FOCUS_RING } from "@/lib/styles";
 import { submitSuggestion } from "@/services/suggestionService";
 import { useEffect, useRef, useState } from "react";
