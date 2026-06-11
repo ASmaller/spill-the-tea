@@ -31,7 +31,7 @@ export function TeaTrendCard({ teaId, initialTrend }: Props) {
 
     try {
       const response = await fetch(
-        `/api/admin/teas/${teaId}/analytics?limit=${nextRange}`,
+        `/api/tea/${teaId}/analytics?limit=${nextRange}`,
         { cache: "no-store" }
       );
 
