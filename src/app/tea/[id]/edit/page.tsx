@@ -2,7 +2,6 @@
 
 import { BackLink } from "@/components/admin/BackLink";
 import { PageShell } from "@/components/admin/PageShell";
-import { FeedHeader } from "@/components/feed/FeedHeader";
 import { EditTeaForm } from "@/components/TeaForm/EditTeaForm";
 import { Tea } from "@/generated/prisma/client";
 import { getTeaById } from "@/services/teaService";
@@ -39,7 +38,6 @@ export default function EditTeaPage({
 
   return (
     <>
-      <FeedHeader />
       <PageShell
         backlink={<BackLink href={`/tea/${id}`}>← {tea.name}</BackLink>}
         title={"Edit tea"}

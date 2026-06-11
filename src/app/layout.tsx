@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { FeedHeader } from "@/components/feed/FeedHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${instrumentSerif.variable} antialiased`}
     >
       <body className="bg-cream text-ink min-h-[100svh] font-sans">
+        <FeedHeader />
         {children}
       </body>
     </html>

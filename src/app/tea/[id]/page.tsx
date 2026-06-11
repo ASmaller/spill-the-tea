@@ -8,7 +8,6 @@ import { CommentList } from "@/components/admin/sections/CommentList";
 import { TeaTrendCard } from "@/components/admin/sections/TeaTrendCard";
 import { CupRating } from "@/components/brand/CupRating";
 import { DeleteTeaButton } from "@/components/DeleteTeaButton";
-import { FeedHeader } from "@/components/feed/FeedHeader";
 import { RatingBlock } from "@/components/TeaSheet/RatingBlock";
 import { buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -39,7 +38,6 @@ export default async function TeaDetailPage({ params }: PageProps) {
 
   return (
     <div className="relative">
-      <FeedHeader />
       <main>
         <PageShell
           backlink={<BackLink href="/">← Teas</BackLink>}
