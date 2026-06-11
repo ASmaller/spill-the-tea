@@ -182,6 +182,7 @@ export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
               key={tea.id}
               tea={tea}
               urlPrefix={urlPrefix}
+              highlightTag={tag === "all" ? undefined : tag}
               onClick={onClick}
             />
           ))}

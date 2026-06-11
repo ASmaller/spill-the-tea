@@ -4,16 +4,30 @@ import { Pill } from "@/components/primitives/Pill";
 import { DistSpark } from "@/components/statistics/charts/DistSpark";
 import { ratingColor } from "@/lib/admin/colors";
 import { FOCUS_RING } from "@/lib/styles";
-import type { TeaStat } from "@/lib/types";
+import type { TeaStat, TeaTag } from "@/lib/types";
 import Link from "next/link";
 
 type Props = {
   tea: TeaStat;
   urlPrefix: string;
+  highlightTag?: TeaTag;
   onClick?: (id: string) => void;
 };
 
-export function TeaCard({ tea, urlPrefix, onClick }: Props) {
+export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
+  const tags =
+    highlightTag !== undefined
+      ? tea.tags.toSorted((a, b) => {
+          if (a === highlightTag) {
+            return -1;
+          } else if (b === highlightTag) {
+            return 1;
+          } else {
+            return a.localeCompare(b);
+          }
+        })
+      : tea.tags.toSorted((a, b) => a.localeCompare(b));
+
   return (
     <Link
       href={urlPrefix + tea.id}
@@ -23,7 +37,6 @@ export function TeaCard({ tea, urlPrefix, onClick }: Props) {
       className="text-ink text-body/1.3 font-semibold"
     >
       <div
-        // ...(onClick && { onClick })
         onClick={() => onClick?.(tea.id)}
         className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden rounded-lg border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       >
@@ -34,11 +47,13 @@ export function TeaCard({ tea, urlPrefix, onClick }: Props) {
         )}
         <div className="flex flex-1 flex-col gap-2 p-3">
           <div>
-            {tea.name}
-            {tea.tags.length > 0 && (
+            <span className="block max-w-full overflow-hidden text-nowrap text-ellipsis">
+              {tea.name}
+            </span>
+            {tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
-                {tea.tags.map(t => (
-                  <Pill key={t} tone="neutral">
+                {tags.map(t => (
+                  <Pill key={t} tone={t === highlightTag ? "warn" : "neutral"}>
                     {t}
                   </Pill>
                 ))}
