@@ -93,14 +93,13 @@ export default async function TeaDetailPage({ params }: PageProps) {
             <Card>
               <SectionHead
                 title="Rating distribution"
-                sub="How students actually scored it"
+                sub="What people think about this tea"
               />
               {tea.reviews.length ? (
                 <>
                   <RatingHistogram dist={tea.distribution} />
                   <div className="text-ink-muted text-meta border-ink/6 mt-4 border-t pt-4">
-                    Distribution is{" "}
-                    {interpretRatingDistribution(tea.distribution)}
+                    Reviews are {interpretRatingDistribution(tea.distribution)}
                   </div>
                 </>
               ) : (
@@ -116,7 +115,7 @@ export default async function TeaDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-4">
               <Card>
                 <SectionHead
-                  title="What students said"
+                  title="Tags in reviews"
                   sub="Quick-tag frequencies"
                 />
                 {tea.tagBars.length > 0 ? (

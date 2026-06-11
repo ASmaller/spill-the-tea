@@ -36,7 +36,10 @@ export default function AdminSuggestionsPage() {
     });
   }, []);
   return (
-    <PageShell title="Suggestions" subtitle="Tea suggestions left by students">
+    <PageShell
+      title="Suggestions"
+      subtitle="More tea is wanted by avid tea drinkers!"
+    >
       <SuggestionsBrowser suggestions={suggestions} lastViewed={lastViewed} />
     </PageShell>
   );
