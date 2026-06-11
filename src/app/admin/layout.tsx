@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/admin/Sidebar";
+import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { verifySession } from "@/lib/session";
 import { getAdminSidebarStats } from "@/services/statisticsService";
 import type { Metadata } from "next";
@@ -30,7 +30,7 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={`bg-cream flex overflow-hidden ${heightClass}`}>
-      <Sidebar
+      <AdminSidebar
         manager={{
           name,
           initials,

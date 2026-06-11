@@ -1,8 +1,7 @@
-import { BackLink } from "@/components/admin/BackLink";
-import { PageShell } from "@/components/admin/PageShell";
-import { Pill } from "@/components/admin/Pill";
-import { buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/layout/Card";
+import { PageShell } from "@/components/layout/PageShell";
+import { buttonClassName } from "@/components/primitives/Button";
+import { Pill } from "@/components/primitives/Pill";
 import { isNewSuggestion } from "@/lib/admin/suggestions";
 import { formatPostedDate } from "@/lib/dateFormat";
 import { getSuggestionById } from "@/services/suggestionService";
@@ -26,7 +25,7 @@ export default async function SuggestionDetailPage({ params }: PageProps) {
 
   return (
     <PageShell
-      backlink={<BackLink href="/admin/suggestions">← Suggestions</BackLink>}
+      backlink={true}
       title={
         <div className="flex flex-row items-center gap-1">
           {suggestion.title} {isNew && <Pill tone="warn">New</Pill>}

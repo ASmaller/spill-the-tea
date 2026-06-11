@@ -1,6 +1,6 @@
 "use client";
 
-import { TeaBrowser } from "@/components/TeaBrowser/TeaBrowser";
+import { TeaBrowser } from "@/components/browsers/tea/TeaBrowser";
 import { TeaStat } from "@/lib/types";
 import { getMyRatings } from "@/services/reviewService";
 import { getTeaCatalog } from "@/services/statisticsService";

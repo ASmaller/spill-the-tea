@@ -1,7 +1,7 @@
 "use client";
 
-import { PageShell } from "@/components/admin/PageShell";
-import { SuggestionsBrowser } from "@/components/admin/sections/SuggestionsBrowser";
+import { SuggestionsBrowser } from "@/components/browsers/suggestions/SuggestionsBrowser";
+import { PageShell } from "@/components/layout/PageShell";
 import { Suggestion } from "@/generated/prisma/browser";
 import {
   getAllSuggestions,

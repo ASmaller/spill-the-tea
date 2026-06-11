@@ -1,16 +1,15 @@
-import { BackLink } from "@/components/admin/BackLink";
-import { RatingHistogram } from "@/components/admin/charts/RatingHistogram";
-import { TagBars } from "@/components/admin/charts/TagBars";
-import { PageShell } from "@/components/admin/PageShell";
-import { Pill } from "@/components/admin/Pill";
-import { SectionHead } from "@/components/admin/SectionHead";
-import { CommentList } from "@/components/admin/sections/CommentList";
-import { TeaTrendCard } from "@/components/admin/sections/TeaTrendCard";
-import { CupRating } from "@/components/brand/CupRating";
-import { DeleteTeaButton } from "@/components/DeleteTeaButton";
-import { RatingBlock } from "@/components/TeaSheet/RatingBlock";
-import { buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { DeleteTeaButton } from "@/components/actions/DeleteTeaButton";
+import { Card } from "@/components/layout/Card";
+import { PageShell } from "@/components/layout/PageShell";
+import { SectionHead } from "@/components/layout/SectionHead";
+import { CommentList } from "@/components/lists/CommentList";
+import { buttonClassName } from "@/components/primitives/Button";
+import { Pill } from "@/components/primitives/Pill";
+import { CupRating } from "@/components/rating/CupRating";
+import { RatingBlock } from "@/components/rating/RatingBlock";
+import { RatingHistogram } from "@/components/statistics/charts/RatingHistogram";
+import { TagBars } from "@/components/statistics/charts/TagBars";
+import { TeaTrendCard } from "@/components/statistics/TeaTrendCard";
 import {
   interpretRatingDistribution,
   ratingAverage,
@@ -40,7 +39,7 @@ export default async function TeaDetailPage({ params }: PageProps) {
     <div className="relative">
       <main>
         <PageShell
-          backlink={<BackLink href="/">← Teas</BackLink>}
+          backlink={true}
           title={tea.name}
           subtitle={
             tea.tags.length > 0 && (

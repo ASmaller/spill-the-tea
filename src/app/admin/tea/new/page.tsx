@@ -1,5 +1,5 @@
-import { PageShell } from "@/components/admin/PageShell";
-import { NewTeaForm } from "@/components/TeaForm/NewTeaForm";
+import { NewTeaForm } from "@/components/forms/tea/NewTeaForm";
+import { PageShell } from "@/components/layout/PageShell";
 import { isAdmin } from "@/lib/session";
 import { redirect } from "next/navigation";
 

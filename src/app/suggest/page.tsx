@@ -1,4 +1,4 @@
-import { SuggestForm } from "@/components/SuggestForm/SuggestForm";
+import { SuggestForm } from "@/components/forms/suggest/SuggestForm";
 
 export default function Suggest() {
   return (

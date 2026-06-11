@@ -1,7 +1,7 @@
-import { PageShell } from "@/components/admin/PageShell";
-import { KpiStrip } from "@/components/admin/sections/KpiStrip";
-import { RankedTeas } from "@/components/admin/sections/RankedTeas";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/layout/Card";
+import { PageShell } from "@/components/layout/PageShell";
+import { RankedTeas } from "@/components/lists/RankedTeas";
+import { KpiStrip } from "@/components/statistics/KpiStrip";
 import { verifySession } from "@/lib/session";
 import { getAdminOverview } from "@/services/statisticsService";
 
