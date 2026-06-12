@@ -1,15 +1,59 @@
-import { createSession } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import {
+  createGammaAuthorizationCode,
+  createSession,
+  isAdmin,
+  SessionProfile,
+} from "@/lib/session";
+import { userAvatarUrl } from "gammait/urls";
 import { NextRequest, NextResponse } from "next/server";
 
-// Mocked callback route. Creates a new session without authentication.
 export async function GET(req: NextRequest) {
-  // Create a new session
-  await createSession(
-    "1e6b625e-a4fe-43c7-8e66-399f328fd4ef",
-    "Testu",
-    "Exempelsson"
-  );
+  const code = req.nextUrl.searchParams.get("code");
+  if (code == null) {
+    return new NextResponse("401 Unauthorized: Missing authorization code", {
+      status: 401,
+    });
+  }
 
-  // Redirect to the admin dashboard
-  return NextResponse.redirect(new URL("/admin", req.url));
+  const authorizationCode = createGammaAuthorizationCode();
+  try {
+    await authorizationCode.generateToken(code);
+  } catch (error) {
+    return new NextResponse(
+      `500 Internal Server Error: Failed to generate access token, code may already be used. Details: ${String(error)}`,
+      { status: 500 }
+    );
+  }
+
+  const userInfo = await authorizationCode.userInfo();
+
+  const user = await prisma.user.upsert({
+    where: {
+      gammaId: userInfo.sub,
+    },
+    create: {
+      name: userInfo.nickname,
+      gammaId: userInfo.sub,
+    },
+    update: {
+      name: userInfo.nickname,
+    },
+  });
+
+  const profile: SessionProfile = {
+    sub: user.id,
+    gamma_id: userInfo.sub,
+    nickname: userInfo.nickname,
+    picture: userAvatarUrl(userInfo.sub),
+  };
+
+  // Create a new session
+  await createSession(profile);
+
+  // Redirect to the admin dashboard if an admin
+  // TODO: Redirect to profile page instead
+  const admin = await isAdmin();
+  const destinationUrl = new URL(admin ? "/admin" : "/", req.url);
+  return NextResponse.redirect(destinationUrl);
 }

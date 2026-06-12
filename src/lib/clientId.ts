@@ -1,5 +1,6 @@
 import "server-only";
 import { randomUUID } from "crypto";
+import { env } from "@/lib/env";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +11,7 @@ const CLIENT_ID_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 const cookieOptions = () => ({
   httpOnly: true,
   sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  secure: env.NODE_ENV === "production",
   path: "/",
   maxAge: CLIENT_ID_MAX_AGE_SECONDS,
 });

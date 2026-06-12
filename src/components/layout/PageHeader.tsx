@@ -23,7 +23,7 @@ export async function PageHeader() {
           <Link href="/suggest" className="text-ink font-serif">
             Suggest
           </Link>
-          <LoginButton>{session?.given_name}</LoginButton>
+          <LoginButton>{session?.nickname}</LoginButton>
         </span>
       </div>
     </header>

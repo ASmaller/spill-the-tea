@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { createGammaAuthorizationCode } from "@/lib/session";
+import { NextResponse } from "next/server";
 
-// Mocked login route. Redirects directly to the callback instead of a login page.
-export function GET(req: NextRequest) {
-  return NextResponse.redirect(new URL("/callback", req.url));
+export function GET() {
+  const url = createGammaAuthorizationCode().authorizeUrl();
+  return NextResponse.redirect(url);
 }

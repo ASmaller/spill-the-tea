@@ -48,16 +48,11 @@ export async function createSuggestion(
 export async function updateLastVisited() {
   const session = await verifySession();
 
-  await prisma.user.upsert({
+  await prisma.user.update({
     where: {
       id: session.sub,
     },
-    update: {
-      lastTimeReviewsViewed: new Date(),
-    },
-    create: {
-      id: session.sub,
-      name: session.given_name,
+    data: {
       lastTimeReviewsViewed: new Date(),
     },
   });

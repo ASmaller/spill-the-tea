@@ -1,25 +1,46 @@
 // Mostly copied from https://nextjs.org/docs/app/guides/authentication
 
 import "server-only";
+import { env } from "@/lib/env";
+import { AuthorizationCode, ClientApi, UserId } from "gammait";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import z, { ZodError } from "zod";
 
+export function createGammaAuthorizationCode() {
+  return new AuthorizationCode({
+    clientId: env.GAMMA_CLIENT_ID,
+    clientSecret: env.GAMMA_CLIENT_SECRET,
+    redirectUri: env.BASE_URL + "/callback",
+    scope: ["openid", "profile"],
+  });
+}
+
+export function createGammaClientApi() {
+  return new ClientApi({
+    authorization: `pre-shared ${env.GAMMA_API_KEY_ID}:${env.GAMMA_API_KEY_SECRET}`,
+  });
+}
+
 /** Properties stored in the session token. */
 const SessionPayload = z.object({
   /** JWT subject/user id. */
   sub: z.string(),
-  /** First name of the user. */
-  given_name: z.string(),
-  /** Last name of the user. */
-  family_name: z.string(),
+  /** User Gamma ID. */
+  gamma_id: z.uuidv4(),
+  /** Nickname of the user. */
+  nickname: z.string(),
+  /** URL to the user's profile picture. */
+  picture: z.url().optional(),
   /** Expiration time of the session cookie as a timestamp in seconds. */
   exp: z.number(),
 });
 
 export type SessionPayload = z.infer<typeof SessionPayload>;
+export type SessionProfile = Omit<SessionPayload, "exp">;
+
 // The mocked authentication does not require a secure secret since it does not
 // intend to offer any actual security
 const secretKey = "my-secret";
@@ -67,25 +88,17 @@ export async function decrypt(
 }
 
 /**
- * Create a new session for an authenticated user.
- * @param id The user id.
- * @param firstName First name of the user.
- * @param lastName Last name of the user.
+ * Create a new session for an authenticated user and store in a cookie.
+ * @param profile The user profile.
  */
-export async function createSession(
-  id: string,
-  firstName: string,
-  lastName: string
-) {
+export async function createSession(profile: SessionProfile): Promise<void> {
   // Calculate the session expiration
   const expiresAt = new Date(Date.now() + sessionExpireAfter);
   const expiresAtSeconds = expiresAt.getTime() / 1000;
 
   // Create a new session
   const session = await encrypt({
-    sub: id,
-    given_name: firstName,
-    family_name: lastName,
+    ...profile,
     exp: expiresAtSeconds,
   });
 
@@ -93,7 +106,7 @@ export async function createSession(
   const cookieStore = await cookies();
   cookieStore.set("session", session, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
+    secure: env.NODE_ENV !== "development",
     expires: expiresAt,
     sameSite: "lax",
     path: "/",
@@ -177,8 +190,14 @@ export async function isAdmin(): Promise<boolean> {
     return false;
   }
 
-  // TODO: Check Gamma authorities
-  return true;
+  const clientApi = createGammaClientApi();
+  const authorities = await clientApi.getAuthoritiesFor(
+    session.gamma_id as UserId
+  );
+
+  return (
+    authorities.find(authority => authority.startsWith("admin")) !== undefined
+  );
 }
 
 /**

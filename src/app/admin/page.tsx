@@ -22,7 +22,7 @@ export default async function AdminOverviewPage() {
       title={
         <>
           Good morning,{" "}
-          <span className="text-tea italic">{session.given_name}</span>
+          <span className="text-tea italic">{session.nickname}</span>
         </>
       }
       subtitle={formatToday()}
