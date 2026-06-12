@@ -53,6 +53,7 @@ describe("statisticsService", () => {
         name: "Tacos",
         description: "Foo",
         tags: ["meat"],
+        image: "",
         reviews: [
           {
             teaId: "2",
@@ -117,6 +118,7 @@ describe("statisticsService", () => {
           posted: new Date("2026-05-13T09:00:00.000Z"),
         },
       ],
+      image: "",
     } satisfies TeaWithReviews);
 
     const detail = await getTeaDetail("2");
@@ -177,6 +179,7 @@ describe("statisticsService", () => {
           posted: new Date("2026-05-13T08:00:00.000Z"),
         },
       ],
+      image: "",
     } satisfies TeaWithReviews);
 
     const trend = await getTeaTrend("2", 30);

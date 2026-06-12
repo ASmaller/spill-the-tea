@@ -42,7 +42,7 @@ export type TeaStat = {
   rating: number | null;
   votes: number;
   distribution: [number, number, number, number, number];
-  image: string;
+  image: string | null;
 };
 
 export type TeaForm = {
