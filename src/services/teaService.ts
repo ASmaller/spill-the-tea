@@ -1,5 +1,7 @@
 "use server";
 
+import { unlink, writeFile } from "fs";
+import path from "path";
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaCreateInput, TeaUpdateInput } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
@@ -29,9 +31,21 @@ export async function getTeaWithReviewsById(
 }
 
 export async function deleteTeaById(id: string): Promise<Tea | null> {
-  return prisma.tea.delete({
+  const tea = await prisma.tea.delete({
     where: { id },
   });
+
+  if (tea.image) {
+    const uploadDir = path.join(process.cwd(), "public");
+    const filePath = path.join(uploadDir, tea.image);
+    unlink(filePath, err => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+
+  return tea;
 }
 
 export async function addTea(tea: TeaCreateInput): Promise<Tea> {
@@ -40,8 +54,32 @@ export async function addTea(tea: TeaCreateInput): Promise<Tea> {
       name: tea.name,
       description: tea.description ?? Prisma.skip,
       tags: tea.tags,
+      image: tea.image ?? Prisma.skip,
     },
   });
+}
+
+export async function uploadImage(file: File): Promise<string> {
+  // TODO: validate file type and size
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const uploadDir = path.join(process.cwd(), "public", "tea");
+    const filePath = path.join(uploadDir, file.name);
+    await writeFile(filePath, buffer, err => {
+      if (err) {
+        console.log(err);
+      }
+    });
+    console.log("");
+
+    return `/tea/${file.name}`;
+  } catch (error) {
+    console.error("Upload error:", error);
+    return "";
+  }
 }
 
 export async function updateTea(

@@ -10,21 +10,24 @@ import { SectionHead } from "@/components/layout/SectionHead";
 import { Button, buttonClassName } from "@/components/primitives/Button";
 import { Tea } from "@/generated/prisma/client";
 import { TeaCreateInput } from "@/generated/prisma/models";
-import { PhotoRef, TeaTag } from "@/lib/types";
+import { TeaTag } from "@/lib/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export interface Props {
   id: string;
-  initialTea?: Pick<Tea, "name" | "tags">;
+  initialTea?: Pick<Tea, "name" | "tags" | "image">;
   backHref?: string;
-  onSubmit?: (value: TeaCreateInput) => void | Promise<void>;
+  onSubmit?: (
+    value: TeaCreateInput,
+    file?: File | null
+  ) => void | Promise<void>;
 }
 
 export function TeaForm({
   id,
-  initialTea = { name: "", tags: [] },
+  initialTea = { name: "", tags: [], image: "" },
   backHref,
   onSubmit,
 }: Props) {
@@ -32,7 +35,7 @@ export function TeaForm({
 
   const [name, setName] = useState<string>(initialTea.name);
   const [tags, setTags] = useState<string[]>(initialTea.tags);
-  const [photo, setPhoto] = useState<PhotoRef | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
@@ -45,13 +48,13 @@ export function TeaForm({
   const isDirty =
     name.trim() !== initialTea.name.trim() ||
     JSON.stringify(tags) !== JSON.stringify(initialTea.tags) ||
-    photo !== null;
+    file !== null;
 
   return (
     <>
       {isDirty && (
         <div
-          className="border-amber/30 bg-amber/[0.10]"
+          className="border-amber/30 bg-amber/10"
           style={{
             marginBottom: 14,
             padding: "10px 14px",
@@ -78,10 +81,13 @@ export function TeaForm({
           setSubmitting(true);
           if (onSubmit) {
             try {
-              await onSubmit({
-                name,
-                tags,
-              });
+              await onSubmit(
+                {
+                  name,
+                  tags,
+                },
+                file
+              );
             } catch {
               setSubmitting(false);
             }
@@ -93,7 +99,7 @@ export function TeaForm({
         <div className="flex flex-col" style={{ gap: 16 }}>
           <Card>
             <SectionHead title="Photo" />
-            <PhotoDrop value={photo} onChange={setPhoto} />
+            <PhotoDrop setFile={setFile} />
           </Card>
         </div>
 

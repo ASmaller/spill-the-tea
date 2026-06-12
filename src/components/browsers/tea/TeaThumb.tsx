@@ -8,17 +8,17 @@ export enum TriedStatus {
 }
 
 type Props = {
-  tea: Pick<TeaStat, "name" | "photo">;
+  tea: TeaStat;
   tried?: TriedStatus;
 };
 
 export function TeaThumb({ tea, tried }: Props) {
-  if (!tea.photo?.url) return null;
+  const imageUrl = tea.image ? tea.image : "/tea/DefaultTeaImage.webp";
 
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Image
-        src={tea.photo.url}
+        src={imageUrl}
         alt={tea.name}
         fill
         sizes="(max-width: 768px) 50vw, 240px"

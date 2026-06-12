@@ -36,6 +36,7 @@ model Tea {
   name        String   @unique
   tags        String[]
   description String   @default("")
+  image       String?
   reviews     Review[]
 }
 
