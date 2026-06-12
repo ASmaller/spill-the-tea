@@ -1,56 +1,31 @@
-import type {
-  Lunch,
-  Ingredient as PrismaIngredient,
-  Review,
-} from "@/generated/prisma/client";
-import { kgToBucket, LINE_COLOR, MEAL_LINES } from "@/lib/admin/colors";
+"use server";
+
+import type { Review } from "@/generated/prisma/client";
 import {
-  INGREDIENT_UNITS,
-  NEW_TAG,
-  type IngredientRow,
-  type IngredientUnit,
-  type Kpi,
-  type MealComment,
-  type MealStat,
-  type TagBarItem,
-  type TrendFootnote,
-  type TrendSeries,
-} from "@/lib/admin/types";
-import { getFeedDateKey } from "@/lib/dateFormat";
+  addDays,
+  DAY_MS,
+  formatShortDate,
+  getFeedDateKey,
+  getStartOfToday,
+  getStartOfWeek,
+} from "@/lib/dateFormat";
 import { prisma } from "@/lib/prisma";
-import type { DietTag, MealLine } from "@/lib/types";
+import type {
+  Kpi,
+  TagBarItem,
+  TeaStat,
+  TeaWithReviews,
+  TrendSeries,
+} from "@/lib/types";
+import { isValidRating, NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
 
 type RatingDistribution = [number, number, number, number, number];
 
 export type TrendRange = "7d" | "30d" | "1y";
 
-export type AdminOverviewTrend = {
-  xLabels: string[];
-  series: TrendSeries[];
-  footnotes: TrendFootnote[];
-};
-
-export type AdminMealTrend = {
-  xLabels: string[];
-  series: TrendSeries[];
-};
-
 export type AdminOverview = {
   kpis: Kpi[];
-  meals: MealStat[];
-  trend: AdminOverviewTrend;
-};
-
-export type UpcomingServing = {
-  id: number;
-  date: string;
-};
-
-export type AdminMealDetail = MealStat & {
-  comments: MealComment[];
-  tagBars: TagBarItem[];
-  trend: AdminMealTrend;
-  upcomingServings: UpcomingServing[];
+  teas: TeaStat[];
 };
 
 export type AdminSidebarStats = {
@@ -58,94 +33,21 @@ export type AdminSidebarStats = {
   ratingsThisWeek: number;
 };
 
+export type TeaTrend = {
+  xLabels: string[];
+  series: TrendSeries[];
+};
+
+export type TeaDetail = TeaStat & {
+  reviews: Review[];
+  tagBars: TagBarItem[];
+  trend: TeaTrend;
+};
+
 type ReviewSnapshot = Pick<
   Review,
   "id" | "rating" | "comment" | "tags" | "posted"
 >;
-
-type ServingSnapshot = {
-  id: number;
-  date: Date;
-  reviews: ReviewSnapshot[];
-};
-
-type LunchSnapshot = Pick<Lunch, "id" | "name" | "line" | "ecoScore"> & {
-  ingredients: PrismaIngredient[];
-  servings: ServingSnapshot[];
-};
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-const TREND_RANGE_DAYS: Record<TrendRange, number> = {
-  "7d": 7,
-  "30d": 30,
-  "1y": 365,
-};
-
-const POSITIVE_TAGS = new Set([
-  "balanced",
-  "delicious",
-  "filling",
-  "fresh",
-  "loved it",
-  "more please",
-  "perfect",
-]);
-
-const NEGATIVE_TAGS = new Set([
-  "bland",
-  "cold",
-  "dry",
-  "overcooked",
-  "small portion",
-  "too salty",
-  "too small",
-]);
-
-const FISH_INGREDIENTS = ["fish", "cod", "salmon", "tuna", "herring"];
-const MEAT_INGREDIENTS = [
-  "beef",
-  "chicken",
-  "meat",
-  "pork",
-  "turkey",
-  "bacon",
-  "ham",
-];
-const ANIMAL_PRODUCT_INGREDIENTS = [
-  ...FISH_INGREDIENTS,
-  ...MEAT_INGREDIENTS,
-  "butter",
-  "cheese",
-  "cream",
-  "egg",
-  "milk",
-  "ricotta",
-  "yogurt",
-];
-
-function isValidRating(rating: number): boolean {
-  return Number.isInteger(rating) && rating >= 1 && rating <= 5;
-}
-
-function getStartOfToday(now: Date): Date {
-  const startOfToday = new Date(now);
-  startOfToday.setHours(0, 0, 0, 0);
-  return startOfToday;
-}
-
-function getStartOfWeek(now: Date): Date {
-  const startOfWeek = getStartOfToday(now);
-  const daysSinceMonday = (startOfWeek.getDay() + 6) % 7;
-  startOfWeek.setDate(startOfWeek.getDate() - daysSinceMonday);
-  return startOfWeek;
-}
-
-function addDays(date: Date, days: number): Date {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
 
 function roundTo(value: number, decimals = 1): number {
   const factor = 10 ** decimals;
@@ -180,176 +82,21 @@ function getDateKeys(start: Date, days: number): string[] {
   );
 }
 
-function parseDateKey(dateKey: string): Date {
-  return new Date(`${dateKey}T00:00:00`);
-}
-
-function formatShortDate(date: Date | string): string {
-  const parsed = typeof date === "string" ? parseDateKey(date) : date;
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-  }).format(parsed);
-}
-
-function formatDailyTrendLabel(dateKey: string, totalDays: number): string {
-  const date = parseDateKey(dateKey);
-
-  if (totalDays <= 14) {
-    return new Intl.DateTimeFormat("en-GB", { weekday: "short" }).format(date);
-  }
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-  }).format(date);
-}
-
-// One label per calendar month: every month has exactly one Monday whose
-// day-of-month is in 1..7, so this produces ~12 labels across a year.
-function formatWeeklyTrendLabel(weekKey: string): string {
-  const date = parseDateKey(weekKey);
-  if (date.getDate() > 7) return "";
-  return new Intl.DateTimeFormat("en-GB", { month: "short" }).format(date);
-}
-
-function getWeekKeys(start: Date, endExclusive: Date): string[] {
-  const keys: string[] = [];
-  let cursor = getStartOfWeek(start);
-  while (cursor < endExclusive) {
-    keys.push(getLocalDateKey(cursor));
-    cursor = addDays(cursor, 7);
-  }
-  return keys;
-}
-
-function getWeekKey(date: Date): string {
-  return getLocalDateKey(getStartOfWeek(date));
-}
-
-function formatRelativeDate(date: Date | null, now = new Date()): string {
-  if (!date) return "never";
-
-  const today = getStartOfToday(now);
-  const dateStart = getStartOfToday(date);
-  const daysAgo = Math.round((today.getTime() - dateStart.getTime()) / DAY_MS);
-
-  if (daysAgo === 0) return "Today";
-  if (daysAgo === 1) return "Yesterday";
-  if (daysAgo > 1 && daysAgo < 7) return `${daysAgo}d ago`;
-  if (daysAgo >= 7 && daysAgo < 56) return `${Math.floor(daysAgo / 7)}w ago`;
-
-  return formatShortDate(date);
-}
-
-function dateToIso(date: Date | null): string | null {
-  return date ? date.toISOString() : null;
-}
-
-const warnedLines = new Set<string>();
-
-function getMealLine(line: string): MealLine {
-  if (MEAL_LINES.includes(line as MealLine)) return line as MealLine;
-  if (!warnedLines.has(line)) {
-    warnedLines.add(line);
-    console.warn(
-      `[statisticsService] Unknown meal line "${line}", falling back to "Street food".`
-    );
-  }
-  return "Street food";
-}
-
-function hasIngredient(
-  ingredients: PrismaIngredient[],
-  names: string[]
-): boolean {
-  return ingredients.some(ingredient => {
-    const tokens = ingredient.name.toLowerCase().split(/[^a-z]+/);
-    return names.some(
-      name => tokens.includes(name) || tokens.includes(`${name}s`)
-    );
-  });
-}
-
-function getDietTags(ingredients: PrismaIngredient[]): DietTag[] {
-  const hasFish = hasIngredient(ingredients, FISH_INGREDIENTS);
-  const hasMeat = hasIngredient(ingredients, MEAT_INGREDIENTS);
-  const hasAnimalProduct = hasIngredient(
-    ingredients,
-    ANIMAL_PRODUCT_INGREDIENTS
-  );
-  const tags: DietTag[] = [];
-
-  if (hasFish) tags.push("fish");
-  if (hasMeat) tags.push("meat");
-  if (!hasFish && !hasMeat) tags.push("vegetarian");
-  if (!hasAnimalProduct) tags.push("vegan");
-
-  return tags;
-}
-
-function toAdminIngredient(ingredient: PrismaIngredient): IngredientRow {
-  const unit = INGREDIENT_UNITS.includes(ingredient.unit as IngredientUnit)
-    ? (ingredient.unit as IngredientUnit)
-    : "g";
-
-  return {
-    id: ingredient.id,
-    name: ingredient.name,
-    amount: ingredient.amount,
-    unit,
-  };
-}
-
-function getServingDateRange(servings: ServingSnapshot[]) {
-  if (servings.length === 0) {
-    return { firstServedAt: null, lastServedAt: null };
-  }
-
-  const timestamps = servings.map(serving => serving.date.getTime());
-
-  return {
-    firstServedAt: new Date(Math.min(...timestamps)),
-    lastServedAt: new Date(Math.max(...timestamps)),
-  };
-}
-
-function getAllReviews(servings: ServingSnapshot[]): ReviewSnapshot[] {
-  return servings.flatMap(serving => serving.reviews);
-}
-
-function toMealStat(lunch: LunchSnapshot): MealStat {
+function toTeaStat(tea: TeaWithReviews): TeaStat {
   // Compare via UTC date keys so the past/future partition matches
   // scheduleServing's storage (UTC midnight) regardless of server timezone.
-  const todayKey = getFeedDateKey(new Date());
-  const pastServings = lunch.servings.filter(
-    serving => getFeedDateKey(serving.date) <= todayKey
-  );
-  const reviews = getAllReviews(pastServings);
+  const reviews = tea.reviews;
   const ratings = reviews.map(review => review.rating).filter(isValidRating);
   const rating = averageRating(ratings);
   const distribution = getDistribution(ratings);
-  const { firstServedAt, lastServedAt } = getServingDateRange(pastServings);
-  const tags: string[] = getDietTags(lunch.ingredients);
-
-  if (!lastServedAt) tags.push(NEW_TAG);
 
   return {
-    id: lunch.id,
-    name: lunch.name,
-    line: getMealLine(lunch.line),
-    tags,
+    id: tea.id,
+    name: tea.name,
+    tags: tea.tags,
     rating: rating == null ? null : roundTo(rating),
     votes: ratings.length,
     distribution,
-    co2: roundTo(lunch.ecoScore),
-    climate: kgToBucket(lunch.ecoScore),
-    lastServed: formatRelativeDate(lastServedAt),
-    firstServed: formatRelativeDate(firstServedAt),
-    firstServedAt: dateToIso(firstServedAt),
-    lastServedAt: dateToIso(lastServedAt),
-    timesServed: pastServings.length,
-    ingredients: lunch.ingredients.map(toAdminIngredient),
   };
 }
 
@@ -379,37 +126,43 @@ function getTagBars(reviews: ReviewSnapshot[]): TagBarItem[] {
     .slice(0, MAX_TAG_BARS);
 }
 
-function getComments(
-  lunch: Pick<LunchSnapshot, "id" | "name">,
-  servings: ServingSnapshot[]
-): MealComment[] {
-  return getAllReviews(servings)
-    .filter(review => review.comment?.trim())
-    .sort((a, b) => b.posted.getTime() - a.posted.getTime())
-    .map(review => ({
-      id: review.id,
-      mealId: lunch.id,
-      mealName: lunch.name,
-      rating: review.rating,
-      text: review.comment?.trim() ?? "",
-      when: formatRelativeDate(review.posted),
-      postedAt: review.posted.toISOString(),
-      tags: review.tags,
-    }));
-}
+function buildAverageRatingTrend(reviews: Review[]): TeaTrend {
+  if (reviews.length === 0) {
+    return {
+      xLabels: [],
+      series: [
+        {
+          name: "avg",
+          color: "var(--color-tea)",
+          data: [],
+        },
+      ],
+    };
+  }
 
-function buildMealTrend(servings: ServingSnapshot[]): AdminMealTrend {
-  const points = [...servings]
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .flatMap(serving => {
-      const ratings = serving.reviews
-        .map(review => review.rating)
-        .filter(isValidRating);
-      const avg = averageRating(ratings);
-      if (avg == null) return [];
+  const sortedReviews = reviews.sort(
+    (a, b) => a.posted.getTime() - b.posted.getTime()
+  );
 
-      return [{ label: formatShortDate(serving.date), value: roundTo(avg) }];
-    });
+  // Get review time span
+  const firstDay = getStartOfToday(sortedReviews[0].posted);
+  const lastDay = getStartOfToday(
+    sortedReviews[sortedReviews.length - 1].posted
+  );
+
+  // Generate points for average during time span
+  const points: { label: string; value: number }[] = [];
+
+  for (
+    let currentDate = firstDay;
+    currentDate.getTime() <= lastDay.getTime();
+    currentDate = addDays(currentDate, 1)
+  ) {
+    const avg = calculateAverageRatingAtDate(currentDate, sortedReviews);
+    if (avg != null) {
+      points.push({ label: formatShortDate(currentDate), value: roundTo(avg) });
+    }
+  }
 
   return {
     xLabels: points.map(point => point.label),
@@ -423,13 +176,37 @@ function buildMealTrend(servings: ServingSnapshot[]): AdminMealTrend {
   };
 }
 
-function getRangeWindow(range: TrendRange, now = new Date()) {
-  const days = TREND_RANGE_DAYS[range];
-  const endExclusive = addDays(getStartOfToday(now), 1);
-  const start = addDays(endExclusive, -days);
-  const previousStart = addDays(start, -days);
+function calculateAverageRatingAtDate(
+  date: Date,
+  sortedReviews: Review[]
+): number | null {
+  const timeLessThan = addDays(date, 1).getTime();
 
-  return { days, start, endExclusive, previousStart };
+  if (sortedReviews.length === 0) return null;
+
+  if (timeLessThan < sortedReviews[0].posted.getTime()) return null;
+
+  if (timeLessThan > sortedReviews[sortedReviews.length - 1].posted.getTime()) {
+    // All reviews are before date
+    return averageReviewRating(sortedReviews);
+  }
+
+  // Use binary search to find included reviews
+  let low = 0;
+  let high = sortedReviews.length;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    const postedTime = sortedReviews[mid].posted.getTime();
+
+    if (postedTime < timeLessThan) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  const includedReviews = sortedReviews.slice(0, high);
+  return averageReviewRating(includedReviews);
 }
 
 function formatTrend(delta: number | null, decimals = 1): string {
@@ -467,82 +244,20 @@ function getIsoWeek(now: Date): number {
   return Math.ceil(((date.getTime() - yearStart.getTime()) / DAY_MS + 1) / 7);
 }
 
-type TrendGrain = "day" | "week";
-
-function formatBucketValue(grain: TrendGrain, key: string): string {
-  const short = formatShortDate(key);
-  return grain === "week" ? `Wk of ${short}` : short;
-}
-
-function getTrendFootnotes(
-  grain: TrendGrain,
-  bucketKeys: string[],
-  reviewsByBucket: Map<string, { sum: number; count: number }>,
-  currentAverage: number | null,
-  previousAverage: number | null
-): TrendFootnote[] {
-  let best: { key: string; avg: number; count: number } | null = null;
-  let worst: { key: string; avg: number; count: number } | null = null;
-
-  for (const key of bucketKeys) {
-    const bucket = reviewsByBucket.get(key);
-    if (!bucket || bucket.count === 0) continue;
-
-    const point = { key, avg: bucket.sum / bucket.count, count: bucket.count };
-    if (!best || point.avg > best.avg) best = point;
-    if (!worst || point.avg < worst.avg) worst = point;
-  }
-
-  const delta =
-    currentAverage == null || previousAverage == null
-      ? null
-      : currentAverage - previousAverage;
-  const unit = grain === "week" ? "week" : "day";
-
-  return [
-    {
-      label: `Best ${unit}`,
-      value: best ? formatBucketValue(grain, best.key) : "—",
-      sub: best
-        ? `${roundTo(best.avg).toFixed(1)} avg · ${best.count} ratings`
-        : "No ratings in range",
-      tone: "var(--color-sage)",
-    },
-    {
-      label: `Worst ${unit}`,
-      value: worst ? formatBucketValue(grain, worst.key) : "—",
-      sub: worst
-        ? `${roundTo(worst.avg).toFixed(1)} avg · ${worst.count} ratings`
-        : "No ratings in range",
-      tone: "var(--color-rose)",
-    },
-    {
-      label: "Range delta",
-      value: formatTrend(delta),
-      sub: "vs. previous equal range",
-      tone:
-        delta == null || delta >= 0 ? "var(--color-tea)" : "var(--color-rose)",
-    },
-  ];
-}
-
 export async function getAdminSidebarStats(): Promise<AdminSidebarStats> {
   const now = new Date();
   const startOfWeek = getStartOfWeek(now);
-  const reviews = await prisma.review.findMany({
+  const reviewCount = await prisma.review.count({
     where: {
-      serving: {
-        date: {
-          gte: startOfWeek,
-        },
+      posted: {
+        gte: startOfWeek,
       },
     },
-    select: { id: true },
   });
 
   return {
     week: `Week ${getIsoWeek(now)}`,
-    ratingsThisWeek: reviews.length,
+    ratingsThisWeek: reviewCount,
   };
 }
 
@@ -556,27 +271,22 @@ export async function getAdminKpis(): Promise<Kpi[]> {
 
   const reviews = await prisma.review.findMany({
     where: {
-      serving: {
-        date: {
-          gte: startOfPreviousWeek,
-          lt: startOfTomorrow,
-        },
+      posted: {
+        gte: startOfPreviousWeek,
+        lt: startOfTomorrow,
       },
     },
     select: {
       rating: true,
       comment: true,
-      serving: { select: { date: true } },
+      posted: true,
     },
   });
 
-  const currentWeek = reviews.filter(
-    review => review.serving.date >= startOfWeek
-  );
+  const currentWeek = reviews.filter(review => review.posted >= startOfWeek);
   const previousWeek = reviews.filter(
     review =>
-      review.serving.date >= startOfPreviousWeek &&
-      review.serving.date < startOfWeek
+      review.posted >= startOfPreviousWeek && review.posted < startOfWeek
   );
   const currentWeekAverage = averageReviewRating(currentWeek) ?? 0;
   const previousWeekAverage = averageReviewRating(previousWeek);
@@ -595,9 +305,9 @@ export async function getAdminKpis(): Promise<Kpi[]> {
   );
 
   reviews
-    .filter(review => review.serving.date >= lastSevenStart)
+    .filter(review => review.posted >= lastSevenStart)
     .forEach(review => {
-      const key = getLocalDateKey(review.serving.date);
+      const key = getLocalDateKey(review.posted);
       const bucket = sparkBuckets.get(key);
       if (!bucket) return;
       if (isValidRating(review.rating)) {
@@ -654,222 +364,75 @@ export async function getAdminKpis(): Promise<Kpi[]> {
   ];
 }
 
-export async function getAdminMealCatalog(): Promise<MealStat[]> {
-  const lunches = await prisma.lunch.findMany({
-    include: {
-      ingredients: true,
-      servings: {
-        include: {
-          reviews: true,
-        },
-      },
-    },
+export async function getTeaCatalog(): Promise<TeaStat[]> {
+  const teas = await prisma.tea.findMany({
     orderBy: {
       name: "asc",
     },
+    include: {
+      reviews: true,
+    },
   });
 
-  return lunches.map(toMealStat);
+  return teas.map(toTeaStat);
 }
 
-export async function getAdminOverviewTrend(
-  range: TrendRange = "30d"
-): Promise<AdminOverviewTrend> {
-  const { days, start, endExclusive, previousStart } = getRangeWindow(range);
-  const grain: TrendGrain = range === "1y" ? "week" : "day";
-  const bucketKeys =
-    grain === "week"
-      ? getWeekKeys(start, endExclusive)
-      : getDateKeys(start, days);
-  const bucketKeyFor = (date: Date) =>
-    grain === "week" ? getWeekKey(date) : getLocalDateKey(date);
-  const formatAxisLabel = (key: string) =>
-    grain === "week"
-      ? formatWeeklyTrendLabel(key)
-      : formatDailyTrendLabel(key, days);
-  const [currentReviews, previousReviews] = await Promise.all([
-    prisma.review.findMany({
-      where: {
-        serving: {
-          date: {
-            gte: start,
-            lt: endExclusive,
-          },
-        },
-      },
-      select: {
-        rating: true,
-        serving: {
-          select: {
-            date: true,
-            lunch: {
-              select: {
-                line: true,
-              },
-            },
-          },
-        },
-      },
-    }),
-    prisma.review.findMany({
-      where: {
-        serving: {
-          date: {
-            gte: previousStart,
-            lt: start,
-          },
-        },
-      },
-      select: {
-        rating: true,
-      },
-    }),
-  ]);
-  const lineBuckets = new Map<
-    MealLine,
-    Map<string, { sum: number; count: number }>
-  >();
-  const overallBuckets = new Map<string, { sum: number; count: number }>();
+export async function getAdminOverview(): Promise<AdminOverview> {
+  const [kpis, teas] = await Promise.all([getAdminKpis(), getTeaCatalog()]);
 
-  MEAL_LINES.forEach(line => {
-    const bucketMap = new Map<string, { sum: number; count: number }>();
-    bucketKeys.forEach(key => bucketMap.set(key, { sum: 0, count: 0 }));
-    lineBuckets.set(line, bucketMap);
-  });
-  bucketKeys.forEach(key => overallBuckets.set(key, { sum: 0, count: 0 }));
-
-  for (const review of currentReviews) {
-    if (!isValidRating(review.rating)) continue;
-
-    const key = bucketKeyFor(review.serving.date);
-    const line = getMealLine(review.serving.lunch.line);
-    const lineBucket = lineBuckets.get(line)?.get(key);
-    const overallBucket = overallBuckets.get(key);
-
-    if (lineBucket) {
-      lineBucket.sum += review.rating;
-      lineBucket.count += 1;
-    }
-
-    if (overallBucket) {
-      overallBucket.sum += review.rating;
-      overallBucket.count += 1;
-    }
-  }
-
-  const series = MEAL_LINES.map(line => {
-    const buckets = lineBuckets.get(line);
-    return {
-      name: line,
-      color: LINE_COLOR[line],
-      data: bucketKeys.map(key => {
-        const bucket = buckets?.get(key);
-        if (!bucket || bucket.count === 0) return 0;
-        return roundTo(bucket.sum / bucket.count);
-      }),
-    };
-  });
-  const currentAverage = averageReviewRating(currentReviews);
-  const previousAverage = averageReviewRating(previousReviews);
-
-  return {
-    xLabels: bucketKeys.map(formatAxisLabel),
-    series,
-    footnotes: getTrendFootnotes(
-      grain,
-      bucketKeys,
-      overallBuckets,
-      currentAverage,
-      previousAverage
-    ),
-  };
+  return { kpis, teas };
 }
 
-export async function getAdminOverview(
-  range: TrendRange = "30d"
-): Promise<AdminOverview> {
-  const [kpis, meals, trend] = await Promise.all([
-    getAdminKpis(),
-    getAdminMealCatalog(),
-    getAdminOverviewTrend(range),
-  ]);
-
-  return { kpis, meals, trend };
-}
-
-export async function getAdminMealTrend(
-  lunchId: number,
-  servingLimit = 30
-): Promise<AdminMealTrend | null> {
-  // UTC-midnight boundary to match scheduleServing's storage. Using a
+export async function getTeaTrend(
+  teaId: string,
+  limit = 30,
+  today = new Date()
+): Promise<TeaTrend | null> {
+  // UTC-midnight boundary to match reviews storage. Using a
   // local-midnight Date here would mix coordinate systems with the
-  // serving.date `@db.Date` column (UTC midnight) and miss servings near
+  // review.posted `@db.Date` column (UTC midnight) and miss reviews near
   // the timezone boundary.
-  const todayKey = getFeedDateKey(new Date());
+  const todayKey = getFeedDateKey(today);
   const startOfTomorrow = new Date(`${todayKey}T00:00:00.000Z`);
   startOfTomorrow.setUTCDate(startOfTomorrow.getUTCDate() + 1);
-  const lunch = await prisma.lunch.findUnique({
-    where: { id: lunchId },
-    select: {
-      id: true,
-      servings: {
+  const tea = await prisma.tea.findUnique({
+    where: { id: teaId },
+    include: {
+      reviews: {
         where: {
-          date: { lt: startOfTomorrow },
+          posted: { lt: startOfTomorrow },
         },
         orderBy: {
-          date: "desc",
+          posted: "desc",
         },
-        take: servingLimit,
-        include: {
-          reviews: true,
-        },
+        take: limit,
       },
     },
   });
 
-  if (!lunch) return null;
-  return buildMealTrend(lunch.servings);
+  if (!tea) return null;
+
+  return buildAverageRatingTrend(tea.reviews);
 }
 
-export async function getAdminMealDetail(
-  lunchId: number
-): Promise<AdminMealDetail | null> {
-  const lunch = await prisma.lunch.findUnique({
-    where: { id: lunchId },
+export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
+  const tea = await prisma.tea.findUnique({
+    where: { id: teaId },
     include: {
-      ingredients: true,
-      servings: {
+      reviews: {
         orderBy: {
-          date: "desc",
-        },
-        include: {
-          reviews: true,
+          posted: "desc",
         },
       },
     },
   });
 
-  if (!lunch) return null;
-
-  const meal = toMealStat(lunch);
-  const todayKey = getFeedDateKey(new Date());
-  const pastServings = lunch.servings.filter(
-    serving => getFeedDateKey(serving.date) <= todayKey
-  );
-  const reviews = getAllReviews(pastServings);
-  const upcomingServings: UpcomingServing[] = lunch.servings
-    .filter(serving => getFeedDateKey(serving.date) > todayKey)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .map(serving => ({
-      id: serving.id,
-      date: getFeedDateKey(serving.date),
-    }));
+  if (!tea) return null;
 
   return {
-    ...meal,
-    comments: getComments(lunch, pastServings),
-    tagBars: getTagBars(reviews),
-    trend: buildMealTrend(pastServings.slice(0, 30)),
-    upcomingServings,
+    ...tea,
+    ...toTeaStat(tea),
+    tagBars: getTagBars(tea.reviews),
+    trend: buildAverageRatingTrend(tea.reviews),
   };
 }

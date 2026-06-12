@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id                    String       @unique
+  id                    String       @id @default(ulid())
   name                  String
   reviews               Review[]
   suggestions           Suggestion[]
@@ -20,53 +20,27 @@ model User {
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  rating    Int
-  comment   String?
-  tags      String[] @default([])
-  posted    DateTime
-  servingId Int
-  serving   Serving  @relation(fields: [servingId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  clientId  String?
-
-  @@unique([clientId, servingId])
+  id      String   @id @default(ulid())
+  rating  Int
+  comment String?
+  tags    String[] @default([])
+  posted  DateTime @default(now())
+  teaId   String?
+  tea     Tea?     @relation(fields: [teaId], references: [id], onDelete: SetNull)
+  userId  String?
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
-model Lunch {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  line        String
+model Tea {
+  id          String   @id @default(ulid())
+  name        String   @unique
   tags        String[]
-  description String       @default("")
-  ecoScore    Float
-  ingredients Ingredient[]
-  servings    Serving[]
-}
-
-model Serving {
-  id      Int      @id @default(autoincrement())
-  date    DateTime @db.Date
-  lunchId Int
-  lunch   Lunch    @relation(fields: [lunchId], references: [id], onDelete: Cascade)
-  reviews Review[]
-
-  @@unique([lunchId, date])
-  @@index([date])
-}
-
-model Ingredient {
-  id      Int    @id @default(autoincrement())
-  name    String
-  unit    String
-  amount  Float
-  lunchId Int
-  lunch   Lunch  @relation(fields: [lunchId], references: [id], onDelete: Cascade)
+  description String   @default("")
+  reviews     Review[]
 }
 
 model Suggestion {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(ulid())
   title       String
   description String   @default("")
   postedDate  DateTime

@@ -1,137 +1,77 @@
 "use server";
 
-import { Prisma, Review } from "@/generated/prisma/client";
+import { Review } from "@/generated/prisma/client";
+import { ReviewCreateInput } from "@/generated/prisma/models";
 import { readClientId } from "@/lib/clientId";
 import { prisma } from "@/lib/prisma";
-import {
-  ReviewAlreadyExistsError,
-  ReviewServingNotFoundError,
-  ReviewUserNotFoundError,
-  ReviewValidationError,
-} from "@/services/reviewErrors";
-
-type AddReviewInput = {
-  rating: number;
-  servingId: number;
-  comment?: string;
-  tags?: string[];
-  userId?: string | null;
-};
-
-function cleanTags(tags: string[] = []): string[] {
-  return [...new Set(tags.map(tag => tag.trim()).filter(Boolean))];
-}
+import { isValidRating } from "@/lib/types";
+import { ReviewValidationError } from "@/services/reviewErrors";
 
 export async function addReview({
   rating,
-  servingId,
   comment,
   tags = [],
-  userId = null,
-}: AddReviewInput) {
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+  tea,
+  user,
+}: ReviewCreateInput) {
+  if (!isValidRating(rating)) {
     throw new ReviewValidationError("rating must be an integer from 1 to 5");
   }
 
-  const serving = await prisma.serving.findUnique({
-    where: { id: servingId },
-    select: { id: true },
+  return await prisma.review.create({
+    data: {
+      rating,
+      comment,
+      tags,
+      posted: new Date(),
+      tea,
+      ...(user && { user }),
+    },
   });
-
-  if (!serving) {
-    throw new ReviewServingNotFoundError(`serving ${servingId} does not exist`);
-  }
-
-  if (userId !== null) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
-
-    if (!user) {
-      throw new ReviewUserNotFoundError(`user ${userId} does not exist`);
-    }
-  }
-
-  const clientId = (await readClientId()) ?? null;
-
-  if (clientId) {
-    const existing = await prisma.review.findFirst({
-      where: { clientId, servingId },
-      select: { id: true },
-    });
-    if (existing) {
-      throw new ReviewAlreadyExistsError(
-        `serving ${servingId} already reviewed by this client`
-      );
-    }
-  }
-
-  try {
-    return await prisma.review.create({
-      data: {
-        rating,
-        comment: comment?.trim() || null,
-        tags: cleanTags(tags),
-        posted: new Date(),
-        servingId,
-        userId,
-        clientId,
-      },
-    });
-  } catch (e) {
-    // Race condition between the findFirst guard and the create: the DB
-    // unique index catches the duplicate.
-    if (
-      e instanceof Prisma.PrismaClientKnownRequestError &&
-      e.code === "P2002"
-    ) {
-      throw new ReviewAlreadyExistsError(
-        `serving ${servingId} already reviewed by this client`
-      );
-    }
-    throw e;
-  }
 }
 
 export async function getAll() {
   return await prisma.review.findMany();
 }
 
-export async function getReviewsByServingId(
-  servingId: number
-): Promise<Review[]> {
-  const reviews = await prisma.review.findMany({
-    where: { servingId },
-  });
-
-  return reviews;
-}
-
-export async function getMyReviewSummaries(): Promise<
-  { servingId: string; rating: number }[]
-> {
-  const clientId = await readClientId();
-  if (!clientId) return [];
+/**
+ * Get the ratings of the authenticated user.
+ * @returns A record from the tea id to the given rating.
+ */
+export async function getMyRatings(): Promise<Record<string, number>> {
+  const userId = await readClientId();
+  if (!userId) return {};
 
   const reviews = await prisma.review.findMany({
-    where: { clientId },
-    select: { servingId: true, rating: true },
+    where: { userId },
     orderBy: { posted: "desc" },
   });
 
-  const seen = new Map<number, number>();
-  for (const r of reviews)
-    if (!seen.has(r.servingId)) seen.set(r.servingId, r.rating);
+  const seen: Record<string, number> = {};
+  for (const r of reviews) {
+    if (r.teaId != null && !Object.hasOwn(seen, r.teaId)) {
+      seen[r.teaId] = r.rating;
+    }
+  }
 
-  return [...seen].map(([servingId, rating]) => ({
-    servingId: servingId.toString(),
-    rating,
-  }));
+  return seen;
 }
 
-export async function getReview(id: number) {
+export async function getReview(id: string) {
   return await prisma.review.findUnique({
-    where: { id: id },
+    where: { id },
   });
+}
+
+export async function getAllReviewsOnTea(id: string): Promise<Review[] | null> {
+  let results = null;
+  await prisma.tea
+    .findUnique({
+      where: { id },
+      select: { reviews: true },
+    })
+    .then(res => {
+      results = res?.reviews;
+    });
+  return results;
 }

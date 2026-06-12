@@ -1,7 +1,6 @@
-# Don't Spill the Tea
+# Spill the Tea
 
-Welcome to _Don't Spill the Tea_, a solution for reducing food waste by
-simplifying the collection of feedback about school lunches from students.
+Welcome to **Spill the Tea**! A solution for rating the teas found in Hubben 2.2.
 
 For setting up your own instance, see [SETUP.md](./SETUP.md).
 
@@ -41,8 +40,8 @@ pnpm dev
 
 This will also do a few tasks automatically:
 
-1. Run a development database and [Green Bite API](https://github.com/arienshibani/green-bite) instance with Docker compose
-1. Update the database with the latest Prisma migrations
+1. Run a development database with Docker compose
+2. Update the database with the latest Prisma migrations
 
 The compose file should be stopped automatically after the development server
 is stopped. If it does not run this command manually:

@@ -30,11 +30,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
-    services:
-      green-bite:
-        image: arienshibani/green-bite:latest
-        ports:
-          - "3806:80" # Bind to a non-standard port to avoid collisions
+
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm

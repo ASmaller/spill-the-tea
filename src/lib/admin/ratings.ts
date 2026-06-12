@@ -12,7 +12,8 @@ export function ratingAverage(dist: readonly number[]): number {
 export function interpretRatingDistribution(dist: readonly number[]): string {
   const lows = dist[0] ?? 0;
   const highs = dist[4] ?? 0;
-  if (highs > lows * 4) return "strongly positive - most students love it.";
-  if (lows > highs) return "polarized - many strong dislikes.";
+  if (highs > lows * 4) return "strongly positive";
+  if (lows > highs * 4) return "strongly negative";
+  if (lows > highs) return "polarized";
   return "mixed.";
 }

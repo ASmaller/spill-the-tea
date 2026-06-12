@@ -1,6 +1,6 @@
 # Setup
 
-This document will guide you through setting up your own instance of _Don't Spill the Tea_.
+This document will guide you through setting up your own instance of **Spill the Tea**.
 
 ## Prerequisites
 

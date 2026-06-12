@@ -1,28 +1,36 @@
 "use client";
 
-import { FeedScreen } from "@/components/feed/FeedScreen";
-import { MealSheet } from "@/components/sheet/MealSheet";
-import type { Day, Option, RatingPayload } from "@/lib/types";
-import { addReview, getMyReviewSummaries } from "@/services/reviewService";
+import { TeaBrowser } from "@/components/browsers/tea/TeaBrowser";
+import { TeaStat } from "@/lib/types";
+import { getMyRatings } from "@/services/reviewService";
+import { getTeaCatalog } from "@/services/statisticsService";
 import { useEffect, useMemo, useState } from "react";
 
-type Opened = { option: Option; day: Day };
-
 export default function Home() {
-  const [opened, setOpened] = useState<Opened | null>(null);
-  const [myRatings, setMyRatings] = useState<Map<string, number>>(new Map());
+  const [teas, setTeas] = useState<TeaStat[] | null>(null);
+  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let ignore = false;
 
-    getMyReviewSummaries()
+    getMyRatings()
       .then(rows => {
         if (!ignore) {
-          setMyRatings(new Map(rows.map(r => [r.servingId, r.rating])));
+          setMyRatings(rows);
         }
       })
       .catch(error => {
-        console.log("Failed to fetch my reviews: ", error);
+        console.error("Failed to fetch my reviews: ", error);
+      });
+
+    getTeaCatalog()
+      .then(teas => {
+        if (!ignore) {
+          setTeas(teas);
+        }
+      })
+      .catch(error => {
+        console.error("Failed to fetch teas: ", error);
       });
 
     return () => {
@@ -30,46 +38,17 @@ export default function Home() {
     };
   }, []);
 
-  const ratedIds = useMemo(() => new Set(myRatings.keys()), [myRatings]);
-
-  const handleSubmit = async (payload: RatingPayload) => {
-    try {
-      await addReview({
-        rating: payload.rating,
-        servingId: Number(payload.optionId),
-        comment: payload.note,
-        tags: payload.tags,
-        userId: null,
-      });
-
-      setMyRatings(prev => {
-        const next = new Map(prev);
-        next.set(payload.optionId, payload.rating);
-        return next;
-      });
-      setOpened(null);
-    } catch (error) {
-      console.error("Failed to submit rating", error);
-    }
-  };
-
-  const existingRating = opened
-    ? (myRatings.get(opened.option.id) ?? null)
-    : null;
-
+  const ratedIds = useMemo(() => new Set(Object.keys(myRatings)), [myRatings]);
   return (
-    <main className="relative">
-      <FeedScreen
-        onOpen={(option, day) => setOpened({ option, day })}
-        ratedIds={ratedIds}
-      />
-      <MealSheet
-        option={opened?.option ?? null}
-        day={opened?.day ?? null}
-        existingRating={existingRating}
-        onClose={() => setOpened(null)}
-        onSubmit={handleSubmit}
-      />
+    <main
+      className="bg-cream flex-1 overflow-auto"
+      style={{ padding: "24px 28px" }}
+    >
+      {teas != null ? (
+        <TeaBrowser teas={teas} ratedIds={ratedIds} urlPrefix="/tea/" />
+      ) : (
+        <span>Loading teas...</span>
+      )}
     </main>
   );
 }

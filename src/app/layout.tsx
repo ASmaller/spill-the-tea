@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,8 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Don't Spill the Tea",
-  description: "Rate today's lunch at Chalmers kårrestaurangen.",
+  title: "Spill the Tea",
+  description: "Review and browse teas in Hubben 2.2",
 };
 
 export const viewport: Viewport = {
@@ -37,6 +38,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${instrumentSerif.variable} antialiased`}
     >
       <body className="bg-cream text-ink min-h-[100svh] font-sans">
+        <PageHeader />
         {children}
       </body>
     </html>

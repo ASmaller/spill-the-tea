@@ -1,16 +1,15 @@
 # This is an example of how to run the app in production using the image from
 # the GitHub Container registry.
 
-name: dont-spill-the-tea
+name: spill-the-tea
 
 services:
   server:
-    image: "ghcr.io/olillin/agile-project:latest"
+    image: "ghcr.io/ASmaller/spill-the-tea:latest"
     restart: always
     environment:
       NODE_ENV: production
-      GREEN_BITE_API_URL: http://green-bite:80
-      DATABASE_URL: postgresql://postgres:<DATABASE PASSWORD>@db:5432/dont-spill-the-tea
+      DATABASE_URL: postgresql://postgres:<DATABASE PASSWORD>@db:5432/spill-the-tea
 
     ports:
       - "3000:3000"
@@ -25,7 +24,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql
     environment:
-      - POSTGRES_DB=dont-spill-the-tea
+      - POSTGRES_DB=spill-the-tea
       - POSTGRES_PASSWORD=<DATABASE PASSWORD>
     expose:
       - 5432
@@ -34,10 +33,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  green-bite:
-    image: arienshibani/green-bite:latest
-    restart: unless-stopped
-    expose:
-      - 80
 volumes:
   db-data:

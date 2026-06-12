@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/session";
 
 export async function getSuggestionById(
-  id: number
+  id: string
 ): Promise<Suggestion | null> {
   return prisma.suggestion.findUnique({
     where: {
@@ -119,8 +119,8 @@ export async function submitSuggestion(formData: FormData) {
   }
 
   const review = await createSuggestion(
-    rawFormData.title,
-    rawFormData.description
+    rawFormData.title.trim(),
+    rawFormData.description.trim()
   );
   return review;
 }

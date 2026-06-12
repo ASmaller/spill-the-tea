@@ -1,10 +1,10 @@
-import { Sidebar } from "@/components/admin/Sidebar";
+import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { verifySession } from "@/lib/session";
 import { getAdminSidebarStats } from "@/services/statisticsService";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin · Don't Spill the Tea",
+  title: "Admin · Spill the Tea",
 };
 
 export default function AdminLayout({
@@ -25,14 +25,16 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     session.family_name[0] ?? ""
   }`.toUpperCase();
 
+  // Subtract the header height from the root layout
+  const heightClass = "h-[calc(100vh-14*var(--spacing))]";
+
   return (
-    <div className="bg-cream flex h-screen overflow-hidden">
-      <Sidebar
+    <div className={`bg-cream flex overflow-hidden ${heightClass}`}>
+      <AdminSidebar
         manager={{
           name,
           initials,
-          role: "Lunch manager",
-          school: "Chalmers · kårrestaurangen",
+          role: "MaterialChef",
         }}
         weekStat={weekStat}
       />

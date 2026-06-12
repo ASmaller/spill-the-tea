@@ -1,7 +1,7 @@
 "use client";
 
-import { PageShell } from "@/components/admin/PageShell";
-import { SuggestionsBrowser } from "@/components/admin/sections/SuggestionsBrowser";
+import { SuggestionsBrowser } from "@/components/browsers/suggestions/SuggestionsBrowser";
+import { PageShell } from "@/components/layout/PageShell";
 import { Suggestion } from "@/generated/prisma/browser";
 import {
   getAllSuggestions,
@@ -14,7 +14,7 @@ export interface SuggestionAndUser extends Suggestion {
   displayName: string | null;
 }
 
-export default function AdminMealsPage() {
+export default function AdminSuggestionsPage() {
   const [suggestions, setSuggestions] = useState<SuggestionAndUser[]>([]);
   const [lastViewed, setLastViewed] = useState<Date>(new Date());
   useEffect(() => {
@@ -36,7 +36,10 @@ export default function AdminMealsPage() {
     });
   }, []);
   return (
-    <PageShell title="Suggestions" subtitle="Meal suggestions left by students">
+    <PageShell
+      title="Suggestions"
+      subtitle="More tea is wanted by avid tea drinkers!"
+    >
       <SuggestionsBrowser suggestions={suggestions} lastViewed={lastViewed} />
     </PageShell>
   );

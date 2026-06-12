@@ -1,7 +1,8 @@
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const MINUTE_IN_MS = 60 * 1000;
-const HOUR_IN_MS = 60 * 60 * 1000;
-const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+export const MINUTE_MS = 60 * 1000;
+export const HOUR_MS = 60 * 60 * 1000;
+export const DAY_MS = 24 * 60 * 60 * 1000;
 
 function parseFeedDate(date: Date | string): Date | null {
   if (date instanceof Date) {
@@ -47,7 +48,7 @@ export function formatFeedDayLabel(date: Date | string): string {
   const dayStart = new Date(`${dateKey}T00:00:00.000Z`);
   const todayStart = new Date(`${todayKey}T00:00:00.000Z`);
   const daysFromToday = Math.round(
-    (dayStart.getTime() - todayStart.getTime()) / DAY_IN_MS
+    (dayStart.getTime() - todayStart.getTime()) / DAY_MS
   );
 
   if (daysFromToday === 0) return "Today";
@@ -68,20 +69,85 @@ export function formatPostedDate(date: Date): string {
   const elapsed = time - now;
   if (elapsed <= 0) return "Just now";
 
-  const daysAgo = Math.floor(elapsed / DAY_IN_MS);
+  const daysAgo = Math.floor(elapsed / DAY_MS);
   if (daysAgo > 0) {
     return `${daysAgo}d ago`;
   }
 
-  const hoursAgo = Math.floor(elapsed / HOUR_IN_MS);
+  const hoursAgo = Math.floor(elapsed / HOUR_MS);
   if (hoursAgo > 0) {
     return `${hoursAgo}h ago`;
   }
 
-  const minutesAgo = Math.floor(elapsed / MINUTE_IN_MS);
+  const minutesAgo = Math.floor(elapsed / MINUTE_MS);
   if (minutesAgo > 0) {
     return `${minutesAgo}m ago`;
   }
 
   return "Just now";
+}
+
+function parseDateKey(dateKey: string): Date {
+  return new Date(`${dateKey}T00:00:00`);
+}
+
+export function formatShortDate(date: Date | string): string {
+  const parsed = typeof date === "string" ? parseDateKey(date) : date;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+  }).format(parsed);
+}
+
+export function formatDailyTrendLabel(
+  dateKey: string,
+  totalDays: number
+): string {
+  const date = parseDateKey(dateKey);
+
+  if (totalDays <= 14) {
+    return new Intl.DateTimeFormat("en-GB", { weekday: "short" }).format(date);
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+  }).format(date);
+}
+
+export function formatRelativeDate(
+  date: Date | null,
+  now = new Date()
+): string {
+  if (!date) return "never";
+
+  const today = getStartOfToday(now);
+  const dateStart = getStartOfToday(date);
+  const daysAgo = Math.round((today.getTime() - dateStart.getTime()) / DAY_MS);
+
+  if (daysAgo === 0) return "Today";
+  if (daysAgo === 1) return "Yesterday";
+  if (daysAgo > 1 && daysAgo < 7) return `${daysAgo}d ago`;
+  if (daysAgo >= 7 && daysAgo < 56) return `${Math.floor(daysAgo / 7)}w ago`;
+
+  return formatShortDate(date);
+}
+
+export function getStartOfToday(now: Date): Date {
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  return startOfToday;
+}
+
+export function getStartOfWeek(now: Date): Date {
+  const startOfWeek = getStartOfToday(now);
+  const daysSinceMonday = (startOfWeek.getDay() + 6) % 7;
+  startOfWeek.setDate(startOfWeek.getDate() - daysSinceMonday);
+  return startOfWeek;
+}
+
+export function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
 }
