@@ -48,48 +48,79 @@ export async function deleteTeaById(id: string): Promise<Tea | null> {
   return tea;
 }
 
-export async function addTea(tea: TeaCreateInput): Promise<Tea> {
-  return prisma.tea.create({
+export async function addTea(tea: TeaCreateInput, file?: File): Promise<Tea> {
+  const image = file ? await uploadImage(file, tea.name) : Prisma.skip;
+
+  const res = await prisma.tea.create({
     data: {
       name: tea.name,
       description: tea.description ?? Prisma.skip,
       tags: tea.tags,
-      image: tea.image ?? Prisma.skip,
+      image,
     },
   });
+  return res;
 }
 
-export async function uploadImage(file: File): Promise<string> {
+async function uploadImage(file: File, name: string): Promise<string> {
   // TODO: validate file type and size
 
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    const filenname = `${name}-${Date.now()}.${file.name.split(".").pop()}`;
     const uploadDir = path.join(process.cwd(), "public", "tea");
-    const filePath = path.join(uploadDir, file.name);
-    await writeFile(filePath, buffer, err => {
+    const filePath = path.join(uploadDir, filenname);
+    writeFile(filePath, buffer, err => {
       if (err) {
         console.log(err);
       }
     });
-    console.log("");
 
-    return `/tea/${file.name}`;
+    return `/tea/${filenname}`;
   } catch (error) {
     console.error("Upload error:", error);
     return "";
   }
 }
 
+async function unlinkImage(name: string): Promise<boolean> {
+  try {
+    const uploadDir = path.join(process.cwd(), "public");
+    const filePath = path.join(uploadDir, name);
+    unlink(filePath, err => {
+      if (err) {
+        console.log(err);
+      }
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function updateTea(
   id: string,
-  data: TeaUpdateInput
+  data: TeaUpdateInput,
+  file?: File
 ): Promise<Tea> {
-  return prisma.tea.update({
+  if (file) {
+    const tea = await getTeaById(id);
+    if (tea?.image) {
+      unlinkImage(tea.image);
+    }
+    if (tea) {
+      data.image = await uploadImage(file, tea.name);
+    }
+  }
+
+  const tea = await prisma.tea.update({
     where: {
       id,
     },
     data,
   });
+
+  return tea;
 }

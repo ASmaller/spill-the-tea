@@ -54,9 +54,14 @@ export default function EditTeaPage({
             id={"edit-tea-form"}
             backHref={`/tea/${id}`}
             initialTea={tea}
-            onSubmit={async (tea: TeaCreateInput) => {
-              const created = await updateTea(id, tea);
-              router.push(`/tea/${created.id}`);
+            onSubmit={async (tea: TeaCreateInput, file?: File | null) => {
+              if (file) {
+                const created = await updateTea(id, tea, file);
+                router.push(`/tea/${created.id}`);
+              } else {
+                const created = await updateTea(id, tea);
+                router.push(`/tea/${created.id}`);
+              }
             }}
           />
         </main>

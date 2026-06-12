@@ -48,6 +48,7 @@ export function PhotoDrop({ square, setFile }: Props) {
       >
         {previewUrl ? (
           <Image
+            fill={true}
             src={previewUrl}
             alt="Selected tea preview"
             className="h-full w-full object-cover"

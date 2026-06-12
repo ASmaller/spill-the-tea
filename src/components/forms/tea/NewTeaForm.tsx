@@ -1,7 +1,7 @@
 "use client";
 
 import { TeaCreateInput } from "@/generated/prisma/models";
-import { addTea, uploadImage } from "@/services/teaService";
+import { addTea } from "@/services/teaService";
 import { useRouter } from "next/navigation";
 import { TeaForm, Props as TeaFormProps } from "./TeaForm";
 
@@ -14,11 +14,7 @@ export function NewTeaForm(props: Props) {
     <TeaForm
       {...props}
       onSubmit={async (tea: TeaCreateInput, file?: File | null) => {
-        if (file) {
-          const imagnUrl = await uploadImage(file);
-          tea.image = imagnUrl;
-        }
-        const created = await addTea(tea);
+        const created = await addTea(tea, file ?? undefined);
         router.push(`/tea/${created.id}`);
       }}
     />
