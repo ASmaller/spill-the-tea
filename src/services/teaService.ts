@@ -1,6 +1,6 @@
 "use server";
 
-import { unlink, writeFile } from "fs";
+import { rename, unlink, writeFile } from "fs";
 import path from "path";
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaCreateInput, TeaUpdateInput } from "@/generated/prisma/models";
@@ -105,22 +105,33 @@ export async function updateTea(
   data: TeaUpdateInput,
   file?: File
 ): Promise<Tea> {
-  if (file) {
-    const tea = await getTeaById(id);
-    if (tea?.image) {
+  const tea = await getTeaById(id);
+  if (file && tea) {
+    if (tea.image) {
       unlinkImage(tea.image);
     }
-    if (tea) {
-      data.image = await uploadImage(file, tea.name);
+    const filename = typeof data.name == "string" ? data.name : tea.name;
+    data.image = await uploadImage(file, filename);
+  }
+
+  if (data.name && tea && !file) {
+    if (tea.image) {
+      const uploadDir = path.join(process.cwd(), "public");
+      const filenname = `${data.name}-${Date.now()}.${tea?.image.split(".").pop()}`;
+
+      const oldDir = path.join(uploadDir, tea?.image);
+      const newDir = path.join(uploadDir, "tea", filenname);
+      rename(oldDir, newDir, () => {});
+      data.image = `/tea/${filenname}`;
     }
   }
 
-  const tea = await prisma.tea.update({
+  const res = await prisma.tea.update({
     where: {
       id,
     },
     data,
   });
 
-  return tea;
+  return res;
 }
