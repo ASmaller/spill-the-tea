@@ -18,6 +18,8 @@ If using [Nix](https://nixos.org), simply run `nix develop` to install these.
 
 ## Getting Started
 
+TODO: Add Gamma setup instructions
+
 First, run the command below to install dependencies.
 
 ```bash

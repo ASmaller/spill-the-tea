@@ -14,6 +14,7 @@ type Props = {
 };
 
 export function RatingForm({ tea }: Props) {
+  // TODO: Allow users to rate anonymously?
   const session = useSession();
 
   const [rating, setRating] = useState(0);
