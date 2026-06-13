@@ -1,9 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import {
-  createGammaAuthorizationCode,
-  createSession,
-  SessionProfile,
-} from "@/lib/session";
+import { createGammaAuthorizationCode, createSession } from "@/lib/session";
+import { SessionProfile } from "@/lib/types";
 import { userAvatarUrl } from "gammait/urls";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -7,7 +7,8 @@ import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import z, { ZodError } from "zod";
+import { ZodError } from "zod";
+import { SessionPayload, SessionProfile } from "./types";
 
 export function createGammaAuthorizationCode() {
   return new AuthorizationCode({
@@ -24,25 +25,7 @@ export function createGammaClientApi() {
   });
 }
 
-/** Properties stored in the session token. */
-const SessionPayload = z.object({
-  /** JWT subject/user id. */
-  sub: z.string(),
-  /** User Gamma ID. */
-  gamma_id: z.uuidv4(),
-  /** Nickname of the user. */
-  nickname: z.string(),
-  /** URL to the user's profile picture. */
-  picture: z.url().optional(),
-  /** Expiration time of the session cookie as a timestamp in seconds. */
-  exp: z.number(),
-});
-
-export type SessionPayload = z.infer<typeof SessionPayload>;
-export type SessionProfile = Omit<SessionPayload, "exp">;
-
-// The mocked authentication does not require a secure secret since it does not
-// intend to offer any actual security
+// TODO: Replace with environment
 const secretKey = "my-secret";
 const encodedKey = new TextEncoder().encode(secretKey);
 

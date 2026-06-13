@@ -1,6 +1,6 @@
 "use client";
 
-import { SessionProfile } from "@/lib/session";
+import { SessionProfile } from "@/lib/types";
 import { HTMLAttributes, useState } from "react";
 import { DropDownItem, DropDownList } from "../lists/DropDownList";
 

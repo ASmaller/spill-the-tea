@@ -2,7 +2,7 @@
 
 import type { Suggestion } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { verifySession } from "@/lib/session";
+import { getSession, verifySession } from "@/lib/session";
 
 export async function getSuggestionById(
   id: string
@@ -29,7 +29,7 @@ export async function createSuggestion(
       select: { id: true },
     });
     if (!user) {
-      throw new Error(`user ${userId} does not exist`);
+      throw new Error(`User ${userId} does not exist`);
     }
   }
 
@@ -87,7 +87,10 @@ export async function submitSuggestion(formData: FormData) {
   const rawFormData = {
     title: formData.get("title"),
     description: formData.get("description"),
+    anonymous: formData.get("anonymous"),
   };
+
+  console.log(rawFormData);
 
   // Check null
   if (!rawFormData.title) {
@@ -104,6 +107,12 @@ export async function submitSuggestion(formData: FormData) {
   if (typeof rawFormData.description != "string") {
     throw new Error("Description must be string");
   }
+  if (
+    rawFormData.anonymous !== null &&
+    typeof rawFormData.anonymous != "string"
+  ) {
+    throw new Error("Anonymous toggle must be a string");
+  }
 
   // Check blank string
   if (rawFormData.title.trim() === "") {
@@ -113,9 +122,18 @@ export async function submitSuggestion(formData: FormData) {
     throw new Error("Suggestion must have a description");
   }
 
+  const submitAnonymously = rawFormData.anonymous ?? false;
+  let userId: string | null = null;
+
+  if (!submitAnonymously) {
+    const session = await getSession();
+    userId = session?.sub ?? null;
+  }
+
   const review = await createSuggestion(
     rawFormData.title.trim(),
-    rawFormData.description.trim()
+    rawFormData.description.trim(),
+    userId
   );
   return review;
 }

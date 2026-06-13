@@ -2,6 +2,7 @@
 
 import { ThankYouView } from "@/components/forms/ThankYouView";
 import { Card } from "@/components/layout/Card";
+import { useSession } from "@/lib/hooks";
 import { FOCUS_RING } from "@/lib/styles";
 import { submitSuggestion } from "@/services/suggestionService";
 import { useEffect, useRef, useState } from "react";
@@ -9,8 +10,11 @@ import { useEffect, useRef, useState } from "react";
 const SUBMIT_CLOSE_DELAY = 1600;
 
 export function SuggestForm() {
+  const session = useSession();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +48,7 @@ export function SuggestForm() {
 
         setTitle("");
         setDescription("");
+        setAnonymous(false);
 
         submitTimerRef.current = window.setTimeout(() => {
           submitTimerRef.current = null;
@@ -92,6 +97,23 @@ export function SuggestForm() {
             rows={4}
             className="border-ink/10 bg-cream text-ink mt-1 w-full resize-none rounded-[12px] border px-3 py-2.5 outline-none"
           />
+
+          {session && (
+            <div className="mt-1">
+              <input
+                id="anonymous"
+                type="checkbox"
+                checked={anonymous}
+                onChange={e => setAnonymous(e.target.checked)}
+                name="anonymous"
+                placeholder="What I want is..."
+                className="border-ink/10 bg-cream text-ink mr-1 rounded-[12px] border px-3 py-2.5 outline-none"
+              />
+              <label htmlFor="anonymous" className="text-l font-serif">
+                Submit anonymously
+              </label>
+            </div>
+          )}
 
           <div className="mt-6">
             {error && (
