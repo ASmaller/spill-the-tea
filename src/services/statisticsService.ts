@@ -1,6 +1,7 @@
 "use server";
 
 import type { Review } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import {
   addDays,
   DAY_MS,
@@ -39,7 +40,9 @@ export type TeaTrend = {
 };
 
 export type TeaDetail = TeaStat & {
-  reviews: Review[];
+  reviews: Prisma.ReviewGetPayload<{
+    include: { user: { select: { name: true } } };
+  }>[];
   tagBars: TagBarItem[];
   trend: TeaTrend;
 };
@@ -422,6 +425,13 @@ export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
       reviews: {
         orderBy: {
           posted: "desc",
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
     },

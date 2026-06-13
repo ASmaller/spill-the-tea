@@ -2,9 +2,10 @@
 
 import { CupRating } from "@/components/inputs/CupRating";
 import { Eyebrow } from "@/components/text/Eyebrow";
+import { useSession } from "@/lib/hooks";
 import { FOCUS_RING } from "@/lib/styles";
 import { NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
-import { addReview } from "@/services/reviewService";
+import { submitReview } from "@/services/reviewService";
 import { TeaDetail } from "@/services/statisticsService";
 import { useState } from "react";
 
@@ -13,6 +14,8 @@ type Props = {
 };
 
 export function RatingForm({ tea }: Props) {
+  const session = useSession();
+
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<Set<string>>(new Set());
   const [comment, setComment] = useState("");
@@ -91,15 +94,11 @@ export function RatingForm({ tea }: Props) {
       <button
         type="button"
         onClick={() => {
-          addReview({
+          submitReview({
             rating,
             comment,
             tags: Array.from(tags.values()),
-            tea: {
-              connect: {
-                id: tea.id,
-              },
-            },
+            teaId: tea.id,
           });
           setRating(0);
           setTags(new Set());

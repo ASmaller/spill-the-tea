@@ -30,7 +30,9 @@ export default async function TeaDetailPage({ params }: PageProps) {
   const tea = await getTeaDetail(id);
   if (!tea) notFound();
 
-  const comments = tea.reviews.map(review => review.comment);
+  const comments = tea.reviews
+    .map(review => review.comment)
+    .filter(comment => !!comment);
   const total = ratingTotal(tea.distribution);
   const avg = ratingAverage(tea.distribution);
   const avgLabel = total > 0 ? avg.toFixed(1) : "—";
