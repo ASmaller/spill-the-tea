@@ -49,3 +49,6 @@ next-env.d.ts
 
 # generated
 src/generated/
+
+public/tea/*
+!public/tea/DefaultTeaImage.webp

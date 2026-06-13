@@ -99,7 +99,7 @@ export function TeaForm({
         <div className="flex flex-col" style={{ gap: 16 }}>
           <Card>
             <SectionHead title="Photo" />
-            <PhotoDrop setFile={setFile} />
+            <PhotoDrop setFile={setFile} image={initialTea.image} />
           </Card>
         </div>
 

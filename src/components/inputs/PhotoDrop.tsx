@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 type Props = {
   square?: boolean;
   setFile: (file: File) => void;
+  image: string | null;
 };
 
-export function PhotoDrop({ square, setFile }: Props) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+export function PhotoDrop({ square, setFile, image }: Props) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(image);
 
   useEffect(() => {
     return () => {

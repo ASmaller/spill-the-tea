@@ -63,13 +63,28 @@ export async function addTea(tea: TeaCreateInput, file?: File): Promise<Tea> {
 }
 
 async function uploadImage(file: File, name: string): Promise<string> {
-  // TODO: validate file type and size
+  const IMAGE_EXTENSIONS: Record<string, string> = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "image/gif": ".gif",
+    "image/avif": ".avif",
+  };
+  const extension = IMAGE_EXTENSIONS[file.type];
+
+  if (!extension) {
+    throw new Error("Unsupported image type.");
+  }
+
+  if (file.size <= 0) {
+    throw new Error("The selected image is empty.");
+  }
 
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const filenname = `${name}-${Date.now()}.${file.name.split(".").pop()}`;
+    const filenname = `${name}-${Date.now()}${extension}`;
     const uploadDir = path.join(process.cwd(), "public", "tea");
     const filePath = path.join(uploadDir, filenname);
     writeFile(filePath, buffer, err => {
