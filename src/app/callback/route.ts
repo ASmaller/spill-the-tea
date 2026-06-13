@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import {
   createGammaAuthorizationCode,
   createSession,
-  isAdmin,
   SessionProfile,
 } from "@/lib/session";
 import { userAvatarUrl } from "gammait/urls";
@@ -51,9 +50,7 @@ export async function GET(req: NextRequest) {
   // Create a new session
   await createSession(profile);
 
-  // Redirect to the admin dashboard if an admin
+  // Redirect to homepage
   // TODO: Redirect to profile page instead
-  const admin = await isAdmin();
-  const destinationUrl = new URL(admin ? "/admin" : "/", req.url);
-  return NextResponse.redirect(destinationUrl);
+  return NextResponse.redirect(new URL("/", req.url));
 }
