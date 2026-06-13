@@ -10,6 +10,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://postgres:<DATABASE PASSWORD>@db:5432/spill-the-tea
+      JWT_SECRET: <REPLACE ME>
       GAMMA_CLIENT_SECRET: <REPLACE ME>
       GAMMA_CLIENT_ID: <REPLACE ME>
       GAMMA_API_KEY_ID: <REPLACE ME>

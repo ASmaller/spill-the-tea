@@ -25,8 +25,7 @@ export function createGammaClientApi() {
   });
 }
 
-// TODO: Replace with environment
-const secretKey = "my-secret";
+const secretKey = env.JWT_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
 /** Time before a session expires in milliseconds. */

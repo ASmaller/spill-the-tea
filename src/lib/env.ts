@@ -5,6 +5,7 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["production", "development", "test"]),
     DATABASE_URL: z.url(),
+    JWT_SECRET: z.string(),
     GAMMA_CLIENT_SECRET: z.string(),
     GAMMA_CLIENT_ID: z.string(),
     GAMMA_API_KEY_ID: z.string(),
