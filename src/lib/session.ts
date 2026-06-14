@@ -216,7 +216,7 @@ export const getSession = cache(async (): Promise<SessionPayload | null> => {
 
 export async function generateAndStoreRandomState(): Promise<string> {
   const randomState = crypto.getRandomValues(new Uint8Array(32));
-  const encodedState = btoa(randomState as unknown as string);
+  const encodedState = Buffer.from(randomState).toString("base64url");
 
   const expiresAt = new Date(Date.now() + stateExpireAfter);
 
