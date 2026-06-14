@@ -13,6 +13,8 @@ import {
 import { prisma } from "@/lib/prisma";
 import type {
   Kpi,
+  NegativeReviewTag,
+  PositiveReviewTag,
   TagBarItem,
   TeaStat,
   TeaWithRatings,
@@ -105,8 +107,10 @@ function toTeaStat(tea: TeaWithRatings): TeaStat {
 
 function getTagColor(tag: string): string {
   const normalized = tag.toLowerCase();
-  if (POSITIVE_TAGS.has(normalized)) return "var(--color-sage)";
-  if (NEGATIVE_TAGS.has(normalized)) return "var(--color-amber)";
+  if (POSITIVE_TAGS.includes(normalized as PositiveReviewTag))
+    return "var(--color-sage)";
+  if (NEGATIVE_TAGS.includes(normalized as NegativeReviewTag))
+    return "var(--color-amber)";
   return "var(--color-tea)";
 }
 

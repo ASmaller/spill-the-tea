@@ -40,8 +40,7 @@ export function ProfileButton({
     >
       <button
         className="text-ink cursor-pointer"
-        onClick={ev => {
-          ev.preventDefault();
+        onClick={() => {
           setIsOpen(!isOpen);
         }}
       >

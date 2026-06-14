@@ -111,11 +111,17 @@ export function RatingForm({ tea }: Props) {
             tags: Array.from(tags.values()),
             teaId: tea.id,
             anonymous,
-          });
-          setRating(0);
-          setTags(new Set());
-          setComment("");
-          setAnonymous(false);
+          })
+            .then(() => {
+              // Clear inputs
+              setRating(0);
+              setTags(new Set());
+              setComment("");
+              setAnonymous(false);
+            })
+            .catch(reason => {
+              console.error(`Failed to submit review: ${reason}`);
+            });
         }}
         disabled={rating === 0}
         className={`mt-4 w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${

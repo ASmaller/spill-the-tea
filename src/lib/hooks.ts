@@ -8,7 +8,12 @@ export function useSession(): SessionPayload | null {
   const [session, setSession] = useState<SessionPayload | null>(null);
   useEffect(() => {
     fetch("/api/session")
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Session fetch failed: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(json => {
         const result = z.null().or(SessionPayload).safeParse(json);
         if (result.success) {
@@ -17,6 +22,9 @@ export function useSession(): SessionPayload | null {
           console.warn("Failed to parse session from API, see Zod error below");
           console.warn(result.error);
         }
+      })
+      .catch(error => {
+        console.warn("Failed to fetch session:", error);
       });
   }, []);
   return session;

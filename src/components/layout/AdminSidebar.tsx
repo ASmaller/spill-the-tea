@@ -146,13 +146,14 @@ export function AdminSidebar({ manager, weekStat }: Props) {
         className="border-ink/[0.06] flex items-center border-t"
         style={{ padding: "10px 12px", borderRadius: 10, gap: 10 }}
       >
-        <div className="bg-tea text-paper text-meta flex h-7 w-7 items-center justify-center overflow-hidden rounded-full font-semibold">
+        <div className="bg-tea text-paper text-meta relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full font-semibold">
           {manager.picture ? (
             <Image
               src={manager.picture}
               alt={`${manager.name} profile picture`}
-              width={64}
-              height={64}
+              fill
+              sizes="28px"
+              className="object-cover"
             />
           ) : (
             manager.initials

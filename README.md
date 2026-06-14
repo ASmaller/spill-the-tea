@@ -46,12 +46,12 @@ pnpm prisma generate
 After the `.env` file is created you must provide the Gamma Client credentials.
 Open `.env` and you should see some empty fields, fill **all** these in:
 
-| Environment variable   | Description                                                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `GAMMA_CLIENT_SECRET`  | Client secret of the Gamma Client.                                                       |
-| `GAMMA_CLIENT_ID`      | Client id of the Gamma Client.                                                           |
-| `GAMMA_API_KEY_ID`     | API key id. Found between `pre-shared ` and `:` in the generated `Authorization` header. |
-| `GAMMA_API_KEY_SECRET` | API key secret. Displayed as "Api key" below the client secret.                          |
+| Environment variable   | Description                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `GAMMA_CLIENT_SECRET`  | Client secret of the Gamma Client.                                                      |
+| `GAMMA_CLIENT_ID`      | Client id of the Gamma Client.                                                          |
+| `GAMMA_API_KEY_ID`     | API key id. Found between `pre-shared` and `:` in the generated `Authorization` header. |
+| `GAMMA_API_KEY_SECRET` | API key secret. Displayed as "Api key" below the client secret.                         |
 
 > [!TIP]
 > You may also want to add yourself as an administrator. See

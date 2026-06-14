@@ -23,7 +23,7 @@ Start by copying the content of [compose.prod.yaml](./compose.prod.yaml) into a
 `compose.yaml` file in a new directory.
 
 Fill in the details in angle brackets (`<>`) like the database password and
-Gamma Client credentials. Refer to the [Configuration](#Configuration) section
+Gamma Client credentials. Refer to the [Configuration](#configuration) section
 for what the different options mean.
 
 Run this command to start everything for you:
@@ -54,14 +54,14 @@ in the Gamma documentation.
 This is a list of available options for the service, exposed as environment
 variables.
 
-| Variable               | Required                                                                                                          | Description                                                                                                                       | Default                 |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `JWT_SECRET`           | Y                                                                                                                 | Secret key used for signing JWT tokens. Generate a random string.                                                                 |                         |
-| `DATABASE_URL`         | [Connection URL](https://www.prisma.io/docs/orm/reference/connection-urls) to the database which Prisma will use. |
-| `GAMMA_CLIENT_SECRET`  | Y                                                                                                                 | Client secret of the Gamma Client.                                                                                                |                         |
-| `GAMMA_CLIENT_ID`      | Y                                                                                                                 | Client id of the Gamma Client.                                                                                                    |                         |
-| `GAMMA_API_KEY_ID`     | Y                                                                                                                 | API key id. Found between `pre-shared ` and `:` in the generated `Authorization` header.                                          |                         |
-| `GAMMA_API_KEY_SECRET` | Y                                                                                                                 | API key secret. Displayed as "Api key" below the client secret.                                                                   |                         |
-| `GAMMA_REDIRECT_URI`   | N                                                                                                                 | Custom redirect URI if the for some reason the default `<BASE_URL>/callback` cannot be used.                                      |                         |
-| `BASE_URL`             | N                                                                                                                 | URL where the website is hosted without a path. Such as `https://example.com`.                                                    | `http://localhost:3000` |
-| `SKIP_ENV_VALIDATION`  | N                                                                                                                 | Set to `1` to skip validation of environment variables. Used when building the Docker image and should not be used in production. |
+| Variable               | Required | Description                                                                                                                       |
+| ---------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_SECRET`           | Y        | Secret key used for signing JWT tokens. Generate a random string.                                                                 |
+| `BASE_URL`             | Y        | URL where the website is hosted without a path. Such as `https://example.com`.                                                    |
+| `DATABASE_URL`         | Y        | [Connection URL](https://www.prisma.io/docs/orm/reference/connection-urls) to the database which Prisma will use.                 |
+| `GAMMA_CLIENT_SECRET`  | Y        | Client secret of the Gamma Client.                                                                                                |
+| `GAMMA_CLIENT_ID`      | Y        | Client id of the Gamma Client.                                                                                                    |
+| `GAMMA_API_KEY_ID`     | Y        | API key id. Found between `pre-shared` and `:` in the generated `Authorization` header.                                           |
+| `GAMMA_API_KEY_SECRET` | Y        | API key secret. Displayed as "Api key" below the client secret.                                                                   |
+| `GAMMA_REDIRECT_URI`   | N        | Custom redirect URI if the for some reason the default `<BASE_URL>/callback` cannot be used.                                      |
+| `SKIP_ENV_VALIDATION`  | N        | Set to `1` to skip validation of environment variables. Used when building the Docker image and should not be used in production. |

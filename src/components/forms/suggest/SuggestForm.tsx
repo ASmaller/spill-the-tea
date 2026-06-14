@@ -60,6 +60,7 @@ export function SuggestForm() {
         if (reason instanceof Error) {
           setError(`Failed to submit: ${reason.message}`);
         } else {
+          console.error(reason);
           setError("Something went wrong, try again later");
         }
       })

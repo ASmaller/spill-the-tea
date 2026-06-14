@@ -90,8 +90,6 @@ export async function submitSuggestion(formData: FormData) {
     anonymous: formData.get("anonymous"),
   };
 
-  console.log(rawFormData);
-
   // Check null
   if (!rawFormData.title) {
     throw new Error("Suggestion must have a title");

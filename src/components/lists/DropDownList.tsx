@@ -27,19 +27,20 @@ export function DropDownList({
   return (
     <div {...rest} className={`absolute ${className ?? ""}`}>
       <ul
-        className={`bg-paper text-md text-ink border-ink/10 supports-[backdrop-filter]:bg-paper/70 absolute min-h-4 min-w-4 border p-2 font-serif backdrop-blur-md ${leftAnchored ? "left-0" : "right-0"} ${topAnchored ? "bottom-0" : "top-0"} rounded-${topAnchored ? "t" : "b"}-lg`}
+        className={`bg-paper text-md text-ink border-ink/10 supports-[backdrop-filter]:bg-paper/70 absolute min-h-4 min-w-4 border p-2 font-serif backdrop-blur-md ${leftAnchored ? "left-0" : "right-0"} ${topAnchored ? "bottom-0 rounded-t-lg" : "top-0 rounded-b-lg"}`}
       >
         {items.map(item => {
-          const linkProps: {
-            href: string;
-          } & HTMLAttributes<HTMLAnchorElement> &
-            LinkProps = {
+          const linkProps = {
             href: item.href,
             className: `block ${leftAnchored ? "text-left" : "text-right"}`,
             onClick: () => {
               onNavigate?.();
             },
-          };
+          } satisfies {
+            href: string;
+          } & HTMLAttributes<HTMLAnchorElement> &
+            LinkProps;
+
           return (
             <li key={item.key} className="mb-1">
               {item.dumb ? (

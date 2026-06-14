@@ -22,7 +22,7 @@ export function CheckboxField({
         name={name}
         checked={checked}
         onChange={onChange ? ev => onChange(ev.target.checked) : undefined}
-        className="border-ink/10 bg-cream text-ink mr-1 rounded-[12px] border px-3 py-2.5 outline-none"
+        className="border-ink/10 bg-cream text-ink mr-1 rounded-[12px] border px-3 py-2.5"
       />
       <label htmlFor={name} className="text-l">
         {label}

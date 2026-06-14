@@ -18,7 +18,7 @@ export type ReviewSubmission = {
 };
 
 export async function submitReview(data: ReviewSubmission): Promise<Review> {
-  const tagOptions = Array.from(POSITIVE_TAGS.union(NEGATIVE_TAGS));
+  const tagOptions = [...POSITIVE_TAGS, ...NEGATIVE_TAGS];
 
   const schema = z.object({
     rating: z.int().gte(1).lte(5),

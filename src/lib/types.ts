@@ -14,21 +14,25 @@ export type RatingPayload = {
   comment: string;
 };
 
-export const POSITIVE_TAGS = new Set([
+export const POSITIVE_TAGS = [
   "delicious",
   "energizing",
   "fresh",
   "aromatic",
   "floral",
-]);
+] as const;
 
-export const NEGATIVE_TAGS = new Set([
+export const NEGATIVE_TAGS = [
   "bland",
   "too sweet",
   "bitter",
   "artificial",
   "weak",
-]);
+] as const;
+
+export type PositiveReviewTag = (typeof POSITIVE_TAGS)[number];
+export type NegativeReviewTag = (typeof NEGATIVE_TAGS)[number];
+export type ReviewTag = PositiveReviewTag | NegativeReviewTag;
 
 export type TeaWithRatings = Prisma.TeaGetPayload<{
   include: { reviews: { select: { rating: true } } };

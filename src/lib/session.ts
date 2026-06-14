@@ -117,7 +117,7 @@ export async function updateSession() {
   const cookieStore = await cookies();
   cookieStore.set("session", session, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
+    secure: env.NODE_ENV !== "development",
     expires: expiresAt,
     sameSite: "lax",
     path: "/",
@@ -175,13 +175,19 @@ export async function isAdmin(): Promise<boolean> {
   }
 
   const clientApi = createGammaClientApi();
-  const authorities = await clientApi.getAuthoritiesFor(
-    session.gamma_id as UserId
-  );
-
-  return (
-    authorities.find(authority => authority.startsWith("admin")) !== undefined
-  );
+  try {
+    const authorities = await clientApi.getAuthoritiesFor(
+      session.gamma_id as UserId
+    );
+    return authorities.some(authority => authority.startsWith("admin"));
+  } catch (error) {
+    if (error instanceof Error) {
+      console.warn(`Failed to fetch authorities from Gamma: ${error}`);
+    } else {
+      console.warn("Failed to fetch authorities from Gamma");
+    }
+    return false;
+  }
 }
 
 /**

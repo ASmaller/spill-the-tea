@@ -11,8 +11,9 @@ export const env = createEnv({
     GAMMA_API_KEY_ID: z.string(),
     GAMMA_API_KEY_SECRET: z.string(),
     GAMMA_REDIRECT_URI: z.url().optional(),
-    BASE_URL: z.url().default("http://localhost:3000"),
+    BASE_URL: z.url(),
   },
+  emptyStringAsUndefined: true,
   // Infer runtime variable values from names
   experimental__runtimeEnv: {},
   // Skip validation with environment variable
