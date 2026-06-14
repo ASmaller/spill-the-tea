@@ -14,4 +14,6 @@ export const env = createEnv({
   },
   // Infer runtime variable values from names
   experimental__runtimeEnv: {},
+  // Skip validation with environment variable
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
 });
