@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckboxField } from "@/components/inputs/CheckboxField";
 import { CupRating } from "@/components/inputs/CupRating";
 import { Eyebrow } from "@/components/text/Eyebrow";
 import { useSession } from "@/lib/hooks";
@@ -14,12 +15,12 @@ type Props = {
 };
 
 export function RatingForm({ tea }: Props) {
-  // TODO: Allow users to rate anonymously?
   const session = useSession();
 
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<Set<string>>(new Set());
   const [comment, setComment] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
 
   const toggleTag = (t: string) => {
     setTags(prev => {
@@ -90,6 +91,15 @@ export function RatingForm({ tea }: Props) {
             className="border-ink/10 bg-cream text-ink mt-3 w-full resize-none rounded-[12px] border px-3 py-2.5 outline-none"
             style={{ fontSize: 16, lineHeight: 1.4 }}
           />
+          {session && (
+            <CheckboxField
+              name="anonymous"
+              checked={anonymous}
+              onChange={checked => setAnonymous(checked)}
+              label="Hide my name on this review"
+              className="mt-1"
+            />
+          )}
         </div>
       )}
       <button
@@ -100,10 +110,12 @@ export function RatingForm({ tea }: Props) {
             comment,
             tags: Array.from(tags.values()),
             teaId: tea.id,
+            anonymous,
           });
           setRating(0);
           setTags(new Set());
           setComment("");
+          setAnonymous(false);
         }}
         disabled={rating === 0}
         className={`mt-4 w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${

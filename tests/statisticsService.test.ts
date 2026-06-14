@@ -1,4 +1,4 @@
-import { TeaWithReviews } from "@/lib/types";
+import { TeaWithRatings } from "@/lib/types";
 import {
   getAdminOverview,
   getTeaCatalog,
@@ -55,26 +55,14 @@ describe("statisticsService", () => {
         tags: ["meat"],
         reviews: [
           {
-            teaId: "2",
-            userId: null,
-            id: "100",
             rating: 5,
-            comment: "Great",
-            tags: ["fresh"],
-            posted: new Date("2026-05-13T08:00:00.000Z"),
           },
           {
-            teaId: "2",
-            userId: null,
-            id: "101",
             rating: 4,
-            comment: null,
-            tags: [],
-            posted: new Date("2026-05-13T09:00:00.000Z"),
           },
         ],
       },
-    ] satisfies TeaWithReviews[]);
+    ] satisfies TeaWithRatings[]);
 
     await expect(getTeaCatalog()).resolves.toEqual([
       expect.objectContaining({
@@ -99,25 +87,13 @@ describe("statisticsService", () => {
       tags: ["meat"],
       reviews: [
         {
-          teaId: "2",
-          userId: null,
-          id: "100",
           rating: 5,
-          comment: "Great",
-          tags: ["fresh", "more please"],
-          posted: new Date("2026-05-13T08:00:00.000Z"),
         },
         {
-          teaId: "2",
-          userId: null,
-          id: "101",
           rating: 2,
-          comment: "Too cold",
-          tags: ["cold", "fresh"],
-          posted: new Date("2026-05-13T09:00:00.000Z"),
         },
       ],
-    } satisfies TeaWithReviews);
+    } satisfies TeaWithRatings);
 
     const detail = await getTeaDetail("2");
 
@@ -150,34 +126,16 @@ describe("statisticsService", () => {
       tags: ["meat"],
       reviews: [
         {
-          teaId: "2",
-          userId: null,
-          id: "100",
           rating: 5,
-          comment: "Great",
-          tags: ["fresh", "more please"],
-          posted: new Date("2026-05-11T08:00:00.000Z"),
         },
         {
-          teaId: "2",
-          userId: null,
-          id: "101",
           rating: 1,
-          comment: "",
-          tags: ["fresh", "more please"],
-          posted: new Date("2026-05-12T08:00:00.000Z"),
         },
         {
-          teaId: "2",
-          userId: null,
-          id: "101",
           rating: 3,
-          comment: "",
-          tags: ["fresh", "more please"],
-          posted: new Date("2026-05-13T08:00:00.000Z"),
         },
       ],
-    } satisfies TeaWithReviews);
+    } satisfies TeaWithRatings);
 
     const trend = await getTeaTrend("2", 30);
 

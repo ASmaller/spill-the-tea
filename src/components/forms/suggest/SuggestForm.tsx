@@ -1,6 +1,7 @@
 "use client";
 
 import { ThankYouView } from "@/components/forms/ThankYouView";
+import { CheckboxField } from "@/components/inputs/CheckboxField";
 import { Card } from "@/components/layout/Card";
 import { useSession } from "@/lib/hooks";
 import { FOCUS_RING } from "@/lib/styles";
@@ -99,20 +100,13 @@ export function SuggestForm() {
           />
 
           {session && (
-            <div className="mt-1">
-              <input
-                id="anonymous"
-                type="checkbox"
-                checked={anonymous}
-                onChange={e => setAnonymous(e.target.checked)}
-                name="anonymous"
-                placeholder="What I want is..."
-                className="border-ink/10 bg-cream text-ink mr-1 rounded-[12px] border px-3 py-2.5 outline-none"
-              />
-              <label htmlFor="anonymous" className="text-l font-serif">
-                Submit anonymously
-              </label>
-            </div>
+            <CheckboxField
+              name="anonymous"
+              checked={anonymous}
+              onChange={checked => setAnonymous(checked)}
+              label="Submit anonymously"
+              className="mt-1"
+            />
           )}
 
           <div className="mt-6">

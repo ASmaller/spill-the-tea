@@ -30,8 +30,8 @@ export const NEGATIVE_TAGS = new Set([
   "weak",
 ]);
 
-export type TeaWithReviews = Prisma.TeaGetPayload<{
-  include: { reviews: true };
+export type TeaWithRatings = Prisma.TeaGetPayload<{
+  include: { reviews: { select: { rating: true } } };
 }>;
 
 // TODO: storage pipeline. Picked Files are captured locally and only
