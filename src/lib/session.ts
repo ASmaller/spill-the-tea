@@ -30,8 +30,14 @@ export function createGammaClientApi() {
 const secretKey = env.JWT_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
+const SESSION_COOKIE = "session";
+const STATE_COOKIE = "state";
+
 /** Time before a session expires in milliseconds. */
 const sessionExpireAfter = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+/** Time before a state expires in milliseconds. */
+const stateExpireAfter = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 /**
  * Encrypt a session as a JWT.
@@ -88,7 +94,7 @@ export async function createSession(profile: SessionProfile): Promise<void> {
 
   // Store the session in a cookie
   const cookieStore = await cookies();
-  cookieStore.set("session", session, {
+  cookieStore.set(SESSION_COOKIE, session, {
     httpOnly: true,
     secure: env.NODE_ENV !== "development",
     expires: expiresAt,
@@ -103,7 +109,7 @@ export async function createSession(profile: SessionProfile): Promise<void> {
  */
 export async function updateSession() {
   // Get the current session
-  const session = (await cookies()).get("session")?.value;
+  const session = (await cookies()).get(SESSION_COOKIE)?.value;
   const payload = await decrypt(session);
 
   if (!session || !payload) {
@@ -115,7 +121,7 @@ export async function updateSession() {
 
   // Create a new session with the new expiration time.
   const cookieStore = await cookies();
-  cookieStore.set("session", session, {
+  cookieStore.set(SESSION_COOKIE, session, {
     httpOnly: true,
     secure: env.NODE_ENV !== "development",
     expires: expiresAt,
@@ -129,7 +135,7 @@ export async function updateSession() {
  */
 export async function deleteSession() {
   const cookieStore = await cookies();
-  cookieStore.delete("session");
+  cookieStore.delete(SESSION_COOKIE);
 }
 
 /**
@@ -143,7 +149,7 @@ export async function deleteSession() {
  */
 export const verifySession = cache(
   async (): Promise<SessionPayload | never> => {
-    const cookie = (await cookies()).get("session")?.value;
+    const cookie = (await cookies()).get(SESSION_COOKIE)?.value;
     const session = await decrypt(cookie);
 
     // Check if session does not exist or has expired
@@ -164,7 +170,7 @@ export const verifySession = cache(
  * @return If the user is an admin.
  */
 export async function isAdmin(): Promise<boolean> {
-  const cookie = (await cookies()).get("session")?.value;
+  const cookie = (await cookies()).get(SESSION_COOKIE)?.value;
   const session = await decrypt(cookie);
 
   // Check if session does not exist or has expired
@@ -196,7 +202,7 @@ export async function isAdmin(): Promise<boolean> {
  * @return The session if it exists and is valid.
  */
 export const getSession = cache(async (): Promise<SessionPayload | null> => {
-  const cookie = (await cookies()).get("session")?.value;
+  const cookie = (await cookies()).get(SESSION_COOKIE)?.value;
   const session = await decrypt(cookie);
 
   // Check if session does not exist or has expired
@@ -207,3 +213,33 @@ export const getSession = cache(async (): Promise<SessionPayload | null> => {
 
   return session;
 });
+
+export async function generateAndStoreRandomState(): Promise<string> {
+  const randomState = crypto.getRandomValues(new Uint8Array(32));
+  const encodedState = btoa(randomState as unknown as string);
+
+  const expiresAt = new Date(Date.now() + stateExpireAfter);
+
+  // Store the state in a cookie
+  const cookieStore = await cookies();
+  cookieStore.set(STATE_COOKIE, encodedState, {
+    httpOnly: true,
+    secure: env.NODE_ENV !== "development",
+    expires: expiresAt,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return encodedState;
+}
+
+export async function readState(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const cookie = cookieStore.get(STATE_COOKIE);
+  return cookie?.value ?? null;
+}
+
+export async function deleteState(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(STATE_COOKIE);
+}

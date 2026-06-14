@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { createGammaAuthorizationCode, createSession } from "@/lib/session";
+import {
+  createGammaAuthorizationCode,
+  createSession,
+  deleteState,
+  readState,
+} from "@/lib/session";
 import { SessionProfile } from "@/lib/types";
 import { userAvatarUrl } from "gammait/urls";
 import { NextRequest, NextResponse } from "next/server";
@@ -11,6 +16,34 @@ export async function GET(req: NextRequest) {
       status: 401,
     });
   }
+
+  const state = req.nextUrl.searchParams.get("state");
+  if (state == null) {
+    return new NextResponse("401 Unauthorized: Missing state", {
+      status: 401,
+    });
+  }
+
+  const storedState = await readState();
+  if (!storedState) {
+    return new NextResponse(
+      "401 Unauthorized: State has expired, please try again",
+      {
+        status: 401,
+      }
+    );
+  }
+
+  if (state !== storedState) {
+    return new NextResponse(
+      "401 Unauthorized: Provided state does not match the stored value, please try again later",
+      {
+        status: 401,
+      }
+    );
+  }
+
+  await deleteState();
 
   const authorizationCode = createGammaAuthorizationCode();
   try {
