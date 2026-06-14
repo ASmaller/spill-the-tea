@@ -11,10 +11,12 @@ import { ZodError } from "zod";
 import { SessionPayload, SessionProfile } from "./types";
 
 export function createGammaAuthorizationCode() {
+  const redirectUri = env.GAMMA_REDIRECT_URI ?? env.BASE_URL + "/callback";
+
   return new AuthorizationCode({
     clientId: env.GAMMA_CLIENT_ID,
     clientSecret: env.GAMMA_CLIENT_SECRET,
-    redirectUri: env.BASE_URL + "/callback",
+    redirectUri,
     scope: ["openid", "profile"],
   });
 }

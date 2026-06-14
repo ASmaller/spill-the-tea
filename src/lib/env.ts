@@ -10,7 +10,8 @@ export const env = createEnv({
     GAMMA_CLIENT_ID: z.string(),
     GAMMA_API_KEY_ID: z.string(),
     GAMMA_API_KEY_SECRET: z.string(),
-    BASE_URL: z.string().default("http://localhost:3000"),
+    GAMMA_REDIRECT_URI: z.url().optional(),
+    BASE_URL: z.url().default("http://localhost:3000"),
   },
   // Infer runtime variable values from names
   experimental__runtimeEnv: {},

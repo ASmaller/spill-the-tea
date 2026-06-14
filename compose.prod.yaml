@@ -15,6 +15,7 @@ services:
       GAMMA_CLIENT_ID: <REPLACE ME>
       GAMMA_API_KEY_ID: <REPLACE ME>
       GAMMA_API_KEY_SECRET: <REPLACE ME>
+      BASE_URL: <REPLACE ME>
 
     ports:
       - "3000:3000"

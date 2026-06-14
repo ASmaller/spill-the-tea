@@ -16,9 +16,18 @@ This project uses these tools:
 
 If using [Nix](https://nixos.org), simply run `nix develop` to install these.
 
-## Getting Started
+The website also requires a
+[Gamma Client](https://gamma-docs.olillin.com/#what-is-a-client) with an API key
+to integrate with Gamma and enable login. Follow the guide on
+[**Creating a User Client**](https://gamma-docs.olillin.com/website/#creating-a-user-client)
+in the Gamma documentation.
 
-TODO: Add Gamma setup instructions
+When creating the client, make sure that _Generate api key_ is checked and
+_Redirect url_ is set to the local callback route at
+`http://localhost:3000/callback`. Keep the page open so you can copy your
+credentials later.
+
+## Getting Started
 
 First, run the command below to install dependencies.
 
@@ -33,6 +42,20 @@ Prisma client manually. To do so run this command:
 ```bash
 pnpm prisma generate
 ```
+
+After the `.env` file is created you must provide the Gamma Client credentials.
+Open `.env` and you should see some empty fields, fill **all** these in:
+
+| Environment variable   | Description                                                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `GAMMA_CLIENT_SECRET`  | Client secret of the Gamma Client.                                                       |
+| `GAMMA_CLIENT_ID`      | Client id of the Gamma Client.                                                           |
+| `GAMMA_API_KEY_ID`     | API key id. Found between `pre-shared ` and `:` in the generated `Authorization` header. |
+| `GAMMA_API_KEY_SECRET` | API key secret. Displayed as "Api key" below the client secret.                          |
+
+> [!TIP]
+> You may also want to add yourself as an administrator. See
+> [SETUP.md](./SETUP.md#Administrators) for how administrators are managed.
 
 Then run the development server:
 
