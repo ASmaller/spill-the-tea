@@ -1,4 +1,4 @@
-import { TeaWithRatings } from "@/lib/types";
+import { Prisma } from "@/generated/prisma/client";
 import {
   getAdminOverview,
   getTeaCatalog,
@@ -6,6 +6,12 @@ import {
   getTeaTrend,
 } from "@/services/statisticsService";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+type TeaWithReviews = Prisma.TeaGetPayload<{
+  include: {
+    reviews: true;
+  };
+}>;
 
 const prismaMock = vi.hoisted(() => ({
   tea: {
@@ -55,14 +61,28 @@ describe("statisticsService", () => {
         tags: ["meat"],
         reviews: [
           {
+            teaId: "2",
+            userId: null,
+            id: "100",
             rating: 5,
+            comment: "Great",
+            tags: ["fresh"],
+            posted: new Date("2026-05-13T08:00:00.000Z"),
+            anonymous: false,
           },
           {
+            teaId: "2",
+            userId: null,
+            id: "101",
             rating: 4,
+            comment: null,
+            tags: [],
+            posted: new Date("2026-05-13T09:00:00.000Z"),
+            anonymous: false,
           },
         ],
       },
-    ] satisfies TeaWithRatings[]);
+    ] satisfies TeaWithReviews[]);
 
     await expect(getTeaCatalog()).resolves.toEqual([
       expect.objectContaining({
@@ -87,13 +107,27 @@ describe("statisticsService", () => {
       tags: ["meat"],
       reviews: [
         {
+          teaId: "2",
+          userId: null,
+          id: "100",
           rating: 5,
+          comment: "Great",
+          tags: ["fresh", "more please"],
+          posted: new Date("2026-05-13T08:00:00.000Z"),
+          anonymous: false,
         },
         {
+          teaId: "2",
+          userId: null,
+          id: "101",
           rating: 2,
+          comment: "Too cold",
+          tags: ["cold", "fresh"],
+          posted: new Date("2026-05-13T09:00:00.000Z"),
+          anonymous: false,
         },
       ],
-    } satisfies TeaWithRatings);
+    } satisfies TeaWithReviews);
 
     const detail = await getTeaDetail("2");
 
@@ -126,16 +160,37 @@ describe("statisticsService", () => {
       tags: ["meat"],
       reviews: [
         {
+          teaId: "2",
+          userId: null,
+          id: "100",
           rating: 5,
+          comment: "Great",
+          tags: ["fresh", "more please"],
+          posted: new Date("2026-05-11T08:00:00.000Z"),
+          anonymous: false,
         },
         {
+          teaId: "2",
+          userId: null,
+          id: "101",
           rating: 1,
+          comment: "",
+          tags: ["fresh", "more please"],
+          posted: new Date("2026-05-12T08:00:00.000Z"),
+          anonymous: false,
         },
         {
+          teaId: "2",
+          userId: null,
+          id: "101",
           rating: 3,
+          comment: "",
+          tags: ["fresh", "more please"],
+          posted: new Date("2026-05-13T08:00:00.000Z"),
+          anonymous: false,
         },
       ],
-    } satisfies TeaWithRatings);
+    } satisfies TeaWithReviews);
 
     const trend = await getTeaTrend("2", 30);
 
