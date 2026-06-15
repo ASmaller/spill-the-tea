@@ -11,11 +11,12 @@ type Props = {
 };
 
 export function PhotoDrop({ square, setFile, image }: Props) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(image);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const activePreviewUrl = previewUrl ?? image;
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
@@ -47,10 +48,10 @@ export function PhotoDrop({ square, setFile, image }: Props) {
           gap: 8,
         }}
       >
-        {previewUrl ? (
+        {activePreviewUrl ? (
           <Image
             fill={true}
-            src={previewUrl}
+            src={activePreviewUrl}
             alt="Selected tea preview"
             className="h-full w-full object-cover"
             style={{ aspectRatio: square ? "1 / 1" : "4 / 3" }}
