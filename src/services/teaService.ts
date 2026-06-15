@@ -1,6 +1,6 @@
 "use server";
 
-import { rename, unlink, writeFile } from "fs";
+import { rename, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaCreateInput, TeaUpdateInput } from "@/generated/prisma/models";
@@ -38,11 +38,7 @@ export async function deleteTeaById(id: string): Promise<Tea | null> {
   if (tea.image) {
     const uploadDir = path.join(process.cwd(), "public");
     const filePath = path.join(uploadDir, tea.image);
-    unlink(filePath, err => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    unlink(filePath);
   }
 
   return tea;
@@ -60,6 +56,15 @@ export async function addTea(tea: TeaCreateInput, file?: File): Promise<Tea> {
     },
   });
   return res;
+}
+
+function toSafeFileStem(value: string): string {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tea"
+  );
 }
 
 async function uploadImage(file: File, name: string): Promise<string> {
@@ -84,15 +89,10 @@ async function uploadImage(file: File, name: string): Promise<string> {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const filenname = `${name}-${Date.now()}${extension}`;
+    const filenname = `${toSafeFileStem(name)}-${Date.now()}${extension}`;
     const uploadDir = path.join(process.cwd(), "public", "tea");
     const filePath = path.join(uploadDir, filenname);
-    writeFile(filePath, buffer, err => {
-      if (err) {
-        console.log(err);
-      }
-    });
-
+    await writeFile(filePath, buffer);
     return `/tea/${filenname}`;
   } catch (error) {
     console.error("Upload error:", error);
@@ -104,11 +104,7 @@ async function unlinkImage(name: string): Promise<boolean> {
   try {
     const uploadDir = path.join(process.cwd(), "public");
     const filePath = path.join(uploadDir, name);
-    unlink(filePath, err => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    await unlink(filePath);
     return true;
   } catch {
     return false;
@@ -123,20 +119,20 @@ export async function updateTea(
   const tea = await getTeaById(id);
   if (file && tea) {
     if (tea.image) {
-      unlinkImage(tea.image);
+      await unlinkImage(tea.image);
     }
     const filename = typeof data.name == "string" ? data.name : tea.name;
     data.image = await uploadImage(file, filename);
   }
 
-  if (data.name && tea && !file) {
+  if (typeof data.name == "string" && tea && !file) {
     if (tea.image) {
       const uploadDir = path.join(process.cwd(), "public");
-      const filenname = `${data.name}-${Date.now()}.${tea?.image.split(".").pop()}`;
+      const filenname = `${toSafeFileStem(data.name)}-${Date.now()}.${tea.image.split(".").pop()}`;
 
       const oldDir = path.join(uploadDir, tea?.image);
       const newDir = path.join(uploadDir, "tea", filenname);
-      rename(oldDir, newDir, () => {});
+      await rename(oldDir, newDir);
       data.image = `/tea/${filenname}`;
     }
   }

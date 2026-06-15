@@ -71,7 +71,7 @@ export default async function TeaDetailPage({ params }: PageProps) {
             <Card className="relative min-h-42 overflow-hidden p-0">
               <Image
                 loading="eager"
-                src={tea.image ?? "/tea/DefaultTeaImage.webp"}
+                src={tea.image || "/tea/DefaultTeaImage.webp"}
                 alt={tea.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 40vw"

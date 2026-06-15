@@ -38,6 +38,7 @@ export function PhotoDrop({ square, setFile, image }: Props) {
     >
       <input
         type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
         onChange={handleChange}
         className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
       />
@@ -73,7 +74,7 @@ export function PhotoDrop({ square, setFile, image }: Props) {
                 className="text-ink-soft basis-full text-center"
                 style={{ fontSize: 11 }}
               >
-                .webp, .png, .jpg
+                .webp, .png, .jpg, .gif, .avif
               </div>
             </div>
           </>

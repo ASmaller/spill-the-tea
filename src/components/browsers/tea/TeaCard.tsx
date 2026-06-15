@@ -28,7 +28,6 @@ export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
         })
       : tea.tags.toSorted((a, b) => a.localeCompare(b));
 
-  console.log(tea.image);
   return (
     <Link
       href={urlPrefix + tea.id}
