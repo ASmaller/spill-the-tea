@@ -38,7 +38,7 @@ export async function deleteTeaById(id: string): Promise<Tea | null> {
   if (tea.image) {
     const uploadDir = path.join(process.cwd(), "public");
     const filePath = path.join(uploadDir, tea.image);
-    unlink(filePath);
+    await unlink(filePath);
   }
 
   return tea;
