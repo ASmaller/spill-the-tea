@@ -20,10 +20,7 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     verifySession(),
     getAdminSidebarStats(),
   ]);
-  const name = `${session.given_name} ${session.family_name}`.trim();
-  const initials = `${session.given_name[0] ?? ""}${
-    session.family_name[0] ?? ""
-  }`.toUpperCase();
+  const initials = session.nickname[0] ?? "";
 
   // Subtract the header height from the root layout
   const heightClass = "h-[calc(100vh-14*var(--spacing))]";
@@ -32,9 +29,10 @@ async function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     <div className={`bg-cream flex overflow-hidden ${heightClass}`}>
       <AdminSidebar
         manager={{
-          name,
+          name: session.nickname,
+          picture: session.picture,
           initials,
-          role: "MaterialChef",
+          role: "Admin",
         }}
         weekStat={weekStat}
       />

@@ -3,6 +3,7 @@
 import { LogoutButton } from "@/components/actions/LogoutButton";
 import { FOCUS_RING } from "@/lib/styles";
 import { countNewSuggestions } from "@/services/suggestionService";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ type NavItem = {
 type SidebarManager = {
   name: string;
   initials: string;
+  picture?: string;
   role: string;
 };
 
@@ -144,16 +146,18 @@ export function AdminSidebar({ manager, weekStat }: Props) {
         className="border-ink/[0.06] flex items-center border-t"
         style={{ padding: "10px 12px", borderRadius: 10, gap: 10 }}
       >
-        <div
-          className="bg-tea text-paper text-meta flex items-center justify-center font-semibold"
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 999,
-            letterSpacing: 0,
-          }}
-        >
-          {manager.initials}
+        <div className="bg-tea text-paper text-meta relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full font-semibold">
+          {manager.picture ? (
+            <Image
+              src={manager.picture}
+              alt={`${manager.name} profile picture`}
+              fill
+              sizes="28px"
+              className="object-cover"
+            />
+          ) : (
+            manager.initials
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-ink text-meta truncate font-medium">

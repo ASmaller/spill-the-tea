@@ -1,4 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client";
+import z from "zod";
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
 
@@ -13,24 +14,28 @@ export type RatingPayload = {
   comment: string;
 };
 
-export const POSITIVE_TAGS = new Set([
+export const POSITIVE_TAGS = [
   "delicious",
   "energizing",
   "fresh",
   "aromatic",
   "floral",
-]);
+] as const;
 
-export const NEGATIVE_TAGS = new Set([
+export const NEGATIVE_TAGS = [
   "bland",
   "too sweet",
   "bitter",
   "artificial",
   "weak",
-]);
+] as const;
 
-export type TeaWithReviews = Prisma.TeaGetPayload<{
-  include: { reviews: true };
+export type PositiveReviewTag = (typeof POSITIVE_TAGS)[number];
+export type NegativeReviewTag = (typeof NEGATIVE_TAGS)[number];
+export type ReviewTag = PositiveReviewTag | NegativeReviewTag;
+
+export type TeaWithRatings = Prisma.TeaGetPayload<{
+  include: { reviews: { select: { rating: true } } };
 }>;
 
 // TODO: storage pipeline. Picked Files are captured locally and only
@@ -100,3 +105,20 @@ export type Kpi = {
   spark: number[];
   color: string;
 };
+
+/** Properties stored in the session token. */
+export const SessionPayload = z.object({
+  /** JWT subject/user id. */
+  sub: z.string(),
+  /** User Gamma ID. */
+  gamma_id: z.uuidv4(),
+  /** Nickname of the user. */
+  nickname: z.string(),
+  /** URL to the user's profile picture. */
+  picture: z.url().optional(),
+  /** Expiration time of the session cookie as a timestamp in seconds. */
+  exp: z.number(),
+});
+
+export type SessionPayload = z.infer<typeof SessionPayload>;
+export type SessionProfile = Omit<SessionPayload, "exp">;

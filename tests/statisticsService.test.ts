@@ -1,4 +1,4 @@
-import { TeaWithReviews } from "@/lib/types";
+import { Prisma } from "@/generated/prisma/client";
 import {
   getAdminOverview,
   getTeaCatalog,
@@ -6,6 +6,12 @@ import {
   getTeaTrend,
 } from "@/services/statisticsService";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+type TeaWithReviews = Prisma.TeaGetPayload<{
+  include: {
+    reviews: true;
+  };
+}>;
 
 const prismaMock = vi.hoisted(() => ({
   tea: {
@@ -62,6 +68,7 @@ describe("statisticsService", () => {
             comment: "Great",
             tags: ["fresh"],
             posted: new Date("2026-05-13T08:00:00.000Z"),
+            anonymous: false,
           },
           {
             teaId: "2",
@@ -71,6 +78,7 @@ describe("statisticsService", () => {
             comment: null,
             tags: [],
             posted: new Date("2026-05-13T09:00:00.000Z"),
+            anonymous: false,
           },
         ],
       },
@@ -106,6 +114,7 @@ describe("statisticsService", () => {
           comment: "Great",
           tags: ["fresh", "more please"],
           posted: new Date("2026-05-13T08:00:00.000Z"),
+          anonymous: false,
         },
         {
           teaId: "2",
@@ -115,6 +124,7 @@ describe("statisticsService", () => {
           comment: "Too cold",
           tags: ["cold", "fresh"],
           posted: new Date("2026-05-13T09:00:00.000Z"),
+          anonymous: false,
         },
       ],
     } satisfies TeaWithReviews);
@@ -157,6 +167,7 @@ describe("statisticsService", () => {
           comment: "Great",
           tags: ["fresh", "more please"],
           posted: new Date("2026-05-11T08:00:00.000Z"),
+          anonymous: false,
         },
         {
           teaId: "2",
@@ -166,6 +177,7 @@ describe("statisticsService", () => {
           comment: "",
           tags: ["fresh", "more please"],
           posted: new Date("2026-05-12T08:00:00.000Z"),
+          anonymous: false,
         },
         {
           teaId: "2",
@@ -175,6 +187,7 @@ describe("statisticsService", () => {
           comment: "",
           tags: ["fresh", "more please"],
           posted: new Date("2026-05-13T08:00:00.000Z"),
+          anonymous: false,
         },
       ],
     } satisfies TeaWithReviews);

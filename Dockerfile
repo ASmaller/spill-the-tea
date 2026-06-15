@@ -45,6 +45,10 @@ ENV NODE_ENV=production
 # Learn more here: https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Skip environment validation to prevent errors caused by required environment
+# variables. Read more: https://create.t3.gg/en/deployment/docker
+ENV SKIP_ENV_VALIDATION=1
+
 # Build Next.js application with caching.
 # This caches the .next/cache directory across builds, but it also prevents
 # .next/cache/fetch-cache from being included in the final image, meaning

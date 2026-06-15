@@ -1,10 +1,12 @@
 "use client";
 
+import { CheckboxField } from "@/components/inputs/CheckboxField";
 import { CupRating } from "@/components/inputs/CupRating";
 import { Eyebrow } from "@/components/text/Eyebrow";
+import { useSession } from "@/lib/hooks";
 import { FOCUS_RING } from "@/lib/styles";
 import { NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
-import { addReview } from "@/services/reviewService";
+import { submitReview } from "@/services/reviewService";
 import { TeaDetail } from "@/services/statisticsService";
 import { useState } from "react";
 
@@ -13,9 +15,12 @@ type Props = {
 };
 
 export function RatingForm({ tea }: Props) {
+  const session = useSession();
+
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<Set<string>>(new Set());
   const [comment, setComment] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
 
   const toggleTag = (t: string) => {
     setTags(prev => {
@@ -86,24 +91,37 @@ export function RatingForm({ tea }: Props) {
             className="border-ink/10 bg-cream text-ink mt-3 w-full resize-none rounded-[12px] border px-3 py-2.5 outline-none"
             style={{ fontSize: 16, lineHeight: 1.4 }}
           />
+          {session && (
+            <CheckboxField
+              name="anonymous"
+              checked={anonymous}
+              onChange={checked => setAnonymous(checked)}
+              label="Hide my name on this review"
+              className="mt-1"
+            />
+          )}
         </div>
       )}
       <button
         type="button"
         onClick={() => {
-          addReview({
+          submitReview({
             rating,
             comment,
             tags: Array.from(tags.values()),
-            tea: {
-              connect: {
-                id: tea.id,
-              },
-            },
-          });
-          setRating(0);
-          setTags(new Set());
-          setComment("");
+            teaId: tea.id,
+            anonymous,
+          })
+            .then(() => {
+              // Clear inputs
+              setRating(0);
+              setTags(new Set());
+              setComment("");
+              setAnonymous(false);
+            })
+            .catch(reason => {
+              console.error(`Failed to submit review: ${reason}`);
+            });
         }}
         disabled={rating === 0}
         className={`mt-4 w-full rounded-[14px] font-semibold transition-colors ${FOCUS_RING.cream} ${

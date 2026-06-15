@@ -16,7 +16,12 @@ const eslintConfig = defineConfig([
         {
           properties: "always",
           ignoreImports: true,
-          allow: ["given_name", "family_name"],
+          allow: [
+            "given_name",
+            "family_name",
+            "gamma_id",
+            "experimental__runtimeEnv",
+          ],
         },
       ],
     },

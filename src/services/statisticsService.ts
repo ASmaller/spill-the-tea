@@ -1,6 +1,7 @@
 "use server";
 
 import type { Review } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import {
   addDays,
   DAY_MS,
@@ -12,9 +13,11 @@ import {
 import { prisma } from "@/lib/prisma";
 import type {
   Kpi,
+  NegativeReviewTag,
+  PositiveReviewTag,
   TagBarItem,
   TeaStat,
-  TeaWithReviews,
+  TeaWithRatings,
   TrendSeries,
 } from "@/lib/types";
 import { isValidRating, NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
@@ -39,7 +42,9 @@ export type TeaTrend = {
 };
 
 export type TeaDetail = TeaStat & {
-  reviews: Review[];
+  reviews: Prisma.ReviewGetPayload<{
+    include: { user: { select: { name: true } } };
+  }>[];
   tagBars: TagBarItem[];
   trend: TeaTrend;
 };
@@ -82,7 +87,7 @@ function getDateKeys(start: Date, days: number): string[] {
   );
 }
 
-function toTeaStat(tea: TeaWithReviews): TeaStat {
+function toTeaStat(tea: TeaWithRatings): TeaStat {
   // Compare via UTC date keys so the past/future partition matches
   // scheduleServing's storage (UTC midnight) regardless of server timezone.
   const reviews = tea.reviews;
@@ -102,8 +107,10 @@ function toTeaStat(tea: TeaWithReviews): TeaStat {
 
 function getTagColor(tag: string): string {
   const normalized = tag.toLowerCase();
-  if (POSITIVE_TAGS.has(normalized)) return "var(--color-sage)";
-  if (NEGATIVE_TAGS.has(normalized)) return "var(--color-amber)";
+  if (POSITIVE_TAGS.includes(normalized as PositiveReviewTag))
+    return "var(--color-sage)";
+  if (NEGATIVE_TAGS.includes(normalized as NegativeReviewTag))
+    return "var(--color-amber)";
   return "var(--color-tea)";
 }
 
@@ -370,7 +377,11 @@ export async function getTeaCatalog(): Promise<TeaStat[]> {
       name: "asc",
     },
     include: {
-      reviews: true,
+      reviews: {
+        select: {
+          rating: true,
+        },
+      },
     },
   });
 
@@ -415,6 +426,29 @@ export async function getTeaTrend(
   return buildAverageRatingTrend(tea.reviews);
 }
 
+type ReviewWithUserName = Prisma.ReviewGetPayload<{
+  include: { user: { select: { name: true } } };
+}>;
+
+/**
+ * Remove the user from this review if it is anonymous.
+ * @param review The review to process.
+ * @return The processed review.
+ */
+function processAnonymousReview(
+  review: ReviewWithUserName
+): ReviewWithUserName {
+  if (review.anonymous) {
+    return {
+      ...review,
+      userId: null,
+      user: null,
+      anonymous: false,
+    };
+  }
+  return review;
+}
+
 export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
   const tea = await prisma.tea.findUnique({
     where: { id: teaId },
@@ -423,11 +457,20 @@ export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
         orderBy: {
           posted: "desc",
         },
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
       },
     },
   });
 
   if (!tea) return null;
+
+  tea.reviews = tea.reviews.map(review => processAnonymousReview(review));
 
   return {
     ...tea,

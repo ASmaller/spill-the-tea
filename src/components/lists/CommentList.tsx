@@ -4,13 +4,21 @@ import { CupRating } from "@/components/inputs/CupRating";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { Pill } from "@/components/primitives/Pill";
 import { SelectFilter } from "@/components/search/SelectFilter";
-import { Review } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { formatRelativeDate } from "@/lib/dateFormat";
 import { FOCUS_RING } from "@/lib/styles";
 import { useMemo, useState } from "react";
 
 type Props = {
-  reviews: Review[];
+  reviews: Prisma.ReviewGetPayload<{
+    include: {
+      user: {
+        select: {
+          name: true;
+        };
+      };
+    };
+  }>[];
   pageSize?: number;
 };
 
@@ -99,6 +107,9 @@ export function CommentList({ reviews, pageSize = 5 }: Props) {
               style={{ gap: 8, marginBottom: 5 }}
             >
               <CupRating value={review.rating} size={11} disabled />
+              {review.user?.name && (
+                <span className="text-ink text-meta">{review.user.name}</span>
+              )}
               <span className="text-ink-soft text-meta">
                 {formatRelativeDate(review.posted)}
               </span>

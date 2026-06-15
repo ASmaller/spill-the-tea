@@ -3,7 +3,6 @@
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaCreateInput, TeaUpdateInput } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
-import { TeaWithReviews } from "@/lib/types";
 
 export async function getTeas(take?: number): Promise<Tea[] | null> {
   return prisma.tea.findMany({
@@ -14,17 +13,6 @@ export async function getTeas(take?: number): Promise<Tea[] | null> {
 export async function getTeaById(id: string): Promise<Tea | null> {
   return prisma.tea.findUnique({
     where: { id },
-  });
-}
-
-export async function getTeaWithReviewsById(
-  id: string
-): Promise<TeaWithReviews | null> {
-  return prisma.tea.findUnique({
-    where: { id },
-    include: {
-      reviews: true,
-    },
   });
 }
 
