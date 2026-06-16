@@ -76,7 +76,7 @@ async function uploadImage(file: File, name: string): Promise<string> {
   const extension = IMAGE_EXTENSIONS[file.type];
 
   if (!extension) {
-    throw new Error("Unsupported image type.");
+    throw new Error("Unsupported image type. Supported types are: .jpg, .png, .webp, .gif, and .avif");
   }
 
   if (file.size <= 0) {

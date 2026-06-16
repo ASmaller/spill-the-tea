@@ -56,7 +56,7 @@ export function TeaForm({
       error instanceof Error ? error.message : "Could not save tea.";
 
     if (message.includes("Body exceeded 1 MB limit")) {
-      return "The uploaded file is too large. Please choose a smaller image.";
+      return "The uploaded file is too large. Please choose a image smaller than 1 MB";
     }
 
     return message;
