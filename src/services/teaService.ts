@@ -94,7 +94,7 @@ async function uploadImage(file: File, name: string): Promise<string> {
     return `/tea/${filenname}`;
   } catch (error) {
     console.error("Upload error:", error);
-    return "";
+    throw new Error("Could not upload the selected image.");
   }
 }
 

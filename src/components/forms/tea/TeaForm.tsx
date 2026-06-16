@@ -38,6 +38,7 @@ export function TeaForm({
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const toggleTag = (tag: TeaTag) =>
     setTags(prev =>
@@ -49,6 +50,17 @@ export function TeaForm({
     name.trim() !== initialTea.name.trim() ||
     JSON.stringify(tags) !== JSON.stringify(initialTea.tags) ||
     file !== null;
+
+  const getSubmitErrorMessage = (error: unknown) => {
+    const message =
+      error instanceof Error ? error.message : "Could not save tea.";
+
+    if (message.includes("Body exceeded 1 MB limit")) {
+      return "The uploaded file is too large. Please choose a smaller image.";
+    }
+
+    return message;
+  };
 
   return (
     <>
@@ -72,12 +84,30 @@ export function TeaForm({
           </span>
         </div>
       )}
+      {submitError && (
+        <div
+          className="border-rose-deep/30 bg-rose-deep/10"
+          style={{
+            marginBottom: 14,
+            padding: "10px 14px",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderStyle: "solid",
+            fontSize: 12,
+          }}
+          role="status"
+        >
+          <span className="text-ink font-semibold">An error occurred</span>
+          <span className="text-ink-muted"> · {submitError}</span>
+        </div>
+      )}
       <form
         id={id}
         onSubmit={async e => {
           e.preventDefault();
 
           if (!isValid || submitting) return;
+          setSubmitError(null);
           setSubmitting(true);
           if (onSubmit) {
             try {
@@ -88,7 +118,9 @@ export function TeaForm({
                 },
                 file
               );
-            } catch {
+            } catch (error) {
+              setSubmitError(getSubmitErrorMessage(error));
+            } finally {
               setSubmitting(false);
             }
           }
