@@ -13,8 +13,8 @@ export function NewTeaForm(props: Props) {
   return (
     <TeaForm
       {...props}
-      onSubmit={async (tea: TeaCreateInput) => {
-        const created = await addTea(tea);
+      onSubmit={async (tea: TeaCreateInput, file?: File | null) => {
+        const created = await addTea(tea, file ?? undefined);
         router.push(`/tea/${created.id}`);
       }}
     />

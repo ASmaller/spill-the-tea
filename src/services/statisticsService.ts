@@ -99,6 +99,7 @@ function toTeaStat(tea: TeaWithRatings): TeaStat {
     id: tea.id,
     name: tea.name,
     tags: tea.tags,
+    image: tea.image,
     rating: rating == null ? null : roundTo(rating),
     votes: ratings.length,
     distribution,

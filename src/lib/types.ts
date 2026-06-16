@@ -38,13 +38,6 @@ export type TeaWithRatings = Prisma.TeaGetPayload<{
   include: { reviews: { select: { rating: true } } };
 }>;
 
-// TODO: storage pipeline. Picked Files are captured locally and only
-// `filename` is set. `url` is populated once a real upload lands.
-export type PhotoRef = {
-  filename: string;
-  url?: string;
-};
-
 export type TeaStat = {
   id: string;
   name: string;
@@ -52,13 +45,13 @@ export type TeaStat = {
   rating: number | null;
   votes: number;
   distribution: [number, number, number, number, number];
-  photo?: PhotoRef;
+  image: string | null;
 };
 
 export type TeaForm = {
   name: string;
   tags: string[];
-  photo: PhotoRef | null;
+  image: string;
 };
 
 // TODO: Move to database and allow admin user to update

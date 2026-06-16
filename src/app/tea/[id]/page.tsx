@@ -17,6 +17,7 @@ import {
 } from "@/lib/admin/ratings";
 import { isAdmin } from "@/lib/session";
 import { getTeaDetail } from "@/services/statisticsService";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -69,20 +70,33 @@ export default async function TeaDetailPage({ params }: PageProps) {
           }
         >
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.5fr]">
-            <Card padding={18}>
-              <div className="text-ink-soft text-eyebrow-lg uppercase">
-                Average
-              </div>
-              <div className="mt-2 flex flex-wrap items-baseline gap-4">
-                <div className="text-ink text-kpi font-serif leading-none">
-                  {avgLabel}
+            <Card className="relative min-h-42 overflow-hidden p-0">
+              <Image
+                loading="eager"
+                src={tea.image || "/tea/DefaultTeaImage.webp"}
+                alt={tea.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/72 via-black/28 to-black/10" />
+              <div className="text-paper absolute inset-0 flex flex-col justify-end p-4.5">
+                <div>
+                  <div className="text-eyebrow-lg text-paper/80 uppercase">
+                    Average
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-baseline gap-4">
+                    <div className="text-kpi font-serif leading-none">
+                      {avgLabel}
+                    </div>
+                    {total > 0 && (
+                      <CupRating value={Math.round(avg)} size={20} disabled />
+                    )}
+                  </div>
+                  <div className="text-meta text-paper/80 mt-2">
+                    {total} ratings · {comments.length} comments
+                  </div>
                 </div>
-                {total > 0 && (
-                  <CupRating value={Math.round(avg)} size={20} disabled />
-                )}
-              </div>
-              <div className="text-ink-muted text-meta mt-2">
-                {total} ratings · {comments.length} comments
               </div>
             </Card>
 

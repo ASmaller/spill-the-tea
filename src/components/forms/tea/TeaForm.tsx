@@ -10,21 +10,24 @@ import { SectionHead } from "@/components/layout/SectionHead";
 import { Button, buttonClassName } from "@/components/primitives/Button";
 import { Tea } from "@/generated/prisma/client";
 import { TeaCreateInput } from "@/generated/prisma/models";
-import { PhotoRef, TeaTag } from "@/lib/types";
+import { TeaTag } from "@/lib/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export interface Props {
   id: string;
-  initialTea?: Pick<Tea, "name" | "tags">;
+  initialTea?: Pick<Tea, "name" | "tags" | "image">;
   backHref?: string;
-  onSubmit?: (value: TeaCreateInput) => void | Promise<void>;
+  onSubmit?: (
+    value: TeaCreateInput,
+    file?: File | null
+  ) => void | Promise<void>;
 }
 
 export function TeaForm({
   id,
-  initialTea = { name: "", tags: [] },
+  initialTea = { name: "", tags: [], image: "" },
   backHref,
   onSubmit,
 }: Props) {
@@ -32,9 +35,10 @@ export function TeaForm({
 
   const [name, setName] = useState<string>(initialTea.name);
   const [tags, setTags] = useState<string[]>(initialTea.tags);
-  const [photo, setPhoto] = useState<PhotoRef | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const toggleTag = (tag: TeaTag) =>
     setTags(prev =>
@@ -45,13 +49,24 @@ export function TeaForm({
   const isDirty =
     name.trim() !== initialTea.name.trim() ||
     JSON.stringify(tags) !== JSON.stringify(initialTea.tags) ||
-    photo !== null;
+    file !== null;
+
+  const getSubmitErrorMessage = (error: unknown) => {
+    const message =
+      error instanceof Error ? error.message : "Could not save tea.";
+
+    if (message.includes("Body exceeded 1 MB limit")) {
+      return "The uploaded file is too large. Please choose a image smaller than 1 MB";
+    }
+
+    return message;
+  };
 
   return (
     <>
       {isDirty && (
         <div
-          className="border-amber/30 bg-amber/[0.10]"
+          className="border-amber/30 bg-amber/10"
           style={{
             marginBottom: 14,
             padding: "10px 14px",
@@ -69,20 +84,43 @@ export function TeaForm({
           </span>
         </div>
       )}
+      {submitError && (
+        <div
+          className="border-rose-deep/30 bg-rose-deep/10"
+          style={{
+            marginBottom: 14,
+            padding: "10px 14px",
+            borderRadius: 8,
+            borderWidth: 1,
+            borderStyle: "solid",
+            fontSize: 12,
+          }}
+          role="status"
+        >
+          <span className="text-ink font-semibold">An error occurred</span>
+          <span className="text-ink-muted"> · {submitError}</span>
+        </div>
+      )}
       <form
         id={id}
         onSubmit={async e => {
           e.preventDefault();
 
           if (!isValid || submitting) return;
+          setSubmitError(null);
           setSubmitting(true);
           if (onSubmit) {
             try {
-              await onSubmit({
-                name,
-                tags,
-              });
-            } catch {
+              await onSubmit(
+                {
+                  name,
+                  tags,
+                },
+                file
+              );
+            } catch (error) {
+              setSubmitError(getSubmitErrorMessage(error));
+            } finally {
               setSubmitting(false);
             }
           }
@@ -93,7 +131,7 @@ export function TeaForm({
         <div className="flex flex-col" style={{ gap: 16 }}>
           <Card>
             <SectionHead title="Photo" />
-            <PhotoDrop value={photo} onChange={setPhoto} />
+            <PhotoDrop setFile={setFile} image={initialTea.image} />
           </Card>
         </div>
 

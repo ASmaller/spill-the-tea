@@ -40,11 +40,9 @@ export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
         onClick={() => onClick?.(tea.id)}
         className={`bg-paper border-ink/[0.06] flex flex-col overflow-hidden rounded-lg border transition-shadow hover:shadow-[0_4px_18px_rgba(26,24,21,0.10)] ${FOCUS_RING.cream}`}
       >
-        {tea.photo?.url && (
-          <div className="aspect-4/3 w-full overflow-hidden">
-            <TeaThumb tea={tea} />
-          </div>
-        )}
+        <div className="aspect-4/3 w-full overflow-hidden">
+          <TeaThumb tea={tea} />
+        </div>
         <div className="flex flex-1 flex-col gap-2 p-3">
           <div>
             <span className="block max-w-full overflow-hidden text-nowrap text-ellipsis">
