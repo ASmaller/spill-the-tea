@@ -87,11 +87,11 @@ async function uploadImage(file: File, name: string): Promise<string> {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const filenname = `${toSafeFileStem(name)}-${Date.now()}${extension}`;
+    const filename = `${toSafeFileStem(name)}-${Date.now()}${extension}`;
     const uploadDir = path.join(process.cwd(), "public", "tea");
-    const filePath = path.join(uploadDir, filenname);
+    const filePath = path.join(uploadDir, filename);
     await writeFile(filePath, buffer);
-    return `/tea/${filenname}`;
+    return `/tea/${filename}`;
   } catch (error) {
     console.error("Upload error:", error);
     throw new Error("Could not upload the selected image.");
@@ -126,12 +126,13 @@ export async function updateTea(
   if (typeof data.name == "string" && tea && !file) {
     if (tea.image) {
       const uploadDir = path.join(process.cwd(), "public");
-      const filenname = `${toSafeFileStem(data.name)}-${Date.now()}.${tea.image.split(".").pop()}`;
+      const extension = path.extname(tea.image) || ".jpg";
+      const filename = `${toSafeFileStem(data.name)}-${Date.now()}${extension}`;
 
       const oldDir = path.join(uploadDir, tea?.image);
-      const newDir = path.join(uploadDir, "tea", filenname);
+      const newDir = path.join(uploadDir, "tea", filename);
       await rename(oldDir, newDir);
-      data.image = `/tea/${filenname}`;
+      data.image = `/tea/${filename}`;
     }
   }
 
