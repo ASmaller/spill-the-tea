@@ -3,16 +3,18 @@ import { env } from "@/lib/env";
 import { verifySession } from "@/lib/session";
 import { NextRequest, NextResponse, ProxyConfig } from "next/server";
 
-const protectedRoutes: RegExp[] = [/\/admin(\/.*)?/];
+const protectedRoutes: RegExp[] = [
+  // If any of these patterns match the user will be redirected
+  /\/admin\b/,
+  /\/tea\/[^\/]*\/edit\b/,
+];
 
 // The proxy is run before a request is completed.
 // Read more: https://nextjs.org/docs/app/getting-started/proxy
 export default async function proxy(req: NextRequest): Promise<NextResponse> {
   // Check if the current route is protected
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = !!protectedRoutes.find(pattern =>
-    pattern.test(path)
-  );
+  const isProtectedRoute = protectedRoutes.some(pattern => pattern.test(path));
 
   if (isProtectedRoute) {
     // Verify session and redirect if not authenticated
