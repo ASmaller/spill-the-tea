@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [new URL("https://auth.chalmers.it/images/user/avatar/**")],
   },
   basePath: basePath !== "/" ? basePath : undefined,
+  experimental: {
+    // @ts-ignore Setting not recognized by TypeScript
+    trustHostHeader: true,
+  },
 };
 
 export default nextConfig;
