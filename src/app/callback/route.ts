@@ -1,4 +1,4 @@
-import { env } from "@/lib/env";
+import { relativeUrl } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import {
   createGammaAuthorizationCode,
@@ -83,5 +83,5 @@ export async function GET(req: NextRequest) {
 
   // Redirect to homepage
   // TODO: Redirect to profile page instead
-  return NextResponse.redirect(new URL("/", env.BASE_URL));
+  return NextResponse.redirect(relativeUrl("/"));
 }

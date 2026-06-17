@@ -1,5 +1,5 @@
 import { ensureClientIdOnResponse } from "@/lib/clientId";
-import { env } from "@/lib/env";
+import { relativeUrl } from "@/lib/env";
 import { verifySession } from "@/lib/session";
 import { NextRequest, NextResponse, ProxyConfig } from "next/server";
 
@@ -34,7 +34,7 @@ export default async function proxy(req: NextRequest): Promise<NextResponse> {
       // The mocked authentication redirects to the homepage instead of the
       // login page since the mocked login would instantly re-authenticate
       // the user.
-      return NextResponse.redirect(new URL("/", env.BASE_URL));
+      return NextResponse.redirect(relativeUrl("/"));
     }
   }
 

@@ -19,3 +19,14 @@ export const env = createEnv({
   // Skip validation with environment variable
   skipValidation: process.env.SKIP_ENV_VALIDATION === "1",
 });
+
+/**
+ * Create an full URL relative to the BASE_URL.
+ * @param path The URL path with or without a preceding /.
+ * @returns The resulting URL starting with BASE_URL.
+ */
+export function relativeUrl(path: string): string {
+  const baseWithPath = env.BASE_URL.replace(/\/$/, "");
+  const pathWithoutSlash = path.replace(/^\//, "");
+  return baseWithPath + "/" + pathWithoutSlash;
+}

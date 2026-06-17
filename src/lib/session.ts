@@ -1,7 +1,7 @@
 // Mostly copied from https://nextjs.org/docs/app/guides/authentication
 
 import "server-only";
-import { env } from "@/lib/env";
+import { env, relativeUrl } from "@/lib/env";
 import { AuthorizationCode, ClientApi, UserId } from "gammait";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
@@ -11,8 +11,7 @@ import { ZodError } from "zod";
 import { SessionPayload, SessionProfile } from "./types";
 
 export function createGammaAuthorizationCode() {
-  const redirectUri =
-    env.GAMMA_REDIRECT_URI ?? new URL("/callback", env.BASE_URL).toString();
+  const redirectUri = env.GAMMA_REDIRECT_URI ?? relativeUrl("/callback");
 
   return new AuthorizationCode({
     clientId: env.GAMMA_CLIENT_ID,
