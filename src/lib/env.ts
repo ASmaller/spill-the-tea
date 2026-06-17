@@ -10,8 +10,8 @@ export const env = createEnv({
     GAMMA_CLIENT_ID: z.string(),
     GAMMA_API_KEY_ID: z.string(),
     GAMMA_API_KEY_SECRET: z.string(),
-    GAMMA_REDIRECT_URI: z.url().optional(),
-    BASE_URL: z.url(),
+    GAMMA_REDIRECT_URI: z.url({ protocol: /^https?$/ }).optional(),
+    BASE_URL: z.url({ normalize: true, protocol: /^https?$/ }),
   },
   emptyStringAsUndefined: true,
   // Infer runtime variable values from names
