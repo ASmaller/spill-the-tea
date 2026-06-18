@@ -1,7 +1,8 @@
+import { relativeUrl } from "@/lib/env";
 import { deleteSession } from "@/lib/session";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   await deleteSession();
-  return NextResponse.redirect(new URL("/", req.url));
+  return NextResponse.redirect(relativeUrl("/"));
 }
