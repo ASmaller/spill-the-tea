@@ -135,3 +135,15 @@ export async function updateTea(
 
   return res;
 }
+
+export async function getRandomTea(): Promise<Tea | null> {
+  const res = await getTeas().then((teas) => {
+    if (teas == null) {
+      return null
+    }
+    const randomIndex = Math.floor(Math.random() * teas.length)
+    return teas[randomIndex]
+  }
+  )
+  return res
+}

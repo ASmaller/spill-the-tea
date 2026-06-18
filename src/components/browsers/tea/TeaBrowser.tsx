@@ -213,9 +213,8 @@ function ViewPicker({
             key={v}
             type="button"
             onClick={() => onChange && onChange(v)}
-            className={`text-meta cursor-pointer px-3 py-2 font-medium ${
-              active ? "bg-ink text-paper" : "bg-paper text-ink"
-            } ${FOCUS_RING.paper}`}
+            className={`text-meta cursor-pointer px-3 py-2 font-medium ${active ? "bg-ink text-paper" : "bg-paper text-ink"
+              } ${FOCUS_RING.paper}`}
             aria-pressed={active}
           >
             {v === "grid" ? "▦ Grid" : "☰ Table"}
