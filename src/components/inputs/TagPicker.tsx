@@ -1,12 +1,10 @@
 "use client";
 
+import { TagEditorDialog } from "@/components/forms/tags/TagEditorDialog";
 import { Tag } from "@/generated/prisma/client";
 import { FOCUS_RING } from "@/lib/styles";
 import { addTag, getTags } from "@/services/tagService";
 import { useEffect, useState } from "react";
-import { Dialog } from "../layout/Dialog";
-import { Button } from "../primitives/Button";
-import { TextInput } from "./TextInput";
 
 type Props = {
   // Loose `string[]` accepts non-DietTag legacy/orphan tags (e.g. `pasta`,
@@ -20,30 +18,23 @@ export function TagPicker({ value, onToggle }: Props) {
   const [tagOptions, setTagOptions] = useState<Tag[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // TODO: Move into separate component
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [newTagName, setNewTagName] = useState("");
-  const [newTagColor, setNewTagColor] = useState("");
-
-  function handleAddTag() {
-    setIsSubmitting(true);
-
-    addTag({ name: newTagName, color: newTagColor });
-
+  async function handleAddTag(values: { name: string; color: string }) {
+    await addTag(values);
     setDialogOpen(false);
-    setNewTagName("");
-    setNewTagColor("");
-    setIsSubmitting(false);
+    await refreshTags();
+  }
+
+  async function refreshTags() {
+    const res = await getTags();
+    setTagOptions(res ?? []);
   }
 
   useEffect(() => {
     let ignore = false;
 
-    getTags().then(res => {
+    void refreshTags().catch(() => {
       if (!ignore) {
-        setTagOptions(res ? res : []);
-        console.log(res);
+        setTagOptions([]);
       }
     });
 
@@ -88,56 +79,11 @@ export function TagPicker({ value, onToggle }: Props) {
       >
         +
       </button>
-      <Dialog
+      <TagEditorDialog
         open={dialogOpen}
-        onClose={() => {
-          setDialogOpen(false);
-        }}
-        title="Create tag"
-        footer={
-          <>
-            <Button
-              type="button"
-              onClick={() => {
-                setDialogOpen(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              primary
-              onClick={handleAddTag}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating…" : "Create tag"}
-            </Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-3 text-left">
-          <label className="text-ink text-sm font-medium">Tag name</label>
-          <TextInput
-            value={newTagName}
-            onChange={setNewTagName}
-            placeholder="e.g. Floral"
-            onKeyDown={e => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                void handleAddTag();
-              }
-            }}
-          />
-          <input
-            type="color"
-            value={newTagColor}
-            onChange={e => {
-              setNewTagColor(e.target.value);
-            }}
-          />
-          {errorMessage && <p className="text-rose text-xs">{errorMessage}</p>}
-        </div>
-      </Dialog>
+        onClose={() => setDialogOpen(false)}
+        onSubmit={handleAddTag}
+      />
     </div>
   );
 }

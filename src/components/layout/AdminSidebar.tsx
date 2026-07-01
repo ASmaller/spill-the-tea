@@ -65,6 +65,12 @@ export function AdminSidebar({ manager, weekStat }: Props) {
       href: "/admin/tea/new",
       matchPrefix: "/admin/tea/new",
     },
+    {
+      key: "tags",
+      label: "Tags",
+      href: "/admin/tags",
+      matchPrefix: "/admin/tags",
+    },
   ];
 
   const pathname = usePathname() ?? "";
