@@ -90,7 +90,7 @@ describe("statisticsService", () => {
       expect.objectContaining({
         id: "2",
         name: "Earl Grey",
-        tags: [expect.objectContaining({ id: "tag-meat", name: "meat" })],
+        tags: [expect.objectContaining({ id: "tag-black", name: "black" })],
         rating: 4.5,
         votes: 2,
         distribution: [0, 0, 0, 1, 1],
@@ -160,7 +160,7 @@ describe("statisticsService", () => {
       id: "2",
       name: "Earl Grey",
       description: "A classic black tea",
-      tags: [{ id: "tag-meat", name: "meat", color: "#8b5e3c" }],
+      tags: [{ id: "tag-black", name: "black", color: "#333333" }],
       reviews: [
         {
           teaId: "2",
