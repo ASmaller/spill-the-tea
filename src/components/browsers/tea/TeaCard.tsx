@@ -4,13 +4,13 @@ import { Pill } from "@/components/primitives/Pill";
 import { DistSpark } from "@/components/statistics/charts/DistSpark";
 import { ratingColor } from "@/lib/admin/colors";
 import { FOCUS_RING } from "@/lib/styles";
-import type { TeaStat, TeaTag } from "@/lib/types";
+import type { TeaStat } from "@/lib/types";
 import Link from "next/link";
 
 type Props = {
   tea: TeaStat;
   urlPrefix: string;
-  highlightTag?: TeaTag;
+  highlightTag?: string;
   onClick?: (id: string) => void;
 };
 
@@ -18,15 +18,15 @@ export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
   const tags =
     highlightTag !== undefined
       ? tea.tags.toSorted((a, b) => {
-          if (a === highlightTag) {
+          if (a.name === highlightTag) {
             return -1;
-          } else if (b === highlightTag) {
+          } else if (b.name === highlightTag) {
             return 1;
           } else {
-            return a.localeCompare(b);
+            return a.name.localeCompare(b.name);
           }
         })
-      : tea.tags.toSorted((a, b) => a.localeCompare(b));
+      : tea.tags.toSorted((a, b) => a.name.localeCompare(b.name));
 
   return (
     <Link
@@ -51,8 +51,12 @@ export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
             {tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {tags.map(t => (
-                  <Pill key={t} tone={t === highlightTag ? "warn" : "neutral"}>
-                    {t}
+                  <Pill
+                    key={t.name}
+                    tone={t.name === highlightTag ? "warn" : "neutral"}
+                    color={t.color}
+                  >
+                    {t.name}
                   </Pill>
                 ))}
               </div>

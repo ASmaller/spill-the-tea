@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 type TeaWithReviews = Prisma.TeaGetPayload<{
   include: {
     reviews: true;
+    tags: true;
   };
 }>;
 
@@ -56,9 +57,9 @@ describe("statisticsService", () => {
     prismaMock.tea.findMany.mockResolvedValue([
       {
         id: "2",
-        name: "Tacos",
-        description: "Foo",
-        tags: ["meat"],
+        name: "Earl Grey",
+        description: "A classic black tea",
+        tags: [{ id: "tag-black", name: "black", color: "#333333" }],
         image: "",
         reviews: [
           {
@@ -88,8 +89,8 @@ describe("statisticsService", () => {
     await expect(getTeaCatalog()).resolves.toEqual([
       expect.objectContaining({
         id: "2",
-        name: "Tacos",
-        tags: ["meat"],
+        name: "Earl Grey",
+        tags: [expect.objectContaining({ id: "tag-meat", name: "meat" })],
         rating: 4.5,
         votes: 2,
         distribution: [0, 0, 0, 1, 1],
@@ -103,9 +104,9 @@ describe("statisticsService", () => {
 
     prismaMock.tea.findUnique.mockResolvedValue({
       id: "2",
-      name: "Tacos",
-      description: "Foo",
-      tags: ["meat"],
+      name: "Earl Grey",
+      description: "A classic black tea",
+      tags: [{ id: "tag-black", name: "black", color: "#333333" }],
       reviews: [
         {
           teaId: "2",
@@ -137,7 +138,7 @@ describe("statisticsService", () => {
       expect.objectContaining({
         id: "2",
         distribution: [0, 1, 0, 0, 1],
-        description: "Foo",
+        description: "A classic black tea",
         reviews: [
           expect.objectContaining({ id: "100", comment: "Great" }),
           expect.objectContaining({ id: "101", comment: "Too cold" }),
@@ -157,9 +158,9 @@ describe("statisticsService", () => {
 
     prismaMock.tea.findUnique.mockResolvedValue({
       id: "2",
-      name: "Tacos",
-      description: "Foo",
-      tags: ["meat"],
+      name: "Earl Grey",
+      description: "A classic black tea",
+      tags: [{ id: "tag-meat", name: "meat", color: "#8b5e3c" }],
       reviews: [
         {
           teaId: "2",

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 type Props = {
   square?: boolean;
   setFile: (file: File) => void;
-  image: string | null;
+  image: string | null | undefined;
 };
 
 export function PhotoDrop({ square, setFile, image }: Props) {

@@ -9,18 +9,16 @@ import { Card } from "@/components/layout/Card";
 import { SectionHead } from "@/components/layout/SectionHead";
 import { Button, buttonClassName } from "@/components/primitives/Button";
 import { Tea } from "@/generated/prisma/client";
-import { TeaCreateInput } from "@/generated/prisma/models";
-import { TeaTag } from "@/lib/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export interface Props {
   id: string;
-  initialTea?: Pick<Tea, "name" | "tags" | "image">;
+  initialTea?: Pick<Tea, "name" | "image"> & { tags: string[] };
   backHref?: string;
   onSubmit?: (
-    value: TeaCreateInput,
+    value: { name: string; tags: string[] },
     file?: File | null
   ) => void | Promise<void>;
 }
@@ -34,13 +32,13 @@ export function TeaForm({
   const router = useRouter();
 
   const [name, setName] = useState<string>(initialTea.name);
-  const [tags, setTags] = useState<string[]>(initialTea.tags);
+  const [tags, setTags] = useState<string[]>(initialTea.tags ?? []);
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const toggleTag = (tag: TeaTag) =>
+  const toggleTag = (tag: string) =>
     setTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );

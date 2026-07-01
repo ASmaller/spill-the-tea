@@ -1,5 +1,9 @@
 import "dotenv/config";
-import { ReviewCreateInput, TeaCreateInput } from "@/generated/prisma/models";
+import {
+  ReviewCreateInput,
+  TagCreateInput,
+  TeaCreateInput,
+} from "@/generated/prisma/models";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
@@ -7,29 +11,57 @@ const connectionString = process.env.DATABASE_URL!;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-await prisma.tea.deleteMany({});
 await prisma.review.deleteMany({});
+await prisma.tea.deleteMany({});
+await prisma.tag.deleteMany({});
+
+const TAGS: TagCreateInput[] = [
+  {
+    name: "black",
+    color: "#333333",
+  },
+  {
+    name: "white",
+    color: "#AAAAAA",
+  },
+  {
+    name: "citrus",
+    color: "#33AAAA",
+  },
+  {
+    name: "fruity",
+    color: "#AA3333",
+  },
+];
 
 const TEAS: TeaCreateInput[] = [
   {
     name: "Earl Grey",
     description: "A simple earl grey",
-    tags: ["citrus", "black"],
+    tags: {
+      connect: [{ name: "citrus" }, { name: "black" }],
+    },
   },
   {
     name: "Black Currant",
     description: "A tasteful fruity tea",
-    tags: ["black", "fruity"],
+    tags: {
+      connect: [{ name: "black" }, { name: "fruity" }],
+    },
   },
   {
     name: "White Raspberry",
     description: "A white and fruity tea",
-    tags: ["white", "fruity"],
+    tags: {
+      connect: [{ name: "white" }, { name: "fruity" }],
+    },
   },
   {
     name: "Four red fruits",
     description: "A very fruity sweet tea",
-    tags: ["black", "fruity"],
+    tags: {
+      connect: [{ name: "black" }, { name: "fruity" }],
+    },
   },
 ];
 
@@ -145,6 +177,11 @@ const REVIEWS: ReviewCreateInput[] = [
 ];
 
 async function main() {
+  for (const tag of TAGS) {
+    await prisma.tag.create({
+      data: tag,
+    });
+  }
   for (const tea of TEAS) {
     await prisma.tea.create({
       data: tea,
@@ -155,7 +192,9 @@ async function main() {
       data: review,
     });
   }
-  console.log(`Added ${TEAS.length} teas and ${REVIEWS.length} reviews`);
+  console.log(
+    `Added ${TAGS.length} tags, ${TEAS.length} teas and ${REVIEWS.length} reviews`
+  );
 }
 
 main()

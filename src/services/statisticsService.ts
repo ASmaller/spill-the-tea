@@ -17,7 +17,7 @@ import type {
   PositiveReviewTag,
   TagBarItem,
   TeaStat,
-  TeaWithRatings,
+  TeaWithRelations,
   TrendSeries,
 } from "@/lib/types";
 import { isValidRating, NEGATIVE_TAGS, POSITIVE_TAGS } from "@/lib/types";
@@ -87,7 +87,7 @@ function getDateKeys(start: Date, days: number): string[] {
   );
 }
 
-function toTeaStat(tea: TeaWithRatings): TeaStat {
+function toTeaStat(tea: TeaWithRelations): TeaStat {
   // Compare via UTC date keys so the past/future partition matches
   // scheduleServing's storage (UTC midnight) regardless of server timezone.
   const reviews = tea.reviews;
@@ -383,6 +383,13 @@ export async function getTeaCatalog(): Promise<TeaStat[]> {
           rating: true,
         },
       },
+      tags: {
+        select: {
+          id: true,
+          name: true,
+          color: true,
+        },
+      },
     },
   });
 
@@ -464,6 +471,13 @@ export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
               name: true,
             },
           },
+        },
+      },
+      tags: {
+        select: {
+          id: true,
+          name: true,
+          color: true,
         },
       },
     },

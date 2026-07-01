@@ -36,7 +36,7 @@ model Review {
 model Tea {
   id          String   @id @default(ulid())
   name        String   @unique
-  tags        String[]
+  tags        Tag[]
   description String   @default("")
   image       String?
   reviews     Review[]
@@ -49,4 +49,12 @@ model Suggestion {
   postedDate  DateTime
   userId      String?
   user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Tag {
+  id    String @id @default(ulid())
+  name  String @unique
+  color String
+
+  teas Tea[]
 }

@@ -48,8 +48,8 @@ export default async function TeaDetailPage({ params }: PageProps) {
             tea.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 {tea.tags.map(t => (
-                  <Pill key={t} tone="neutral">
-                    {t}
+                  <Pill key={t.id} tone="neutral">
+                    {t.name}
                   </Pill>
                 ))}
               </div>

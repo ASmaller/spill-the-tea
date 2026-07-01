@@ -41,19 +41,52 @@ type Props = {
   tone?: PillTone;
   shape?: PillShape;
   size?: PillSize;
+  color?: string;
   children: ReactNode;
 };
+
+function hexToRgba(hex: string, alpha: number) {
+  const normalized = hex.replace("#", "").trim();
+
+  if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return `rgba(0, 0, 0, ${alpha})`;
+  }
+
+  const expanded =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map(char => char + char)
+          .join("")
+      : normalized;
+
+  const value = Number.parseInt(expanded, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 export function Pill({
   tone = "neutral",
   shape = "round",
   size = "md",
+  color,
   children,
 }: Props) {
+  const customStyle = color
+    ? {
+        backgroundColor: hexToRgba(color, 0.16),
+        color,
+        boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.28)}`,
+      }
+    : undefined;
+
   return (
     <span
       className={`inline-flex items-center justify-center font-semibold whitespace-nowrap ${SHAPE[shape]} ${TONE[tone]}`}
-      style={SIZE_STYLE[size]}
+      style={{ ...SIZE_STYLE[size], ...customStyle }}
     >
       {children}
     </span>
