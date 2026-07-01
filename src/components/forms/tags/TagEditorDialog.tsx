@@ -80,8 +80,11 @@ function TagEditorForm({
       }
     >
       <div key={formKey} className="flex flex-col gap-3 text-left">
-        <label className="text-ink text-sm font-medium">Tag name</label>
+        <label htmlFor="tag-name" className="text-ink text-sm font-medium">
+          Tag name
+        </label>
         <TextInput
+          id="tag-name"
           value={name}
           onChange={value => {
             setName(value);
@@ -96,15 +99,19 @@ function TagEditorForm({
           }}
         />
 
-        <label className="text-ink text-sm font-medium">Color</label>
+        <label htmlFor="tag-color" className="text-ink text-sm font-medium">
+          Color
+        </label>
         <div className="flex items-center gap-2">
           <input
+            id="tag-color"
             type="color"
             value={color}
             onChange={e => setColor(e.target.value)}
             className="border-ink/10 h-10 w-10 cursor-pointer rounded border bg-transparent p-0"
           />
           <TextInput
+            id="tag-color-text"
             value={color}
             onChange={setColor}
             className="font-mono uppercase"
@@ -124,5 +131,5 @@ export function TagEditorDialog(props: Props) {
     return null;
   }
 
-  return <TagEditorForm {...props} formKey={formKey} />;
+  return <TagEditorForm key={formKey} {...props} formKey={formKey} />;
 }

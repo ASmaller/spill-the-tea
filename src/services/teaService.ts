@@ -144,39 +144,56 @@ export async function updateTea(
       : {}),
   };
 
-  if (file && tea) {
-    if (tea.image) {
+  let uploadedImagePath: string | null = null;
+  let renameTarget: { oldDir: string; newDir: string } | null = null;
+
+  try {
+    if (file && tea) {
+      uploadedImagePath = await uploadImage(file, data.name);
+      updateData.image = uploadedImagePath;
+    }
+
+    if (tea && !file) {
+      if (tea.image && tea.name !== data.name) {
+        const uploadDir = path.join(process.cwd(), "public");
+        const extension = path.extname(tea.image) || ".jpg";
+        const filename = `${toSafeFileStem(data.name)}-${Date.now()}${extension}`;
+
+        const oldDir = path.join(uploadDir, tea.image);
+        const newDir = path.join(uploadDir, "tea", filename);
+        renameTarget = { oldDir, newDir };
+        updateData.image = `/tea/${filename}`;
+      }
+    }
+
+    if (data.tags !== undefined) {
+      updateData.tags =
+        data.tags.length > 0
+          ? { set: data.tags.map(tagName => ({ name: tagName })) }
+          : { set: [] };
+    }
+
+    const res = await prisma.tea.update({
+      where: {
+        id,
+      },
+      data: updateData,
+    });
+
+    if (file && tea?.image) {
       await unlinkImage(tea.image);
     }
-    updateData.image = await uploadImage(file, data.name);
-  }
 
-  if (tea && !file) {
-    if (tea.image && tea.name !== data.name) {
-      const uploadDir = path.join(process.cwd(), "public");
-      const extension = path.extname(tea.image) || ".jpg";
-      const filename = `${toSafeFileStem(data.name)}-${Date.now()}${extension}`;
-
-      const oldDir = path.join(uploadDir, tea.image);
-      const newDir = path.join(uploadDir, "tea", filename);
-      await rename(oldDir, newDir);
-      updateData.image = `/tea/${filename}`;
+    if (renameTarget) {
+      await rename(renameTarget.oldDir, renameTarget.newDir);
     }
+
+    return res;
+  } catch (error) {
+    if (uploadedImagePath) {
+      await unlinkImage(uploadedImagePath);
+    }
+
+    throw error;
   }
-
-  if (data.tags !== undefined) {
-    updateData.tags =
-      data.tags.length > 0
-        ? { set: data.tags.map(tagName => ({ name: tagName })) }
-        : { set: [] };
-  }
-
-  const res = await prisma.tea.update({
-    where: {
-      id,
-    },
-    data: updateData,
-  });
-
-  return res;
 }

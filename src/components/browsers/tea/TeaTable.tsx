@@ -47,7 +47,7 @@ export function TeaTable({ teas, urlPrefix }: Props) {
               style={{ gap: 4 }}
             >
               {tea.tags.map(t => (
-                <Pill key={t.id} tone="neutral">
+                <Pill key={t.id} tone="neutral" color={t.color}>
                   {t.name}
                 </Pill>
               ))}

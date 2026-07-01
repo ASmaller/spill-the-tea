@@ -23,6 +23,7 @@ type Props = {
 type SortKey = "rating" | "rating-asc" | "votes" | "name";
 type ViewKey = "grid" | "table";
 
+const ALL_TAG_KEY = "__tea_browser_all__";
 const STATUS_KEYS = ["all", "untried", "tried"] as const;
 type StatusKey = (typeof STATUS_KEYS)[number];
 
@@ -46,12 +47,24 @@ export function TeaBrowser({
   ratedIds,
   urlPrefix,
 }: Props) {
-  const tagKeys = useMemo(() => ["all", ...tags.map(t => t.name)], [tags]);
+  const tagKeys = useMemo(() => {
+    const seen = new Set<string>();
+    const keys = [ALL_TAG_KEY];
+
+    for (const tag of tags) {
+      if (!seen.has(tag.name)) {
+        seen.add(tag.name);
+        keys.push(tag.name);
+      }
+    }
+
+    return keys;
+  }, [tags]);
 
   type TagKey = (typeof tagKeys)[number];
 
   const [view, setView] = useState<ViewKey>("grid");
-  const [tag, setTag] = useState<TagKey>("all");
+  const [tag, setTag] = useState<TagKey>(ALL_TAG_KEY);
   const [status, setStatus] = useState<StatusKey>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("rating");
@@ -60,7 +73,8 @@ export function TeaBrowser({
     const lowerQuery = query.trim().toLowerCase();
     return teas
       .filter(tea => {
-        if (tag !== "all" && !tea.tags.some(t => t.name === tag)) return false;
+        if (tag !== ALL_TAG_KEY && !tea.tags.some(t => t.name === tag))
+          return false;
         if (status === "untried" && ratedIds != null && ratedIds.has(tea.id))
           return false;
         if (status === "tried" && (ratedIds == null || !ratedIds.has(tea.id)))
@@ -78,9 +92,9 @@ export function TeaBrowser({
 
   const tagCounts = useMemo(() => {
     const counts: Record<TagKey, number> = {
-      all: teas.length,
+      [ALL_TAG_KEY]: teas.length,
       ...Object.fromEntries(
-        tagKeys.filter(key => key !== "all").map(key => [key, 0])
+        tagKeys.filter(key => key !== ALL_TAG_KEY).map(key => [key, 0])
       ),
     };
     teas.forEach(tea => {
@@ -132,7 +146,9 @@ export function TeaBrowser({
               onClick={() => setTag(key)}
               count={tagCounts[key]}
             >
-              {key[0].toUpperCase() + key.substring(1)}
+              {key === ALL_TAG_KEY
+                ? "All"
+                : key[0].toUpperCase() + key.substring(1)}
             </Chip>
           ))}
         </FilterRow>
@@ -190,7 +206,7 @@ export function TeaBrowser({
               key={tea.id}
               tea={tea}
               urlPrefix={urlPrefix}
-              highlightTag={tag === "all" ? undefined : tag}
+              highlightTag={tag === ALL_TAG_KEY ? undefined : tag}
               onClick={onClick}
             />
           ))}

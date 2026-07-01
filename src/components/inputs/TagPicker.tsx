@@ -26,17 +26,19 @@ export function TagPicker({ value, onToggle }: Props) {
 
   async function refreshTags() {
     const res = await getTags();
-    setTagOptions(res ?? []);
+    return res ?? [];
   }
 
   useEffect(() => {
     let ignore = false;
 
-    void refreshTags().catch(() => {
-      if (!ignore) {
-        setTagOptions([]);
-      }
-    });
+    refreshTags()
+      .then(tags => {
+        if (!ignore) setTagOptions(tags);
+      })
+      .catch(() => {
+        if (!ignore) setTagOptions([]);
+      });
 
     return () => {
       ignore = true;
