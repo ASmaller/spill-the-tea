@@ -4,6 +4,11 @@ import { TextInput } from "@/components/inputs/TextInput";
 import { Dialog } from "@/components/layout/Dialog";
 import { Button } from "@/components/primitives/Button";
 import type { Tag } from "@/generated/prisma/client";
+import {
+  contrastRatio as calculateContrastRatio,
+  hexToRgb,
+  luminance,
+} from "@/lib/util/color";
 import { useState } from "react";
 
 const DEFAULT_COLOR = "#7c3aed";
@@ -33,6 +38,23 @@ function TagEditorForm({
   const [color, setColor] = useState(initialTag?.color ?? DEFAULT_COLOR);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const referenceBackgroundLuminance = luminance([244, 238, 225]); // From #f4eee1
+  let contrastRatio: number | null = null;
+  try {
+    const colorLuminance = luminance(hexToRgb(color));
+    contrastRatio = calculateContrastRatio(
+      colorLuminance,
+      referenceBackgroundLuminance
+    );
+  } catch {}
+
+  const warningMessage =
+    contrastRatio === null
+      ? "Unable to calculate contrast ratio, please use a valid hex color"
+      : contrastRatio < 3.0
+        ? `Contrast ratio is low (${contrastRatio.toFixed(2)}:1), tag may be difficult to read`
+        : null;
 
   async function handleSubmit() {
     const trimmedName = name.trim();
@@ -118,6 +140,9 @@ function TagEditorForm({
           />
         </div>
 
+        {warningMessage && (
+          <p className="text-amber text-xs">{warningMessage}</p>
+        )}
         {errorMessage && <p className="text-rose text-xs">{errorMessage}</p>}
       </div>
     </Dialog>
