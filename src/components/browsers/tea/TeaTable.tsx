@@ -1,6 +1,6 @@
 import { Card } from "@/components/layout/Card";
 import { Pill } from "@/components/primitives/Pill";
-import { ratingColor } from "@/lib/admin/colors";
+import { ratingColor } from "@/lib/color";
 import { FOCUS_RING } from "@/lib/styles";
 import type { TeaStat } from "@/lib/types";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 "use client";
 
-import { DIST_COLORS } from "@/lib/admin/colors";
-import { ratingTotal } from "@/lib/admin/ratings";
+import { DIST_COLORS } from "@/lib/color";
+import { ratingTotal } from "@/lib/rating";
 import {
   Bar,
   BarChart,

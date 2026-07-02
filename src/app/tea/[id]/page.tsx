@@ -14,7 +14,7 @@ import {
   interpretRatingDistribution,
   ratingAverage,
   ratingTotal,
-} from "@/lib/admin/ratings";
+} from "@/lib/rating";
 import { isAdmin } from "@/lib/session";
 import { getTeaDetail } from "@/services/statisticsService";
 import Image from "next/image";

@@ -47,12 +47,10 @@ export type TeaWithRelations = Prisma.TeaGetPayload<{
   };
 }>;
 
-export type TeaTag = Pick<Tag, "id" | "name" | "color">;
-
 export type TeaStat = {
   id: string;
   name: string;
-  tags: TeaTag[];
+  tags: Tag[];
   rating: number | null;
   votes: number;
   distribution: [number, number, number, number, number];

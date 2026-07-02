@@ -1,9 +1,9 @@
 import { SuggestionAndUser } from "@/app/admin/suggestions/page";
 import { Card } from "@/components/layout/Card";
 import { Pill } from "@/components/primitives/Pill";
-import { isNewSuggestion } from "@/lib/admin/suggestions";
 import { formatPostedDate } from "@/lib/dateFormat";
 import { FOCUS_RING } from "@/lib/styles";
+import { isNewSuggestion } from "@/lib/suggestions";
 import Link from "next/link";
 
 type Props = { suggestions: SuggestionAndUser[]; lastViewed: Date };

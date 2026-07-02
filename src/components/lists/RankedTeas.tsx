@@ -2,7 +2,7 @@
 
 import { SectionHead } from "@/components/layout/SectionHead";
 import { SelectFilter } from "@/components/search/SelectFilter";
-import { ratingColor } from "@/lib/admin/colors";
+import { ratingColor } from "@/lib/color";
 import { FOCUS_RING } from "@/lib/styles";
 import type { TeaStat } from "@/lib/types";
 import Link from "next/link";

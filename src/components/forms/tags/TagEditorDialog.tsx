@@ -8,7 +8,7 @@ import {
   contrastRatio as calculateContrastRatio,
   hexToRgb,
   luminance,
-} from "@/lib/util/color";
+} from "@/lib/color";
 import { useState } from "react";
 
 const DEFAULT_COLOR = "#5b7d6f";

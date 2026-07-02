@@ -7,9 +7,6 @@ import { addTag, getTags } from "@/services/tagService";
 import { useEffect, useState } from "react";
 
 type Props = {
-  // Loose `string[]` accepts non-DietTag legacy/orphan tags (e.g. `pasta`,
-  // `mexican`) read from existing teas. The picker still only toggles
-  // DietTag values.
   value: readonly string[];
   onToggle: (tag: string) => void;
 };

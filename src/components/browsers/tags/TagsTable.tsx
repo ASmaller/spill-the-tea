@@ -5,8 +5,8 @@ import { TagEditorDialog } from "@/components/forms/tags/TagEditorDialog";
 import { Card } from "@/components/layout/Card";
 import { Button } from "@/components/primitives/Button";
 import { Tag } from "@/generated/prisma/client";
+import { capitalizeFirstLetter } from "@/lib/strings";
 import { FOCUS_RING } from "@/lib/styles";
-import { capitalizeFirstLetter } from "@/lib/utils/strings";
 import { addTag, deleteTag, updateTag } from "@/services/tagService";
 import { useState } from "react";
 
