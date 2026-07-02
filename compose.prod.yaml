@@ -5,7 +5,7 @@ name: spill-the-tea
 
 services:
   server:
-    image: "ghcr.io/asmaller/spill-the-tea:latest"
+    image: "ghcr.io/cthit/spill-the-tea:latest"
     restart: always
     environment:
       NODE_ENV: production
