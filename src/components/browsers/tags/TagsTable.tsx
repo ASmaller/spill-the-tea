@@ -6,6 +6,7 @@ import { Card } from "@/components/layout/Card";
 import { Button } from "@/components/primitives/Button";
 import { Tag } from "@/generated/prisma/client";
 import { FOCUS_RING } from "@/lib/styles";
+import { capitalizeFirstLetter } from "@/lib/utils/strings";
 import { addTag, deleteTag, updateTag } from "@/services/tagService";
 import { useState } from "react";
 
@@ -16,10 +17,6 @@ type Props = {
   tags: Tag[];
   onTagsChange?: () => Promise<void> | void;
 };
-
-function capitalizeFirstLetter(val: string) {
-  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
-}
 
 export function TagsTable({ tags, onTagsChange }: Props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

@@ -8,6 +8,7 @@ import { SelectFilter } from "@/components/search/SelectFilter";
 import { Tag } from "@/generated/prisma/client";
 import { FOCUS_RING } from "@/lib/styles";
 import { TeaStat } from "@/lib/types";
+import { capitalizeFirstLetter } from "@/lib/utils/strings";
 import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
@@ -146,9 +147,7 @@ export function TeaBrowser({
               onClick={() => setTag(key)}
               count={tagCounts[key]}
             >
-              {key === ALL_TAG_KEY
-                ? "All"
-                : key[0].toUpperCase() + key.substring(1)}
+              {key === ALL_TAG_KEY ? "All" : capitalizeFirstLetter(key)}
             </Chip>
           ))}
         </FilterRow>
