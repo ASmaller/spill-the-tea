@@ -11,7 +11,7 @@ import {
 } from "@/lib/util/color";
 import { useState } from "react";
 
-const DEFAULT_COLOR = "#7c3aed";
+const DEFAULT_COLOR = "#5b7d6f";
 
 type Props = {
   open: boolean;

@@ -11,7 +11,6 @@ import { addTag, deleteTag, updateTag } from "@/services/tagService";
 import { useState } from "react";
 
 const COLS = "minmax(0, 2fr) minmax(0, 1fr) 96px 96px";
-const DEFAULT_COLOR = "#7c3aed";
 
 type Props = {
   tags: Tag[];
@@ -89,8 +88,6 @@ export function TagsTable({ tags, onTagsChange }: Props) {
         >
           <div>Name</div>
           <div>Color</div>
-          <div>Edit</div>
-          <div>Delete</div>
         </div>
 
         {tags.length === 0 ? (
@@ -111,7 +108,7 @@ export function TagsTable({ tags, onTagsChange }: Props) {
               <div className="flex min-w-0 items-center gap-2">
                 <div
                   className="border-ink/10 h-3.5 w-3.5 rounded-full border"
-                  style={{ backgroundColor: tag.color ?? DEFAULT_COLOR }}
+                  style={{ backgroundColor: tag.color }}
                 />
                 <div className="text-ink inline-block truncate font-medium">
                   {capitalizeFirstLetter(tag.name)}
@@ -121,12 +118,12 @@ export function TagsTable({ tags, onTagsChange }: Props) {
                 <span
                   className="rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase"
                   style={{
-                    borderColor: tag.color ?? DEFAULT_COLOR,
-                    color: tag.color ?? DEFAULT_COLOR,
-                    backgroundColor: `${tag.color ?? DEFAULT_COLOR}18`,
+                    borderColor: tag.color,
+                    color: tag.color,
+                    backgroundColor: `${tag.color}18`,
                   }}
                 >
-                  {tag.color ?? DEFAULT_COLOR}
+                  {tag.color}
                 </span>
               </div>
               <div className="min-w-0">
