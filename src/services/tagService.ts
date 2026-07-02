@@ -5,7 +5,7 @@ import { TagCreateInput, TagUpdateInput } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
 
 export async function getTags(): Promise<Tag[] | null> {
-  return prisma.tag.findMany({});
+  return prisma.tag.findMany({ orderBy: { name: "asc" } });
 }
 
 async function runTagMutation<T>(

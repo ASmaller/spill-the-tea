@@ -41,6 +41,16 @@ const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   name: (a, b) => a.name.localeCompare(b.name),
 };
 
+const sortTags = (tag?: string) => (a: Tag, b: Tag) => {
+  if (a.name === tag) {
+    return -1;
+  } else if (b.name === tag) {
+    return 1;
+  } else {
+    return a.name.localeCompare(b.name);
+  }
+};
+
 export function TeaBrowser({
   onClick,
   teas,
@@ -48,24 +58,10 @@ export function TeaBrowser({
   ratedIds,
   urlPrefix,
 }: Props) {
-  const tagKeys = useMemo(() => {
-    const seen = new Set<string>();
-    const keys = [ALL_TAG_KEY];
-
-    for (const tag of tags) {
-      if (!seen.has(tag.name)) {
-        seen.add(tag.name);
-        keys.push(tag.name);
-      }
-    }
-
-    return keys;
-  }, [tags]);
-
-  type TagKey = (typeof tagKeys)[number];
+  const tagKeys = [ALL_TAG_KEY, ...tags.map(t => t.name).toSorted()];
 
   const [view, setView] = useState<ViewKey>("grid");
-  const [tag, setTag] = useState<TagKey>(ALL_TAG_KEY);
+  const [tag, setTag] = useState<string>(ALL_TAG_KEY);
   const [status, setStatus] = useState<StatusKey>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("rating");
@@ -88,24 +84,27 @@ export function TeaBrowser({
         }
         return true;
       })
+      .map(tea => {
+        tea.tags.sort(tag === ALL_TAG_KEY ? sortTags() : sortTags(tag));
+        return tea;
+      })
       .sort(SORT_COMPARE[sort]);
   }, [teas, ratedIds, tag, status, query, sort]);
 
   const tagCounts = useMemo(() => {
-    const counts: Record<TagKey, number> = {
+    const counts: Record<string, number> = {
       [ALL_TAG_KEY]: teas.length,
-      ...Object.fromEntries(
-        tagKeys.filter(key => key !== ALL_TAG_KEY).map(key => [key, 0])
-      ),
+      ...Object.fromEntries(tags.map(tag => [tag.name, 0])),
     };
     teas.forEach(tea => {
-      tagKeys.forEach(key => {
-        if (key !== "all" && tea.tags.some(t => t.name === key))
-          counts[key] += 1;
-      });
+      tags
+        .map(t => t.name)
+        .forEach(key => {
+          if (tea.tags.some(t => t.name === key)) counts[key] += 1;
+        });
     });
     return counts;
-  }, [teas, tagKeys]);
+  }, [teas, tags]);
 
   const statusCounts = useMemo(() => {
     const triedCount = teas.filter(
@@ -205,7 +204,6 @@ export function TeaBrowser({
               key={tea.id}
               tea={tea}
               urlPrefix={urlPrefix}
-              highlightTag={tag === ALL_TAG_KEY ? undefined : tag}
               onClick={onClick}
             />
           ))}

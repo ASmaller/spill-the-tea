@@ -40,6 +40,9 @@ export async function getTeaById(id: string): Promise<TeaWithTags | null> {
           name: true,
           color: true,
         },
+        orderBy: {
+          name: "asc",
+        },
       },
     },
   });

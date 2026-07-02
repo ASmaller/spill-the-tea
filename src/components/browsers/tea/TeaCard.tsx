@@ -10,24 +10,10 @@ import Link from "next/link";
 type Props = {
   tea: TeaStat;
   urlPrefix: string;
-  highlightTag?: string;
   onClick?: (id: string) => void;
 };
 
-export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
-  const tags =
-    highlightTag !== undefined
-      ? tea.tags.toSorted((a, b) => {
-          if (a.name === highlightTag) {
-            return -1;
-          } else if (b.name === highlightTag) {
-            return 1;
-          } else {
-            return a.name.localeCompare(b.name);
-          }
-        })
-      : tea.tags.toSorted((a, b) => a.name.localeCompare(b.name));
-
+export function TeaCard({ tea, urlPrefix, onClick }: Props) {
   return (
     <Link
       href={urlPrefix + tea.id}
@@ -48,14 +34,10 @@ export function TeaCard({ tea, urlPrefix, highlightTag, onClick }: Props) {
             <span className="block max-w-full overflow-hidden text-nowrap text-ellipsis">
               {tea.name}
             </span>
-            {tags.length > 0 && (
+            {tea.tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
-                {tags.map(t => (
-                  <Pill
-                    key={t.name}
-                    tone={t.name === highlightTag ? "warn" : "neutral"}
-                    color={t.color}
-                  >
+                {tea.tags.map(t => (
+                  <Pill key={t.name} color={t.color}>
                     {t.name}
                   </Pill>
                 ))}

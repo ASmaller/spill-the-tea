@@ -479,6 +479,9 @@ export async function getTeaDetail(teaId: string): Promise<TeaDetail | null> {
           name: true,
           color: true,
         },
+        orderBy: {
+          name: "asc",
+        },
       },
     },
   });
