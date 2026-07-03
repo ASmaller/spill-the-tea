@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog } from "@/components/layout/Dialog";
+import { ConfirmDeleteDialog } from "@/components/actions/ConfirmDeleteDialog";
 import { Button } from "@/components/primitives/Button";
 import { Tea } from "@/generated/prisma/client";
 import { deleteTeaById } from "@/services/teaService";
@@ -32,24 +32,19 @@ export function DeleteTeaButton({ tea }: Props) {
         Delete
       </Button>
 
-      <Dialog
+      <ConfirmDeleteDialog
         open={showDelete}
         onClose={() => setShowDelete(false)}
+        onConfirm={confirmDelete}
         title={`Delete ${tea.name}?`}
-        footer={
+        description={
           <>
-            <Button type="button" onClick={() => setShowDelete(false)}>
-              Cancel
-            </Button>
-            <Button primary danger type="button" onClick={confirmDelete}>
-              Delete tea
-            </Button>
+            The tea will be removed from the catalog. Past ratings stay in your
+            reports but the tea won&apos;t be visible to users.
           </>
         }
-      >
-        The tea will be removed from the catalog. Past ratings stay in your
-        reports but the tea won&apos;t be visible to users.
-      </Dialog>
+        confirmLabel="Delete tea"
+      />
     </div>
   );
 }

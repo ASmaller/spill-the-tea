@@ -1,6 +1,6 @@
 "use client";
 
-import { DIST_COLORS } from "@/lib/admin/colors";
+import { DIST_COLORS } from "@/lib/color";
 import {
   Bar,
   BarChart,

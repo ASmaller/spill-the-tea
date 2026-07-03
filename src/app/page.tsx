@@ -1,13 +1,16 @@
 "use client";
 
 import { TeaBrowser } from "@/components/browsers/tea/TeaBrowser";
+import { Tag } from "@/generated/prisma/client";
 import { TeaStat } from "@/lib/types";
 import { getMyRatings } from "@/services/reviewService";
 import { getTeaCatalog } from "@/services/statisticsService";
+import { getTags } from "@/services/tagService";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
   const [teas, setTeas] = useState<TeaStat[] | null>(null);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -33,6 +36,16 @@ export default function Home() {
         console.error("Failed to fetch teas: ", error);
       });
 
+    getTags()
+      .then(tags => {
+        if (!ignore) {
+          setTags(tags ? tags : []);
+        }
+      })
+      .catch(error => {
+        console.error("Failed to fetch tags: ", error);
+      });
+
     return () => {
       ignore = true;
     };
@@ -45,7 +58,12 @@ export default function Home() {
       style={{ padding: "24px 28px" }}
     >
       {teas != null ? (
-        <TeaBrowser teas={teas} ratedIds={ratedIds} urlPrefix="/tea/" />
+        <TeaBrowser
+          teas={teas}
+          tags={tags}
+          ratedIds={ratedIds}
+          urlPrefix="/tea/"
+        />
       ) : (
         <span>Loading teas...</span>
       )}

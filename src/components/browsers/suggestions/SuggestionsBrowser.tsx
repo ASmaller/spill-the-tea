@@ -6,7 +6,7 @@ import { Chip } from "@/components/primitives/Chip";
 import { FilterRow } from "@/components/search/FilterRow";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SelectFilter } from "@/components/search/SelectFilter";
-import { isNewSuggestion } from "@/lib/admin/suggestions";
+import { isNewSuggestion } from "@/lib/suggestions";
 import { useMemo, useState } from "react";
 import { SuggestionsTable } from "./SuggestionsTable";
 

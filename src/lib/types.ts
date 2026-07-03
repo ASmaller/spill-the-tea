@@ -1,4 +1,4 @@
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma, Tag } from "@/generated/prisma/client";
 import z from "zod";
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
@@ -34,14 +34,23 @@ export type PositiveReviewTag = (typeof POSITIVE_TAGS)[number];
 export type NegativeReviewTag = (typeof NEGATIVE_TAGS)[number];
 export type ReviewTag = PositiveReviewTag | NegativeReviewTag;
 
-export type TeaWithRatings = Prisma.TeaGetPayload<{
-  include: { reviews: { select: { rating: true } } };
+export type TeaWithRelations = Prisma.TeaGetPayload<{
+  include: {
+    reviews: { select: { rating: true } };
+    tags: {
+      select: {
+        id: true;
+        name: true;
+        color: true;
+      };
+    };
+  };
 }>;
 
 export type TeaStat = {
   id: string;
   name: string;
-  tags: string[];
+  tags: Tag[];
   rating: number | null;
   votes: number;
   distribution: [number, number, number, number, number];
@@ -53,23 +62,6 @@ export type TeaForm = {
   tags: string[];
   image: string;
 };
-
-// TODO: Move to database and allow admin user to update
-export const TAG_OPTIONS = [
-  "black",
-  "citrus",
-  "fruity",
-  "white",
-  "chai",
-] as const;
-export type TeaTag = (typeof TAG_OPTIONS)[number];
-
-export function isTeaTag(maybeTeaTag: unknown): maybeTeaTag is TeaTag {
-  return (
-    typeof maybeTeaTag === "string" &&
-    (TAG_OPTIONS as readonly string[]).includes(maybeTeaTag)
-  );
-}
 
 export type TrendSeries = {
   name: string;

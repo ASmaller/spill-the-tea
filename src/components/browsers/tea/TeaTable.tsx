@@ -1,6 +1,6 @@
 import { Card } from "@/components/layout/Card";
 import { Pill } from "@/components/primitives/Pill";
-import { ratingColor } from "@/lib/admin/colors";
+import { ratingColor } from "@/lib/color";
 import { FOCUS_RING } from "@/lib/styles";
 import type { TeaStat } from "@/lib/types";
 import Link from "next/link";
@@ -47,8 +47,8 @@ export function TeaTable({ teas, urlPrefix }: Props) {
               style={{ gap: 4 }}
             >
               {tea.tags.map(t => (
-                <Pill key={t} tone="neutral">
-                  {t}
+                <Pill key={t.id} tone="neutral" color={t.color}>
+                  {t.name}
                 </Pill>
               ))}
             </div>
