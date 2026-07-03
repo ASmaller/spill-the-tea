@@ -47,7 +47,11 @@ function TagEditorForm({
       colorLuminance,
       referenceBackgroundLuminance
     );
-  } catch {}
+  } catch (error) {
+    setErrorMessage(
+      error instanceof Error ? error.message : "Could not save tag."
+    );
+  }
 
   const warningMessage =
     contrastRatio === null
