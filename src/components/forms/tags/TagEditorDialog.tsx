@@ -47,11 +47,7 @@ function TagEditorForm({
       colorLuminance,
       referenceBackgroundLuminance
     );
-  } catch (error) {
-    setErrorMessage(
-      error instanceof Error ? error.message : "Could not save tag."
-    );
-  }
+  } catch {}
 
   const warningMessage =
     contrastRatio === null
@@ -72,6 +68,10 @@ function TagEditorForm({
     try {
       await onSubmit({ name: trimmedName, color });
       onClose();
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Could not save tag."
+      );
     } finally {
       setIsSubmitting(false);
     }
