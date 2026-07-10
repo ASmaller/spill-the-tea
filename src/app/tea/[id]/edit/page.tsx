@@ -2,9 +2,12 @@
 
 import { TeaForm } from "@/components/forms/tea/TeaForm";
 import { PageShell } from "@/components/layout/PageShell";
-import { Tea } from "@/generated/prisma/client";
-import { TeaCreateInput } from "@/generated/prisma/models";
-import { getTeaById, updateTea } from "@/services/teaService";
+import {
+  getTeaById,
+  updateTea,
+  type TeaFormValues,
+  type TeaWithTags,
+} from "@/services/teaService";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
@@ -17,7 +20,7 @@ export default function EditTeaPage({
 
   const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [tea, setTea] = useState<Tea | null>(null);
+  const [tea, setTea] = useState<TeaWithTags | null>(null);
 
   useEffect(() => {
     getTeaById(id)
@@ -39,6 +42,12 @@ export default function EditTeaPage({
     return <p>Could not find tea</p>;
   }
 
+  const initialTea = {
+    name: tea.name,
+    image: tea.image,
+    tags: tea.tags.map(tag => tag.name),
+  };
+
   return (
     <>
       <PageShell
@@ -53,9 +62,14 @@ export default function EditTeaPage({
           <TeaForm
             id={"edit-tea-form"}
             backHref={`/tea/${id}`}
-            initialTea={tea}
-            onSubmit={async (tea: TeaCreateInput, file?: File | null) => {
-              const created = await updateTea(id, tea, file ?? undefined);
+            initialTea={initialTea}
+            onSubmit={async (tea: TeaFormValues, file?: File | null) => {
+              const payload: TeaFormValues = {
+                name: tea.name,
+                tags: tea.tags,
+              };
+
+              const created = await updateTea(id, payload, file ?? undefined);
               router.push(`/tea/${created.id}`);
             }}
           />

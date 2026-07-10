@@ -14,7 +14,7 @@ import {
   interpretRatingDistribution,
   ratingAverage,
   ratingTotal,
-} from "@/lib/admin/ratings";
+} from "@/lib/rating";
 import { isAdmin } from "@/lib/session";
 import { getTeaDetail } from "@/services/statisticsService";
 import Image from "next/image";
@@ -48,8 +48,8 @@ export default async function TeaDetailPage({ params }: PageProps) {
             tea.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 {tea.tags.map(t => (
-                  <Pill key={t} tone="neutral">
-                    {t}
+                  <Pill key={t.id} tone="neutral" color={t.color}>
+                    {t.name}
                   </Pill>
                 ))}
               </div>

@@ -5,8 +5,10 @@ import { Chip } from "@/components/primitives/Chip";
 import { FilterRow } from "@/components/search/FilterRow";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SelectFilter } from "@/components/search/SelectFilter";
+import { Tag } from "@/generated/prisma/client";
+import { capitalizeFirstLetter } from "@/lib/strings";
 import { FOCUS_RING } from "@/lib/styles";
-import { TAG_OPTIONS, TeaStat } from "@/lib/types";
+import { TeaStat } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaTable } from "./TeaTable";
@@ -14,6 +16,7 @@ import { TeaTable } from "./TeaTable";
 type Props = {
   onClick?: (id: string) => void;
   teas: TeaStat[];
+  tags: Tag[];
   ratedIds?: Set<string>;
   urlPrefix: string;
 };
@@ -21,9 +24,7 @@ type Props = {
 type SortKey = "rating" | "rating-asc" | "votes" | "name";
 type ViewKey = "grid" | "table";
 
-const TAG_KEYS = ["all", ...TAG_OPTIONS] as const;
-type TagKey = (typeof TAG_KEYS)[number];
-
+const ALL_TAG_KEY = "__tea_browser_all__";
 const STATUS_KEYS = ["all", "untried", "tried"] as const;
 type StatusKey = (typeof STATUS_KEYS)[number];
 
@@ -40,9 +41,27 @@ const SORT_COMPARE: Record<SortKey, (a: TeaStat, b: TeaStat) => number> = {
   name: (a, b) => a.name.localeCompare(b.name),
 };
 
-export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
+const sortTags = (tag?: string) => (a: Tag, b: Tag) => {
+  if (a.name === tag) {
+    return -1;
+  } else if (b.name === tag) {
+    return 1;
+  } else {
+    return a.name.localeCompare(b.name);
+  }
+};
+
+export function TeaBrowser({
+  onClick,
+  teas,
+  tags,
+  ratedIds,
+  urlPrefix,
+}: Props) {
+  const tagKeys = [ALL_TAG_KEY, ...tags.map(t => t.name).toSorted()];
+
   const [view, setView] = useState<ViewKey>("grid");
-  const [tag, setTag] = useState<TagKey>("all");
+  const [tag, setTag] = useState<string>(ALL_TAG_KEY);
   const [status, setStatus] = useState<StatusKey>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("rating");
@@ -51,7 +70,8 @@ export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
     const lowerQuery = query.trim().toLowerCase();
     return teas
       .filter(tea => {
-        if (tag !== "all" && !tea.tags.includes(tag)) return false;
+        if (tag !== ALL_TAG_KEY && !tea.tags.some(t => t.name === tag))
+          return false;
         if (status === "untried" && ratedIds != null && ratedIds.has(tea.id))
           return false;
         if (status === "tried" && (ratedIds == null || !ratedIds.has(tea.id)))
@@ -59,30 +79,32 @@ export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
         if (lowerQuery !== "") {
           const matches =
             tea.name.toLowerCase().includes(lowerQuery) ||
-            tea.tags.some(t => t.toLowerCase().includes(lowerQuery));
+            tea.tags.some(t => t.name.toLowerCase().includes(lowerQuery));
           if (!matches) return false;
         }
         return true;
+      })
+      .map(tea => {
+        tea.tags.sort(tag === ALL_TAG_KEY ? sortTags() : sortTags(tag));
+        return tea;
       })
       .sort(SORT_COMPARE[sort]);
   }, [teas, ratedIds, tag, status, query, sort]);
 
   const tagCounts = useMemo(() => {
-    const counts: Record<TagKey, number> = {
-      all: teas.length,
-      black: 0,
-      chai: 0,
-      citrus: 0,
-      fruity: 0,
-      white: 0,
+    const counts: Record<string, number> = {
+      [ALL_TAG_KEY]: teas.length,
+      ...Object.fromEntries(tags.map(tag => [tag.name, 0])),
     };
     teas.forEach(tea => {
-      TAG_KEYS.forEach(key => {
-        if (key !== "all" && tea.tags.includes(key)) counts[key] += 1;
-      });
+      tags
+        .map(t => t.name)
+        .forEach(key => {
+          if (tea.tags.some(t => t.name === key)) counts[key] += 1;
+        });
     });
     return counts;
-  }, [teas]);
+  }, [teas, tags]);
 
   const statusCounts = useMemo(() => {
     const triedCount = teas.filter(
@@ -117,14 +139,14 @@ export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
         </div>
 
         <FilterRow label="Tag">
-          {TAG_KEYS.map(key => (
+          {tagKeys.map(key => (
             <Chip
               key={key}
               active={tag === key}
               onClick={() => setTag(key)}
               count={tagCounts[key]}
             >
-              {key[0].toUpperCase() + key.substring(1)}
+              {key === ALL_TAG_KEY ? "All" : capitalizeFirstLetter(key)}
             </Chip>
           ))}
         </FilterRow>
@@ -182,7 +204,6 @@ export function TeaBrowser({ onClick, teas, ratedIds, urlPrefix }: Props) {
               key={tea.id}
               tea={tea}
               urlPrefix={urlPrefix}
-              highlightTag={tag === "all" ? undefined : tag}
               onClick={onClick}
             />
           ))}
@@ -203,7 +224,7 @@ function ViewPicker({
 }) {
   return (
     <div
-      className="border-ink/[0.10] flex overflow-hidden border"
+      className="border-ink/10 flex overflow-hidden border"
       style={{ borderRadius: 7 }}
     >
       {(["grid", "table"] satisfies ViewKey[]).map(v => {
