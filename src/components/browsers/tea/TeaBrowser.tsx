@@ -269,9 +269,8 @@ function ViewPicker({
 function selectTeaOfTheDay(teas: TeaStat[]): TeaStat {
   const currentDate = new Date(Date.now());
   const teaOfTheDayIndex =
-    (currentDate.getDate() *
-      currentDate.getMonth() *
-      currentDate.getFullYear()) %
+    (currentDate.getDate() +
+      currentDate.getMonth() * currentDate.getFullYear()) %
     teas.length;
   return teas[teaOfTheDayIndex];
 }
