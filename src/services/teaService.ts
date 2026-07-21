@@ -5,6 +5,7 @@ import path from "path";
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaUpdateInput } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
+import { TeaStat } from "@/lib/types";
 
 export type TeaFormValues = {
   name: string;
@@ -199,16 +200,4 @@ export async function updateTea(
 
     throw error;
   }
-}
-
-export async function getRandomTea(): Promise<Tea | null> {
-  const res = await getTeas().then((teas) => {
-    if (teas == null) {
-      return null
-    }
-    const randomIndex = Math.floor(Math.random() * teas.length)
-    return teas[randomIndex]
-  }
-  )
-  return res
 }
