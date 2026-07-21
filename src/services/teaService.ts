@@ -5,7 +5,6 @@ import path from "path";
 import { Prisma, Tea } from "@/generated/prisma/client";
 import { TeaUpdateInput } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
-import { TeaStat } from "@/lib/types";
 
 export type TeaFormValues = {
   name: string;

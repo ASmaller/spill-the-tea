@@ -9,7 +9,7 @@ import { Tag } from "@/generated/prisma/client";
 import { capitalizeFirstLetter } from "@/lib/strings";
 import { FOCUS_RING } from "@/lib/styles";
 import { TeaStat } from "@/lib/types";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { TeaCard } from "./TeaCard";
 import { TeaOfTheDay } from "./TeaOfTheDay";
 import { TeaTable } from "./TeaTable";
@@ -210,9 +210,7 @@ export function TeaBrowser({
                 onClick={onClick}
               ></TeaOfTheDay>
             </div>
-          ) : (
-            false
-          )}
+          ) : null}
 
           {filtered
             .filter(tea => {
